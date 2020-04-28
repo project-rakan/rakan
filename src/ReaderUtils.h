@@ -37,6 +37,9 @@ class CRC {
   //  - false otherwise
   bool FoldIntoBytes(uint8_t byte);
 
+  // Returns the final state of the CRC.
+  uint32_t GetFinalState();
+
  private:
   // Initialize the table_ to the appropriate values according to the
   // CRC32 algorithm.
