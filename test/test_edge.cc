@@ -1,3 +1,0 @@
-namespace rakan {
-
-}   // namespace rakan
