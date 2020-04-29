@@ -1,6 +1,7 @@
 #include "../src/Reader.h"
 
-#include <stdio.h>    // for (FILE *)
+#include <stdio.h>        // for (FILE *)
+#include "gtest/gtest.h"
 
 namespace rakan {
 

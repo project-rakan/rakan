@@ -1,4 +1,5 @@
 #include "../src/ReaderUtils.h"
+#include "gtest/gtest.h"
 
 namespace rakan {
 
