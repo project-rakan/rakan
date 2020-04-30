@@ -83,6 +83,10 @@ class Graph {
   // in another district.
   unordered_map<int, unordered_map<int, vector<int>>>
                                     perim_nodes_to_neighbors_;
+  
+  // A map of the district ID to another map of the demographics
+  // in that district.
+  unordered_map<int, unordered_map<string, int>> demographics;
 
   // Metric parameters.
   double alpha_;
