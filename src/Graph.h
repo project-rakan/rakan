@@ -1,11 +1,16 @@
 #ifndef GRAPH_H_
 #define GRAPH_H_
 
-#include <inttypes.h>      // for uint32_t
-#include <stdio.h>         // for FILE *
-#include <unordered_map>   // for std::unordered_map
-#include <vector>          // for std::vector
+#include <bits/stdc++.h>    // for std::unordered_set
+#include <inttypes.h>       // for uint32_t
+#include <stdio.h>          // for FILE *
+#include <memory>           // for std::unique_ptr
+#include <unordered_map>    // for std::unordered_map
+#include <vector>           // for std::vector
 
+#include "Reader.h"        // for reading index file
+
+using std::unordered_set;
 using std::unordered_map;
 using std::vector;
 
@@ -31,7 +36,7 @@ class Graph {
   // Returns:
   //  - true iff loading successful
   //  - false otherwise
-  bool LoadGraph(uint32_t num_districts, FILE *file = nullptr);
+  bool LoadGraph(const uint32_t num_districts, const FILE *file = nullptr);
 
   // Adds a node to this graph.
   //
@@ -41,7 +46,7 @@ class Graph {
   // Returns:
   //  - true iff adding node successful
   //  - false if node already exists
-  bool AddNode(Node& node);
+  bool AddNode(const Node& node);
 
   // Adds an edge between the two supplied nodes. Both nodes
   // must exist on the graph.
@@ -69,30 +74,40 @@ class Graph {
   void set_eta(int val) { eta_ = val; }
 
  private:
+  uint32_t num_districts_;
+  Reader *reader_;
+
   // A vector of all the nodes on this graph.
-  vector<Node> nodes_;
+  vector<Node *> *nodes_;
 
-  // A map of the district ID to the nodes in it.
-  unordered_map<int, int> nodes_in_district_;
+  // An array of pointers to sets. The index of the array
+  // is the district ID, and the pointer at the index points
+  // to a set of nodes in that district.
+  unordered_set<int> *nodes_in_district_;
 
-  // A map of the district ID to the nodes on its perimeter.
-  unordered_map<int, int> nodes_on_perim_;
+  // An array of pointers to sets. The index of the array
+  // is the district ID, and the pointer at the index points
+  // to a set of nodes on the perimeter of that district.
+  unordered_set<int> *nodes_on_perim_;
 
   // A map of the district ID to another map of the nodes
   // on the perimeter of that district to the list of neighbors
   // in another district.
-  unordered_map<int, unordered_map<int, vector<int>>>
-                                    perim_nodes_to_neighbors_;
+  unordered_map<int, unordered_map<int, vector<int> *> *>
+                                    *perim_nodes_to_neighbors_;
   
   // A map of the district ID to another map of the demographics
   // in that district.
-  unordered_map<int, unordered_map<string, int>> demographics;
+  unordered_map<int, unordered_map<string, int> *> *demographics;
 
   // Metric parameters.
   double alpha_;
   double beta_;
   double gamma_;
   double eta_;
+
+  // Needed for populating data structures in graph from file.
+  friend class Reader;
 };        // class Graph
 
 }         // namespace rakan

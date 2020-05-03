@@ -17,14 +17,14 @@ class Node {
   Node();
 
   // Constructor with a unique ID.
-  Node(int id);
+  Node(const int id);
 
   // Constructor with a unique ID and a district ID.
-  Node(int id, int district);
+  Node(const int id, const int district);
 
   // Constructor with a unique ID, a district ID, and a list
   // of neighbors.
-  Node(int id, int district, vector<int>& neighbors);
+  Node(const int id, const int district, const vector<int>& neighbors);
 
   // Destructor.
   ~Node();
@@ -44,35 +44,35 @@ class Node {
   // Returns the district this node resides in.
   int get_district() { return district_; }
 
+  // Sets the total population in this node to be val.
+  bool set_tot_population(const int val) {
+    demographics.insert(std::make_pair<>("tot", val));
+  }
+
   // Sets the African American population in this node to
   // be val.
-  bool set_aa_population(int val) {
+  bool set_aa_population(const int val) {
     demographics.insert(std::make_pair<>("aa", val));
   }
 
   // Sets the American Indian population in this node to
   // be val.
-  bool set_ai_population(int val) {
+  bool set_ai_population(const int val) {
     demographics.insert(std::make_pair<>("ai", val));
   }
 
   // Sets the Asian population in this node to be val.
-  bool set_aa_population(int val) {
+  bool set_aa_population(const int val) {
     demographics.insert(std::make_pair<>("as", val));
   }
 
   // Sets the Caucasian population in this node to be val.
-  bool set_ca_population(int val) {
+  bool set_ca_population(const int val) {
     demographics.insert(std::make_pair<>("cs", val));
   }
 
-  // Sets the Latinx population in this node to be val.
-  bool set_la_population(int val) {
-    demographics.insert(std::make_pair<>("la", val));
-  }
-
   // Sets the other population in this node to be val.
-  bool set_o_population(int val) {
+  bool set_o_population(const int val) {
     demographics.insert(std::make_pair<>("o", val));
   }
 

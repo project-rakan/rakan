@@ -27,37 +27,22 @@ typedef struct header_struct {
 // single node record. The number of node records
 // should be specified in the header.
 //
-// A node record should each be 12 bytes.
+// A node record should each be 8 bytes.
 typedef struct node_record_struct {
-  uint32_t num_vertices;    // 4 bytes
   uint32_t num_neighbors;   // 4 bytes
   uint32_t node_pos;        // 4 bytes
 } NodeRecord;
 
 class Reader {
  public:
-  // Two argument constructor.
-  //
-  // Arguments:
-  //  - fpath: the path to the index file
-  explicit Reader(const string& fpath, bool validate = true);
+  // Default constructor.
+  Reader();
 
-  // Manufactures and returns a HeaderReader for this index file.
-  // A HeaderReader is a derived class of Reader that is specialized
-  // to read the header of the index file.
-  HeaderReader* NewHeaderReader();
+  // Default destructor.
+  ~Reader();
 
-  // Manufactures and returns a NodeReader for this index file. A NodeReader
-  // is a derived class of reader that is specialized to read a node in the
-  // index file.
-  NodeReader* NewNodeReader();
-
- protected:
-  // A pointer to the file to read.
-  FILE *file_;
-
-  // A cached copy of the file header.
-  Header header;
+  // Reads the file and loads information onto graph.
+  ReadFileToGraph(const FILE *file, Graph *graph);
 
  private:
   // Needed for unit tests.
