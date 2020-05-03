@@ -82,7 +82,7 @@ class Graph {
   // Returns:
   //  - true iff the node exists on the graph
   //  - false otherwise
-  bool ContainsNode(const Node& node);
+  bool ContainsNode(const Node& node) const;
 
   // Queries whether or not an edge exists between the two nodes.
   //
@@ -93,7 +93,7 @@ class Graph {
   // Returns:
   //  - true iff the nodes exist and an edge exists between them
   //  - false otherwise
-  bool ContainsEdge(const Node& node1, const Node& node2);
+  bool ContainsEdge(const Node& node1, const Node& node2) const;
 
   // Queries whether or not the node exists in the district.
   //
@@ -104,7 +104,7 @@ class Graph {
   // Returns:
   //  - true iff the node exists on the graph and is in distric
   //  - false otherwise
-  bool NodeExistsInDistrict(const Node& node, uint32_t district);
+  bool NodeExistsInDistrict(const Node& node, uint32_t district) const;
 
   /////////////////////////////////////////////////////////////////////////////
   // Accessor methods
@@ -117,7 +117,7 @@ class Graph {
   //
   // Returns:
   //  - a pointer to the set of nodes in the district
-  unordered_set<int>* GetNodesInDistrict(uint32_t district);
+  unordered_set<int>* GetNodesInDistrict(const uint32_t district) const;
 
   // Gets the set of nodes on the given district's perimeter.
   //
@@ -126,19 +126,19 @@ class Graph {
   //
   // Returns:
   //  - a pointer to the set of nodes on the district perimeter
-  unordered_set<int>* GetPerimNodes(uint32_t district);
+  unordered_set<int>* GetPerimNodes(const uint32_t district) const;
 
   // Gets the set of neighbors of the node. Assumes the node is on the
   // perimeter of the given district.
   //
   // Arguments:
   //  - district: the district that the perim_node resides in
-  //  - perim_node: the node to get the neighbors of
+  //  - node: the node to get the neighbors of
   //
   // Returns:
   //  - a pointer to the set of neighbor nodes of perim_node
-  unordered_set<int>* GetPerimNodeNeighbors(uint32_t district,
-                                            uint32_t perim_node);
+  unordered_set<int>* GetPerimNodeNeighbors(const uint32_t district,
+                                            const uint32_t node) const;
 
   // Gets the total population of the given district.
   //
@@ -147,7 +147,7 @@ class Graph {
   //
   // Returns:
   //  - the total population of the given district
-  uint32_t GetTotalPop(uint32_t district);
+  uint32_t GetTotalPop(const uint32_t district) const;
 
   // Gets the total minority population of the given district.
   //
@@ -156,16 +156,16 @@ class Graph {
   //
   // Returns:
   //  - the total minority population of the given district
-  uint32_t GetMinorityPop(uint32_t district);
+  uint32_t GetMinorityPop(const uint32_t district) const;
 
   /////////////////////////////////////////////////////////////////////////////
   // Mutator methods
   /////////////////////////////////////////////////////////////////////////////
 
-  void SetAlpha(double val) { alpha_ = val; }
-  void SetBeta(double val) { beta_ = val; }
-  void SetGamma(double val) { gamma_ = val; }
-  void SetEta(double val) { eta_ = val; }
+  void SetAlpha(const double val) { alpha_ = val; }
+  void SetBeta(const double val) { beta_ = val; }
+  void SetGamma(const double val) { gamma_ = val; }
+  void SetEta(const double val) { eta_ = val; }
 
  private:
   uint32_t num_nodes_;
@@ -196,6 +196,16 @@ class Graph {
   // A map of the district ID to another map of the demographics
   // in that district.
   unordered_map<int, unordered_map<string, int> *> *demographics;
+
+  // An array of populations. The index of the array is the district
+  // ID. The value at that index corresponds to the population in
+  // that district.
+  uint32_t *pop_by_district_;
+
+  // An array of minority populations. The index of the array is
+  // the district ID. The value at that index corresponds to the
+  // minority population in that district.
+  uint32_t *min_pop_by_district_;
 
   // Metric parameters.
   double alpha_;

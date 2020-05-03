@@ -35,7 +35,7 @@ Graph::~Graph() {
   delete[] perim_nodes_to_neighbors_;
 }
 
-bool Graph::LoadGraph(FILE *file) {
+bool Graph::LoadGraph(const FILE *file) {
   return reader_.ReadFileToGraph(file, this) == SUCCESS;
 }
 
@@ -57,38 +57,43 @@ bool Graph::AddEdge(Node& node1, Node& node2) {
     AddNode(node2);
   }
 
-  node1.neighbors_->push_back(node2.id_);
-  node2.neighbors_->push_back(node1.id_);
-  return true;
+  return Node::AddNeighbor(node1, node2);
 }
 
-bool Graph::ContainsNode(const Node& node) {
+bool Graph::ContainsNode(const Node& node) const {
   return nodes_[node.id_] == node;    // uses == in Node.cc
 }
 
-bool Graph::ContainsEdge(const Node& node1, const Node& node2) {
-  // TODO
+bool Graph::ContainsEdge(const Node& node1, const Node& node2) const {
+  return (node1.neighbors_->find(node2.id_)
+          != node1.neighbors_->end());
 }
 
-bool Graph::NodeExistsInDistrict(const Node& node, uint32_t district) {
-  // TODO
+bool Graph::NodeExistsInDistrict(const Node& node,
+                                 const uint32_t district) const {
+  return (nodes_in_district_[district]->find(node.id_)
+          != nodes_in_district_[district]->end());
 }
 
-unordered_set<int>* Graph::GetNodesInDistrict(uint32_t district) {
-  // TODO
+unordered_set<int>* Graph::GetNodesInDistrict(const uint32_t district) const {
+  return nodes_in_district_[district];
 }
 
-unordered_set<int>* Graph::GetPerimNodes(uint32_t district) {
-  // TODO
+unordered_set<int>* Graph::GetPerimNodes(uint32_t district) const {
+  return nodes_on_perim_[district];
 }
 
-unordered_set<int>* Graph::GetPerimNodeNeighbors(uint32_t district,
-                                                 uint32_t perim_node) {
-  // TODO
+unordered_set<int>* Graph::GetPerimNodeNeighbors(const uint32_t district,
+                                                 const uint32_t node) const {
+  return perim_nodes_to_neighbors_[district][node];
 }
 
-uint32_t GetTotalPop(uint32_t district);
+uint32_t GetTotalPop(const uint32_t district) const {
+  return pop_by_district_[district];
+}
 
-uint32_t GetMinorityPop(uint32_t district);
+uint32_t GetMinorityPop(const uint32_t district) const {
+  return min_pop_by_district_[district];
+}
 
 }     // namespace rakan

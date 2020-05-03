@@ -26,7 +26,7 @@ class Node {
 
   // Constructor with a unique ID, a district ID, and a list
   // of neighbors.
-  Node(const int id, const int district, const vector<int>& neighbors);
+  Node(const int id, const int district, const unordered_set<int>& neighbors);
 
   // Destructor.
   ~Node();
@@ -41,70 +41,70 @@ class Node {
   //  - false otherwise
   bool operator == (const Node& other);
 
-  // Adds a neighbor to this node. A neighbor relationship
-  // is bi-directional.
-  //
-  // Arguments:
-  //  - other: the neighbor to add, also adds this node to
-  //           the other's list of neighbors
-  //
-  // Returns:
-  //  - true iff the relationship is new
-  //  - false otherwise
-  bool AddNeighbor(Node& other);
-
   // Returns the district this node resides in.
-  int get_district() { return district_; }
+  uint32_t get_district() { return district_; }
 
   // Sets the total population in this node to be val.
-  bool set_tot_population(const int val) {
+  bool set_tot_population(const uint32_t val) {
     demographics.insert(std::make_pair<>("tot", val));
   }
 
   // Sets the African American population in this node to
   // be val.
-  bool set_aa_population(const int val) {
+  bool set_aa_population(const uint32_t val) {
     demographics.insert(std::make_pair<>("aa", val));
   }
 
   // Sets the American Indian population in this node to
   // be val.
-  bool set_ai_population(const int val) {
+  bool set_ai_population(const uint32_t val) {
     demographics.insert(std::make_pair<>("ai", val));
   }
 
   // Sets the Asian population in this node to be val.
-  bool set_aa_population(const int val) {
+  bool set_aa_population(const uint32_t val) {
     demographics.insert(std::make_pair<>("as", val));
   }
 
   // Sets the Caucasian population in this node to be val.
-  bool set_ca_population(const int val) {
+  bool set_ca_population(const uint32_t val) {
     demographics.insert(std::make_pair<>("cs", val));
   }
 
   // Sets the other population in this node to be val.
-  bool set_o_population(const int val) {
+  bool set_o_population(const uint32_t val) {
     demographics.insert(std::make_pair<>("o", val));
   }
 
  private: 
   // The unique node ID.
-  int id_;
+  uint32_t id_;
 
   // The district this node resides in.
-  int district_;
+  uint32_t district_;
 
   // The set of neighbors this node has.
-  unordered_set<int> *neighbors_;
+  unordered_set<uint32_t> *neighbors_;
 
   // A demographics map.
-  unordered_map<string, int> *demographics;
+  unordered_map<string, uint32_t> *demographics;
 
   // Needed for populating data structures in graph from file.
   friend class Graph;
   friend class Reader;
 };        // class Node
+
+// Adds the two nodes as neighbors. The relationship is
+// bi-directional.
+//
+// Arguments:
+//  - node1: the neighbor to node2
+//  - node2: the neighbor to node1
+//
+// Returns:
+//  - true iff the relationship is new
+//  - false otherwise
+bool AddNeighbor(Node& node1, Node& node2);
 
 }         // namespace rakan
 
