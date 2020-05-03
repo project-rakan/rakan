@@ -2,10 +2,12 @@
 #define NODE_H_
 
 #include <string>           // for std::string
+#include <unordered_set>    // for std::unordered_set
 #include <unordered_map>    // for std::unordered_map
 #include <vector>           // for std::vector
 
 using std::string;
+using std::unordered_set;
 using std::unordered_map;
 using std::vector;
 
@@ -28,6 +30,16 @@ class Node {
 
   // Destructor.
   ~Node();
+
+  // Operator == for equality check.
+  //
+  // Arguments:
+  //  - other: the other node to check for equality
+  //
+  // Returns:
+  //  - true iff all fields in the nodes are the same
+  //  - false otherwise
+  bool operator == (const Node& other);
 
   // Adds a neighbor to this node. A neighbor relationship
   // is bi-directional.
@@ -83,11 +95,15 @@ class Node {
   // The district this node resides in.
   int district_;
 
-  // The list of neighbors this node has.
-  vector<int> neighbors_;
+  // The set of neighbors this node has.
+  unordered_set<int> *neighbors_;
 
   // A demographics map.
-  unordered_map<string, int> demographics;
+  unordered_map<string, int> *demographics;
+
+  // Needed for populating data structures in graph from file.
+  friend class Graph;
+  friend class Reader;
 };        // class Node
 
 }         // namespace rakan

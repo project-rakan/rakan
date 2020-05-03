@@ -32,5 +32,5 @@ test/test_suite.o: test/%.cc $(HEADERS)
 
 clean:
 	/bin/rm -f src/*.o test/*.o src/*~ test/*~ *.gcno *.gcda *.gcov \
-	test/test_suite libhw1.a
+	test/test_suite
 
