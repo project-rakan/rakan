@@ -9,7 +9,6 @@
 #include <vector>           // for std::vector
 
 #include "Node.h"           // for Node class
-#include "Reader.h"         // for reading index file
 
 using std::unordered_set;
 using std::unordered_map;
@@ -17,17 +16,19 @@ using std::vector;
 
 namespace rakan {
 
-// Global reader.
-Reader reader_();
-
 class Graph {
  public:
   /////////////////////////////////////////////////////////////////////////////
   // Constructors and destructors
   /////////////////////////////////////////////////////////////////////////////
 
-  // Default constructor.
-  Graph();
+  // Default constructor. Supplies the number of nodes and districts on this
+  // graph. Number of nodes and districts must be non-negative.
+  //
+  // Arguments:
+  //  - num_nodes: the number of nodes on this graph
+  //  - num_districts: the number of districts on this graph
+  Graph(const uint32_t num_nodes, const uint32_t num_districts);
 
   // Default destructor. Also destructs nodes on this graph.
   ~Graph();
@@ -35,18 +36,6 @@ class Graph {
   /////////////////////////////////////////////////////////////////////////////
   // Graph mutating methods
   /////////////////////////////////////////////////////////////////////////////
-
-  // Loads the graph from the given file if supplied. If not,
-  // loads an empty graph.
-  //
-  // Arguments:
-  //  - file: a path to the index file to load from; if nullptr,
-  //          loads an empty graph
-  //
-  // Returns:
-  //  - true iff loading successful
-  //  - false otherwise
-  bool LoadGraph(const FILE *file = nullptr);
 
   // Adds a node to this graph.
   //
@@ -56,7 +45,7 @@ class Graph {
   // Returns:
   //  - true iff adding node successful
   //  - false if node cannot be added
-  bool AddNode(const Node& node);
+  bool AddNode(Node& node);
 
   // Adds an edge between the two supplied nodes. If either node does not
   // exist, adds nodes before adding edge.
@@ -174,28 +163,28 @@ class Graph {
 
   // An array of all the nodes on this graph. The index of the array is
   // the node ID.
-  Node *nodes_;
+  Node **nodes_;
 
   // An array of pointers to sets. The index of the array
   // is the district ID, and the pointer at the index points
   // to a set of nodes in that district.
-  unordered_set<int> *nodes_in_district_;
+  unordered_set<int> **nodes_in_district_;
 
   // An array of pointers to sets. The index of the array
   // is the district ID, and the pointer at the index points
   // to a set of nodes on the perimeter of that district.
-  unordered_set<int> *nodes_on_perim_;
+  unordered_set<int> **nodes_on_perim_;
 
   // An array of maps. The index of the map is the district
   // ID. Each district map stores node IDs as keys, and each
   // node must be on the perimeter of the district. Corresponding
   // to each key contains a set of node IDs that are neighbors
   // to the perimeter node.
-  unordered_map<int, unordered_set<int> *> *perim_nodes_to_neighbors_;
+  unordered_map<int, unordered_set<int> *> **perim_nodes_to_neighbors_;
   
   // A map of the district ID to another map of the demographics
   // in that district.
-  unordered_map<int, unordered_map<string, int> *> *demographics;
+  unordered_map<int, unordered_map<string, int> *> *demographics_;
 
   // An array of populations. The index of the array is the district
   // ID. The value at that index corresponds to the population in

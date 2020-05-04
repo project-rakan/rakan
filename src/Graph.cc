@@ -8,43 +8,52 @@
 
 #include "ErrorCodes.h"     // for error codes
 #include "Node.h"           // for Node class
-#include "Reader.h"         // for reading index file
 
 using std::unordered_set;
 using std::unordered_map;
 
 namespace rakan {
 
-Graph::Graph() :
-    num_nodes_(0),
-    num_districts_(0),
-    is_empty(true),
-    alpha_(0),
-    beta_(0),
-    gamma_(0),
-    eta_(0) {}
+Graph::Graph(const uint32_t num_nodes, const uint32_t num_districts) {
+  // Initialize number fields.
+  num_nodes_ = num_nodes;
+  num_districts_ = num_districts;
+
+  // Initialize array of pointers fields.
+  nodes_ = new Node*[num_nodes_];
+  nodes_in_district_ = new unordered_set<int>*[num_districts_];
+  nodes_on_perim_ = new unordered_set<int>*[num_districts_];
+  perim_nodes_to_neighbors_ = new unordered_map<int, unordered_set<int> *>*[num_districts_];
+
+  // Initialize other array fields.
+  demographics_ = new unordered_map<int, unordered_map<string, int> *>;
+  pop_by_district_ = new uint32_t[num_districts_];
+  min_pop_by_district_ = new uint32_t[num_districts_];
+}
 
 Graph::~Graph() {
   // Non-arrays.
-  delete demographics;
+  delete demographics_;
 
   // Arrays.
   delete[] nodes_;
   delete[] nodes_in_district_;
   delete[] nodes_on_perim_;
   delete[] perim_nodes_to_neighbors_;
+  delete[] pop_by_district_;
+  delete[] min_pop_by_district_;
 }
 
-bool Graph::LoadGraph(const FILE *file) {
-  return reader_.ReadFileToGraph(file, this) == SUCCESS;
-}
+// bool Graph::LoadGraph(const FILE *file) {
+//   return reader_.ReadFileToGraph(file, this) == SUCCESS;
+// }
 
-bool Graph::AddNode(const Node& node) {
+bool Graph::AddNode(Node& node) {
   if (node.id_ > num_nodes_) {
     return false;
   }
 
-  nodes_[node.id_] = node;
+  nodes_[node.id_] = &node;
   return true;
 }
 
@@ -57,11 +66,11 @@ bool Graph::AddEdge(Node& node1, Node& node2) {
     AddNode(node2);
   }
 
-  return Node::AddNeighbor(node1, node2);
+  return AddNeighbor(node1, node2);
 }
 
 bool Graph::ContainsNode(const Node& node) const {
-  return nodes_[node.id_] == node;    // uses == in Node.cc
+  return *nodes_[node.id_] == node;    // uses == in Node.cc
 }
 
 bool Graph::ContainsEdge(const Node& node1, const Node& node2) const {
@@ -85,14 +94,14 @@ unordered_set<int>* Graph::GetPerimNodes(uint32_t district) const {
 
 unordered_set<int>* Graph::GetPerimNodeNeighbors(const uint32_t district,
                                                  const uint32_t node) const {
-  return perim_nodes_to_neighbors_[district][node];
+  return (*perim_nodes_to_neighbors_[district]->find(node)).second;
 }
 
-uint32_t GetTotalPop(const uint32_t district) const {
+uint32_t Graph::GetTotalPop(const uint32_t district) const {
   return pop_by_district_[district];
 }
 
-uint32_t GetMinorityPop(const uint32_t district) const {
+uint32_t Graph::GetMinorityPop(const uint32_t district) const {
   return min_pop_by_district_[district];
 }
 
