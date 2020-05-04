@@ -1,10 +1,11 @@
 #include "./Reader.h"
 
-#include <bits/stdc++.h>    // for std::unordered_set
-#include <inttypes.h>       // for uint32_t
-#include <stdio.h>          // for FILE *, fread, fseek
-#include <unordered_map>    // for std::unordered_map
-#include <vector>           // for std::vector
+#include <bits/stdc++.h>      // for std::unordered_set
+#include <boost\crc.hpp>      // for crc32 checksum
+#include <inttypes.h>         // for uint32_t
+#include <stdio.h>            // for FILE *, fread, fseek
+#include <unordered_map>      // for std::unordered_map
+#include <vector>             // for std::vector
 
 #include "./ErrorCodes.h"     // for error codes
 #include "./Graph.h"          // for Graph class
@@ -92,42 +93,42 @@ uint16_t ReadNode(NodeRecord& record, Node *node) const {
   if (res != 1) {
     return READ_FAILED;
   }
-  node.set_tot_population((uint32_t) buf);
+  node.SetTotalPop((uint32_t) buf);
 
   // Read AA population.
   res = fread(buf, sizeof(uint32_t), 1, file_);
   if (res != 1) {
     return READ_FAILED;
   }
-  node.set_aa_population((uint32_t) buf);
+  node.SetAAPop((uint32_t) buf);
 
   // Read AI population.
   res = fread(buf, sizeof(uint32_t), 1, file_);
   if (res != 1) {
     return READ_FAILED;
   }
-  node.set_ai_population((uint32_t) buf);
+  node.SetAIPop((uint32_t) buf);
 
   // Read AS population.
   res = fread(buf, sizeof(uint32_t), 1, file_);
   if (res != 1) {
     return READ_FAILED;
   }
-  node.set_as_population((uint32_t) buf);
+  node.SetASPop((uint32_t) buf);
 
   // Read CA popuation.
   res = fread(buf, sizeof(uint32_t), 1, file_);
   if (res != 1) {
     return READ_FAILED;
   }
-  node.set_ca_population((uint32_t) buf);
+  node.SetCAPop((uint32_t) buf);
 
   // Read other population.
   res = fread(buf, sizeof(uint32_t), 1, file_);
   if (res != 1) {
     return READ_FAILED;
   }
-  node.set_o_population((uint32_t) buf);
+  node.SetOtherPop((uint32_t) buf);
 
   return SUCCESS;
 }

@@ -89,7 +89,7 @@ bool Graph::AddEdge(Node& node1, Node& node2) {
     AddNode(node2);
   }
 
-  return AddNeighbor(node1, node2);
+  return node1.AddNeighbor(node2);
 }
 
 bool Graph::ContainsNode(const Node& node) const {

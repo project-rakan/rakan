@@ -18,3 +18,4 @@ $(EXE): $(OBJS)
 # phony target - remove generated files and backups
 clean:
 	rm -rf $(EXE) *.o *~ *.dSYM
+	

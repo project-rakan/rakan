@@ -1,35 +1,42 @@
 #ifndef NODE_H_
 #define NODE_H_
 
-#include <string>           // for std::string
-#include <unordered_set>    // for std::unordered_set
-#include <unordered_map>    // for std::unordered_map
-#include <vector>           // for std::vector
+#include <bits/stdc++.h>      // for std::unordered_set
+#include <inttypes.h>         // for uint32_t
+#include <string>             // for std::string
+#include <unordered_map>      // for std::unordered_map
 
 using std::string;
 using std::unordered_set;
 using std::unordered_map;
-using std::vector;
 
 namespace rakan {
 
 class Node {
  public:
   // Default constructor.
-  Node();
+  Node() {}
 
   // Constructor with a unique ID.
-  Node(const int id);
+  Node(const uint32_t id) : id_(id) {}
 
   // Constructor with a unique ID and a district ID.
-  Node(const int id, const int district);
+  Node(const uint32_t id, const uint32_t district)
+      : id_(id),
+        district_(district) {}
 
-  // Constructor with a unique ID, a district ID, and a list
-  // of neighbors.
-  Node(const int id, const int district, const unordered_set<int>& neighbors);
+  // Constructor with a unique ID, a district ID, and a set
+  // of neighbors. Assumes the neighbors are dynamically
+  // allocated via new.
+  Node(const uint32_t id,
+       const uint32_t district,
+       unordered_set<uint32_t> *neighbors)
+      : id_(id),
+        district_(district),
+        neighbors_(neighbors) {}
 
   // Destructor.
-  ~Node();
+  ~Node() { delete neighbors_; }
 
   // Operator == for equality check.
   //
@@ -42,38 +49,50 @@ class Node {
   bool operator== (const Node& other) const;
 
   // Returns the district this node resides in.
-  uint32_t get_district() { return district_; }
+  uint32_t GetDistrict() { return district_; }
+
+  // Adds other node as a neighbor to this node. Also adds
+  // this node as a neighbor to the other node. The relationship
+  // is bi-directional.
+  //
+  // Arguments:
+  //  - other: the neighbor to this node
+  //
+  // Returns:
+  //  - true iff the relationship is new
+  //  - false otherwise
+  bool AddNeighbor(Node& other);
 
   // Sets the total population in this node to be val.
-  void set_tot_population(const uint32_t val) {
-    demographics_->insert(std::make_pair<>("tot", val));
+  void SetTotalPop(const uint32_t val) {
+    demographics_->insert({"total", val});
   }
 
   // Sets the African American population in this node to
   // be val.
-  void set_aa_population(const uint32_t val) {
+  void SetAAPop(const uint32_t val) {
     demographics_->insert(std::make_pair<>("aa", val));
   }
 
   // Sets the American Indian population in this node to
   // be val.
-  void set_ai_population(const uint32_t val) {
+  void SetAIPop(const uint32_t val) {
     demographics_->insert(std::make_pair<>("ai", val));
   }
 
   // Sets the Asian population in this node to be val.
-  void set_as_population(const uint32_t val) {
+  void SetASPop(const uint32_t val) {
     demographics_->insert(std::make_pair<>("as", val));
   }
 
   // Sets the Caucasian population in this node to be val.
-  void set_ca_population(const uint32_t val) {
+  void SetCAPop(const uint32_t val) {
     demographics_->insert(std::make_pair<>("cs", val));
   }
 
   // Sets the other population in this node to be val.
-  void set_o_population(const uint32_t val) {
-    demographics_->insert(std::make_pair<>("o", val));
+  void SetOtherPop(const uint32_t val) {
+    demographics_->insert(std::make_pair<>("other", val));
   }
 
  private: 
@@ -93,18 +112,6 @@ class Node {
   friend class Graph;
   friend class Reader;
 };        // class Node
-
-// Adds the two nodes as neighbors. The relationship is
-// bi-directional.
-//
-// Arguments:
-//  - node1: the neighbor to node2
-//  - node2: the neighbor to node1
-//
-// Returns:
-//  - true iff the relationship is new
-//  - false otherwise
-bool AddNeighbor(Node& node1, Node& node2);
 
 }         // namespace rakan
 
