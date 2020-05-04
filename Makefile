@@ -17,9 +17,6 @@ TESTOBJS = test/test_suite.o
 # just types "make" in the same directory as this Makefile
 all: test/test_suite
 
-libhw1.a: $(OBJS) $(HEADERS)
-	$(AR) $(ARFLAGS) libhw1.a $(OBJS)
-
 test/test_suite: $(TESTOBJS) libhw1.a
 	$(CXX) $(CFLAGS) -o test/test_suite $(TESTOBJS) \
 	$(CPPUNITFLAGS) $(LDFLAGS) -lpthread $(LDFLAGS)

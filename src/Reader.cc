@@ -1,7 +1,6 @@
 #include "./Reader.h"
 
 #include <bits/stdc++.h>      // for std::unordered_set
-#include <boost\crc.hpp>      // for crc32 checksum
 #include <inttypes.h>         // for uint32_t
 #include <stdio.h>            // for FILE *, fread, fseek
 #include <unordered_map>      // for std::unordered_map
@@ -10,7 +9,6 @@
 #include "./ErrorCodes.h"     // for error codes
 #include "./Graph.h"          // for Graph class
 #include "./Node.h"           // for Node class
-#include "./ReaderUtils.h"    // for utils: CRC, magic_num
 
 using std::unordered_set;
 using std::unordered_map;
@@ -28,8 +26,6 @@ uint16_t Reader::ReadHeader(Header *header) const {
   if (res != 1) {
     return READ_FAILED;
   }
-
-  // TODO: validate checksum and magic_number
 
   return SUCCESS;
 }
