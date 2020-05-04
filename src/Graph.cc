@@ -32,21 +32,44 @@ Graph::Graph(const uint32_t num_nodes, const uint32_t num_districts) {
 }
 
 Graph::~Graph() {
-  // Non-arrays.
+  uint32_t i;
+
+  // Delete non-array.
   delete demographics_;
 
-  // Arrays.
-  delete[] nodes_;
-  delete[] nodes_in_district_;
-  delete[] nodes_on_perim_;
-  delete[] perim_nodes_to_neighbors_;
+  // Delete non-pointer arrays.
   delete[] pop_by_district_;
   delete[] min_pop_by_district_;
-}
 
-// bool Graph::LoadGraph(const FILE *file) {
-//   return reader_.ReadFileToGraph(file, this) == SUCCESS;
-// }
+  // Delete all node pointers in nodes_.
+  for (i = 0; i < num_nodes_; i++) {
+    delete nodes_[i];
+  }
+  delete[] nodes_;
+
+  // Delete all set pointers in nodes_in_district_.
+  for (i = 0; i < num_districts_; i++) {
+    delete nodes_in_district_[i];
+  }
+  delete[] nodes_in_district_;
+
+  // Delete all set pointers in nodes_on_perim_.
+  for (i = 0; i < num_districts_; i++) {
+    delete nodes_on_perim_[i];
+  }
+  delete[] nodes_on_perim_;
+
+  // Delete all map pointers in perim_nodes_to_neighbors_.
+  for (i = 0; i < num_districts_; i++) {
+    // Delete the set pointer.
+    for (auto& iterator : *perim_nodes_to_neighbors_[i]) {
+      delete iterator.second; 
+    }
+    // Delete the map pointer.
+    delete perim_nodes_to_neighbors_[i];
+  }
+  delete[] perim_nodes_to_neighbors_;
+}
 
 bool Graph::AddNode(Node& node) {
   if (node.id_ > num_nodes_) {
