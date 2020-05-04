@@ -40,59 +40,43 @@ typedef struct node_record_struct {
 class Reader {
  public:
   // Default constructor.
-  Reader() {}
+  //
+  // Arguments:
+  //  - file: the file to read from
+  Reader(const FILE *file = nullptr) : file_(file) {}
 
   // Default destructor.
   ~Reader() {}
 
-  // Reads the file and loads information onto graph.
+  // Reads the header of the file if it is not nullptr.
   //
   // Arguments:
-  //  - file: the index file to read from
-  //  - graph: the graph to populate
+  //  - header: the return parameter to be filled with the header
   //
   // Returns:
   //  - SUCCESS if all reading and loading successful
   //  - INVALID_FILE if the file cannot be read
-  //  - INVALID_GRAPH if the graph cannot be read
-  uint16_t ReadFileToGraph(const FILE *file, Graph *graph);
+  //  - READ_FAILED if reading file failed
+  uint16_t ReadHeader(Header *header) const;
+
+  // Reads the node records in the file. Fills the 
+  //
+  // Arguments:
+  //  - offset: the offset to start reading the node record
+  //  - record: the return parameter to be filled with the node record
+  //
+  // Returns:
+  //  - SUCCESS if all reading and loading successful
+  //  - INVALID_FILE if the file cannot be read
+  //  - SEEK_FAILED if seeking to offset failed
+  //  - READ_FAILED if reading file failed
+  uint16_t ReadNodeRecord(uint32_t offset, NodeRecord *record) const 
+
+  uint16_t ReadNode(uint32_t offset, NodeRecord& record, Node *node) const;
 
  private:
-  // The file currently we're reading.
+  // The file we're currently reading.
   FILE *file_;
-
-  // Reads the header of the file. Assumes valid arguments.
-  //
-  // Returns:
-  //  - a populated Header struct
-  Header ReadHeader() const;
-
-  // Allocates memory for the data structures used in graph.
-  //
-  // Arguments:
-  //  - num_nodes: the total number of nodes to populate
-  //  - num_districts: the total number of districts to populate
-  //  - graph: the graph to populate
-  void InitGraph(const uint32_t num_nodes,
-                 const uint32_t num_districts,
-                 Graph *graph);
-
-  // Reads the node records in the file. Assumes valid arguments.
-  //
-  // Arguments:
-  //  - num_nodes: the number of node records in the file
-  //
-  // Returns:
-  //  - a vector of populated NodeRecord structs
-  vector<NodeRecord> ReadNodeRecords(uint32_t num_nodes) const;
-
-  // Reads the node at offset bytes in the file. Uses a return
-  // parameter.
-  //
-  // Arguments:
-  //  - offset: the offset in the file where the node begins
-  //  - node: a return parameter, to populate with information
-  void ReadNode(uint32_t offset, Node *node) const;
 
   // Needed for unit tests.
   friend class Test_Reader;

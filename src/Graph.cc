@@ -93,7 +93,7 @@ bool Graph::AddEdge(Node& node1, Node& node2) {
 }
 
 bool Graph::ContainsNode(const Node& node) const {
-  return *nodes_[node.id_] == node;    // uses == in Node.cc
+  return *nodes_[node.id_] == node;
 }
 
 bool Graph::ContainsEdge(const Node& node1, const Node& node2) const {

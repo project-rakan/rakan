@@ -2,7 +2,7 @@
 
 #include <bits/stdc++.h>    // for std::unordered_set
 #include <inttypes.h>       // for uint32_t
-#include <stdio.h>          // for FILE *, stderr
+#include <stdio.h>          // for FILE *, fread, fseek
 #include <unordered_map>    // for std::unordered_map
 #include <vector>           // for std::vector
 
@@ -16,23 +16,120 @@ using std::unordered_map;
 
 namespace rakan {
 
-uint16_t Reader::ReadFileToGraph(const FILE *file, Graph *graph) const {
-  if (file == nullptr) {
+uint16_t Reader::ReadHeader(Header *header) const {
+  size_t res;
+
+  if (file_ == nullptr) {
     return INVALID_FILE;
   }
 
-  if (graph == nullptr) {
-    return INVALID_GRAPH;
+  res = fread(header, sizeof(Header), 1, file_);
+  if (res != 1) {
+    return READ_FAILED;
   }
 
-  file_ = file;
-  
-  Header header = ReadHeader();
+  // TODO: validate checksum and magic_number
 
-  nodes_in_district_ = new unordered_set[num_districts_];
-  nodes_on_perim = new unordered_set[num_districts_];
-  perim_nodes_to_neighbors_ = new unordered_set[num_districts_];
-  demographics = new unordered_map();
+  return SUCCESS;
+}
+
+uint16_t ReadNodeRecord(const uint32_t offset, NodeRecord *record) const {
+  int res;
+
+  if (file_ == nullptr) {
+    return INVALID_FILE;
+  }
+
+  if (fseek(file_, offset, SEEK_SET) != 0) {
+    return SEEK_FAILED;
+  }
+
+  res = fread(record, sizeof(NodeRecord), 1, file_);
+  if (res != 1) {
+    return READ_FAILED;
+  }
+
+  return SUCCESS;
+}
+
+uint16_t ReadNode(NodeRecord& record, Node *node) const {
+  int res, i;
+  char buf[sizeof(uint32_t)];
+
+  if (file_ == nullptr) {
+    return INVALID_FILE;
+  }
+
+  if (fseek(file_, record.node_pos, SEEK_SET) != 0) {
+    return SEEK_FAILED;
+  }
+
+  // Read node id.
+  res = fread(buf, sizeof(uint32_t), 1, file_);
+  if (res != 1) {
+    return READ_FAILED;
+  }
+  node.id_ = (uint32_t) buf;
+
+  // Read area.
+  res = fread(buf, sizeof(uint32_t), 1, file_);
+  if (res != 1) {
+    return READ_FAILED;
+  }
+  node.area = (uint32_t) buf;
+
+  for (i = 0; i < record.num_neighbors; i++) {
+    // Read neighbor.
+    res = fread(buf, sizeof(uint32_t), 1, file_);
+    if (res != 1) {
+      return READ_FAILED;
+    }
+    node.neighbors_->insert((uint32_t) buf);
+  }
+
+  // Read total population.
+  res = fread(buf, sizeof(uint32_t), 1, file_);
+  if (res != 1) {
+    return READ_FAILED;
+  }
+  node.set_tot_population((uint32_t) buf);
+
+  // Read AA population.
+  res = fread(buf, sizeof(uint32_t), 1, file_);
+  if (res != 1) {
+    return READ_FAILED;
+  }
+  node.set_aa_population((uint32_t) buf);
+
+  // Read AI population.
+  res = fread(buf, sizeof(uint32_t), 1, file_);
+  if (res != 1) {
+    return READ_FAILED;
+  }
+  node.set_ai_population((uint32_t) buf);
+
+  // Read AS population.
+  res = fread(buf, sizeof(uint32_t), 1, file_);
+  if (res != 1) {
+    return READ_FAILED;
+  }
+  node.set_as_population((uint32_t) buf);
+
+  // Read CA popuation.
+  res = fread(buf, sizeof(uint32_t), 1, file_);
+  if (res != 1) {
+    return READ_FAILED;
+  }
+  node.set_ca_population((uint32_t) buf);
+
+  // Read other population.
+  res = fread(buf, sizeof(uint32_t), 1, file_);
+  if (res != 1) {
+    return READ_FAILED;
+  }
+  node.set_o_population((uint32_t) buf);
+
+  return SUCCESS;
 }
 
 }     // namespace rakan
