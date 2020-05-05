@@ -18,21 +18,6 @@ using std::string;
 
 namespace rakan {
 
-uint32_t RidOfZeros(uint32_t x) {
-  uint32_t copy = x;
-  char *byte = (char *) &x;
-
-  for (int i = 0; i < 8; i++) {
-    if (*byte == 0x0) {
-      copy = copy >> 8;
-    } else {
-      return copy;
-    }
-    byte++;
-  }
-  return copy;
-}
-
 // A header struct that contains all data in the header
 // section of the index file.
 //
@@ -43,6 +28,22 @@ typedef struct header_struct {
   char state[2];            // 2 bytes
   uint32_t num_nodes;       // 4 bytes
   uint32_t num_districts;   // 4 bytes
+
+  uint32_t RidOfZeros(uint32_t x) {
+    uint32_t copy = x;
+    char *byte = (char *) &x;
+
+    for (int i = 0; i < 8; i++) {
+      if (*byte == 0x0) {
+        copy = copy >> 8;
+      } else {
+        break;
+      }
+      byte++;
+    }
+
+    return copy;
+  }
 
   void ToHostFormat() {
     magic_number = RidOfZeros(ntohl(magic_number));
@@ -60,6 +61,26 @@ typedef struct header_struct {
 typedef struct node_record_struct {
   uint32_t num_neighbors;   // 4 bytes
   uint32_t node_pos;        // 4 bytes
+
+  uint32_t RidOfZeros(uint32_t x) {
+    uint32_t copy = x;
+    char *byte = (char *) &x;
+
+    // printf("reading x = %02x\n", x);
+
+    for (int i = 0; i < 8; i++) {
+      // printf("reading byte = %02x\n", *byte);
+      if (*byte == 0x0) {
+        copy = copy >> 8;
+        // printf("copy is now = %02x\n", copy);
+      } else {
+        break;
+      }
+      byte++;
+    }
+    
+    return copy;
+  }
 
   void ToHostFormat() {
     num_neighbors = RidOfZeros(ntohl(num_neighbors));
@@ -102,7 +123,7 @@ class Reader {
   //  - READ_FAILED if reading file failed
   uint16_t ReadNodeRecord(const uint32_t offset, NodeRecord *record) const;
 
-  uint16_t ReadNode(NodeRecord& record, Node *node) const;
+  uint16_t ReadNode(const uint32_t offset, NodeRecord& record, Node *node) const;
 
  private:
   // The file we're currently reading.

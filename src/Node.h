@@ -63,6 +63,14 @@ class Node {
   //  - false otherwise
   bool AddNeighbor(Node& other);
 
+  uint32_t GetID() { return id_; }
+
+  uint32_t GetArea() { return area_; }
+
+  unordered_set<uint32_t>* GetNeighbors() { return neighbors_; }
+
+  unordered_map<string, uint32_t>* GetDemographics() { return demographics_; }
+
   // Sets the total population in this node to be val.
   void SetTotalPop(const uint32_t val) {
     demographics_->insert({"total", val});
