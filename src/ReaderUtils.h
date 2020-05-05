@@ -11,7 +11,7 @@
 namespace rakan {
 
 // The first four bytes of a valid index file.
-const uint32_t kMagicNumber = ;
+const uint32_t kMagicNumber = 0xBEEFCAFE;
 
 // Macro to convert from network to host byte order.
 #define ntohll(x) \
