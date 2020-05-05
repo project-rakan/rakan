@@ -47,6 +47,7 @@ uint16_t Reader::ReadNodeRecord(const uint32_t offset, NodeRecord *record) const
   if (res != 1) {
     return READ_FAILED;
   }
+  record->ToHostFormat();
 
   return SUCCESS;
 }

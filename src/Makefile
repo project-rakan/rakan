@@ -13,7 +13,7 @@ $(EXE): $(OBJS)
 
 # source files
 %.o: %.cc $(HEADERS)
-	$(CXX) $(CPPFLAGS) -c $<
+	$(CXX) $(CPPFLAGS) -c $< 
 
 # phony target - remove generated files and backups
 clean:

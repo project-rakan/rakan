@@ -3,28 +3,35 @@
 
 #include <iostream>
 
-#include <arpa/inet.h>      // For htonl(), ntohl()
+#include <netinet/in.h>       // For htonl(), ntohl()
 #include <stdio.h>            // for (FILE *)
 #include <inttypes.h>         // for uint32_t, etc.
 #include <string>             // for std::string
 
 #include "./Graph.h"          // for Graph class
 #include "./Node.h"           // for Node class
-// #include "./ReaderUtils.h"    // for DISALLOW_COPY_AND_ASSIGN
+#include "./ReaderUtils.h"    // for RidOfZeros, ValidateCheckSum
 
 using rakan::Graph;
 using rakan::Node;
 using std::string;
 
-// Macro to convert from network to host byte order.
-#define ntohll(x) \
-  ( ((uint64_t) (ntohl((uint32_t)((x << 32) >> 32))) << 32) |   \
-    ntohl(((uint32_t)(x >> 32))) )
-
-// Macro to convert from host to network byte order.
-#define htonll(x) (ntohll(x))
-
 namespace rakan {
+
+uint32_t RidOfZeros(uint32_t x) {
+  uint32_t copy = x;
+  char *byte = (char *) &x;
+
+  for (int i = 0; i < 8; i++) {
+    if (*byte == 0x0) {
+      copy = copy >> 8;
+    } else {
+      return copy;
+    }
+    byte++;
+  }
+  return copy;
+}
 
 // A header struct that contains all data in the header
 // section of the index file.
@@ -34,22 +41,14 @@ typedef struct header_struct {
   uint32_t magic_number;    // 4 bytes
   uint32_t checksum;        // 4 bytes
   char state[2];            // 2 bytes
-  int32_t num_nodes;       // 4 bytes
-  int32_t num_districts;   // 4 bytes
+  uint32_t num_nodes;       // 4 bytes
+  uint32_t num_districts;   // 4 bytes
 
   void ToHostFormat() {
-    printf("magic_number, little endian = %02x\n", magic_number);
-    magic_number = htonl(magic_number);
-    printf("magic_number, big endian = %02x\n", magic_number);
-    printf("checksum, little endian = %02x\n", checksum);
-    checksum = htonl(checksum);
-    printf("checksum, big endian = %02x\n", checksum);
-    printf("num_nodes, little endian = %02x\n", num_nodes);
-    num_nodes = htonl(num_nodes);
-    printf("num_nodes, big endian = %02x\n", num_nodes);
-    printf("num_districts, little endian = %02x\n", num_districts);
-    num_districts = htonl(num_districts);
-    printf("num_districts, big endian = %02x\n", num_districts);
+    magic_number = RidOfZeros(ntohl(magic_number));
+    checksum = RidOfZeros(ntohl(checksum));
+    num_nodes = RidOfZeros(ntohl(num_nodes));
+    num_districts = RidOfZeros(ntohl(num_districts));
   }
 } Header;
 
@@ -61,6 +60,11 @@ typedef struct header_struct {
 typedef struct node_record_struct {
   uint32_t num_neighbors;   // 4 bytes
   uint32_t node_pos;        // 4 bytes
+
+  void ToHostFormat() {
+    num_neighbors = RidOfZeros(ntohl(num_neighbors));
+    node_pos = RidOfZeros(ntohl(node_pos));
+  }
 } NodeRecord;
 
 class Reader {
