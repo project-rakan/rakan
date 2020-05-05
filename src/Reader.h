@@ -4,7 +4,6 @@
 #include <iostream>
 
 #include <arpa/inet.h>      // For htonl(), ntohl()
-#include <endian.h>
 #include <stdio.h>            // for (FILE *)
 #include <inttypes.h>         // for uint32_t, etc.
 #include <string>             // for std::string
@@ -35,22 +34,22 @@ typedef struct header_struct {
   uint32_t magic_number;    // 4 bytes
   uint32_t checksum;        // 4 bytes
   char state[2];            // 2 bytes
-  uint32_t num_nodes;       // 4 bytes
-  uint32_t num_districts;   // 4 bytes
+  int32_t num_nodes;       // 4 bytes
+  int32_t num_districts;   // 4 bytes
 
   void ToHostFormat() {
-    std::cout << "magic_number, little endian = " << std::hex << magic_number << std::endl;
-    magic_number = be32toh(magic_number);
-    std::cout << "magic_number, big endian = " << std::hex << magic_number << std::endl;
-    std::cout << "checksum, little endian = " << std::hex << checksum << std::endl;
-    checksum = be32toh(checksum);
-    std::cout << "checksum, big endian = " << std::hex << checksum << std::endl;
-    std::cout << "num_nodes, little endian = " << std::hex << num_nodes << std::endl;
-    num_nodes = be32toh(num_nodes);
-    std::cout << "num_nodes, big endian = " << std::hex << num_nodes << std::endl;
-    std::cout << "num_districts, little endian = " << std::hex << num_districts << std::endl;
-    num_districts = be32toh(num_districts);
-    std::cout << "num_districts, big endian = " << std::hex << num_districts << std::endl;
+    printf("magic_number, little endian = %02x\n", magic_number);
+    magic_number = htonl(magic_number);
+    printf("magic_number, big endian = %02x\n", magic_number);
+    printf("checksum, little endian = %02x\n", checksum);
+    checksum = htonl(checksum);
+    printf("checksum, big endian = %02x\n", checksum);
+    printf("num_nodes, little endian = %02x\n", num_nodes);
+    num_nodes = htonl(num_nodes);
+    printf("num_nodes, big endian = %02x\n", num_nodes);
+    printf("num_districts, little endian = %02x\n", num_districts);
+    num_districts = htonl(num_districts);
+    printf("num_districts, big endian = %02x\n", num_districts);
   }
 } Header;
 

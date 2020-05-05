@@ -6,5 +6,6 @@
 #define INVALID_GRAPH 2
 #define READ_FAILED 3
 #define SEEK_FAILED 4
+// possibly more?
 
 #endif    // ERROR_CODES_H_
