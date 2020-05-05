@@ -15,4 +15,12 @@ using std::unordered_map;
 
 namespace rakan {
 
+class Runner {
+
+
+
+}
+
+uint32_t SeedDistrict()
+
 }

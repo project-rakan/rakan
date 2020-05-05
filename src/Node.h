@@ -99,6 +99,9 @@ class Node {
   // The unique node ID.
   uint32_t id_;
 
+  // The area of this node.
+  uint32_t area_;
+
   // The district this node resides in.
   uint32_t district_;
 

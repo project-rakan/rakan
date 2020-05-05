@@ -2,14 +2,14 @@
 # DO NOT PUSH TO PRODUCTION.
 
 CXX = g++
-OBJS = Graph.o Node.o Reader.o ReaderUtils.o
-EXE  = rakan
-HEADER = Graph.h Node.h Reader.h ReaderUtils.h
+OBJS = Graph.o Node.o Reader.o
+EXE  = test_reader
+HEADER = Graph.h Node.h Reader.h
 CPPFLAGS = -Wall -g -std=c++11
 
 # default target
 $(EXE): $(OBJS)
-	$(CXX) $(CPPFLAGS) -o $(EXE) $(OBJS)
+	$(CXX) $(CPPFLAGS) -o $(EXE) $(OBJS) ../test/test_reader_notgoogle.cc
 
 # source files
 %.o: %.cc $(HEADERS)
