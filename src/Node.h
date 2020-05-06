@@ -14,6 +14,10 @@ namespace rakan {
 
 class Node {
  public:
+  /////////////////////////////////////////////////////////////////////////////
+  // Constructors, destructors, and operators
+  /////////////////////////////////////////////////////////////////////////////
+
   // Default constructor.
   Node();
 
@@ -31,7 +35,7 @@ class Node {
        unordered_set<uint32_t> *neighbors);
 
   // Destructor.
-  ~Node() { delete neighbors_; }
+  ~Node() { delete neighbors_; delete demographics_; }
 
   // Operator == for equality check.
   //
@@ -43,8 +47,24 @@ class Node {
   //  - false otherwise
   bool operator== (const Node& other) const;
 
+  /////////////////////////////////////////////////////////////////////////////
+  // Accessors
+  /////////////////////////////////////////////////////////////////////////////
+
   // Returns the district this node resides in.
   uint32_t GetDistrict() { return district_; }
+
+  uint32_t GetID() { return id_; }
+
+  uint32_t GetArea() { return area_; }
+
+  unordered_set<uint32_t>* GetNeighbors() { return neighbors_; }
+
+  unordered_map<string, uint32_t>* GetDemographics() { return demographics_; }
+
+  /////////////////////////////////////////////////////////////////////////////
+  // Mutators
+  /////////////////////////////////////////////////////////////////////////////
 
   // Adds other node as a neighbor to this node. Also adds
   // this node as a neighbor to the other node. The relationship
@@ -57,15 +77,7 @@ class Node {
   //  - true iff the relationship is new
   //  - false otherwise
   bool AddNeighbor(Node& other);
-
-  uint32_t GetID() { return id_; }
-
-  uint32_t GetArea() { return area_; }
-
-  unordered_set<uint32_t>* GetNeighbors() { return neighbors_; }
-
-  unordered_map<string, uint32_t>* GetDemographics() { return demographics_; }
-
+  
   // Sets the total population in this node to be val.
   void SetTotalPop(const uint32_t val) {
     demographics_->insert({"total", val});

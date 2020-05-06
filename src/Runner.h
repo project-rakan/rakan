@@ -1,4 +1,5 @@
-#include "./Reader.h"
+#ifndef RUNNER_H_
+#define RUNNER_H_
 
 #include <bits/stdc++.h>      // for std::unordered_set
 #include <inttypes.h>         // for uint32_t
@@ -18,7 +19,7 @@ namespace rakan {
 ///////////////////////////////////////////////////////////////////////////////
 // Building methods
 ///////////////////////////////////////////////////////////////////////////////
-void Init();
+void Init(FILE *file);
 
 void SeedDistricts();
 
@@ -46,4 +47,6 @@ void MessageQueue();
 
 void RetrieveQueue();
 
-}
+}         // namespace rakan
+
+#endif    // RUNNER_H_

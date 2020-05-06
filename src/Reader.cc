@@ -1,11 +1,10 @@
 #include "./Reader.h"
 
+#include <arpa/inet.h>        // For ntohl()
 #include <bits/stdc++.h>      // for std::unordered_set
-#include <endian.h>
 #include <inttypes.h>         // for uint32_t
 #include <stdio.h>            // for FILE *, fread, fseek
 #include <unordered_map>      // for std::unordered_map
-#include <vector>             // for std::vector
 
 #include "./ErrorCodes.h"     // for error codes
 #include "./Graph.h"          // for Graph class
@@ -16,23 +15,9 @@ using std::unordered_map;
 
 namespace rakan {
 
-uint32_t RidOfZeros(uint32_t x) {
-  uint32_t copy = x;
-  char *byte = (char *) &x;
+const uint32_t kMagicNumber = 0xBEEFCAFE;
 
-  for (int i = 0; i < 4; i++) {
-    if (*byte == 0x0) {
-      copy = copy >> 8;
-    } else {
-      break;
-    }
-    byte++;
-  }
-
-  return copy;
-}
-
-uint16_t Reader::ReadHeader(Header *header) const {
+uint16_t Reader::ReadHeader(Header *header) {
   size_t res;
 
   if (file_ == nullptr) {
@@ -43,12 +28,16 @@ uint16_t Reader::ReadHeader(Header *header) const {
   if (res != 1) {
     return READ_FAILED;
   }
-  header->ToHostFormat();
+  header->magic_number = ToHostFormat(header->magic_number);
+  header->checksum = ToHostFormat(header->checksum);
+  header->num_nodes = ToHostFormat(header->num_nodes);
+  header->num_districts = ToHostFormat(header->num_districts);
 
   return SUCCESS;
 }
 
-uint16_t Reader::ReadNodeRecord(const uint32_t offset, NodeRecord *record) const {
+uint16_t Reader::ReadNodeRecord(const uint32_t offset,
+                                NodeRecord *record) {
   int res;
 
   if (file_ == nullptr) {
@@ -63,12 +52,15 @@ uint16_t Reader::ReadNodeRecord(const uint32_t offset, NodeRecord *record) const
   if (res != 1) {
     return READ_FAILED;
   }
-  record->ToHostFormat();
+  record->num_neighbors = ToHostFormat(record->num_neighbors);
+  record->node_pos = ToHostFormat(record->node_pos);
 
   return SUCCESS;
 }
 
-uint16_t Reader::ReadNode(const uint32_t offset, NodeRecord& record, Node *node) const {
+uint16_t Reader::ReadNode(const uint32_t offset,
+                          NodeRecord& record,
+                          Node *node) {
   size_t res;
   uint32_t i, temp;
 
@@ -85,14 +77,14 @@ uint16_t Reader::ReadNode(const uint32_t offset, NodeRecord& record, Node *node)
   if (res != 1) {
     return READ_FAILED;
   }
-  node->id_ = RidOfZeros(ntohl(node->id_));
+  node->id_ = ToHostFormat(node->id_);
 
   // Read area.
   res = fread(&node->area_, sizeof(uint32_t), 1, file_);
   if (res != 1) {
     return READ_FAILED;
   }
-  node->area_ = RidOfZeros(ntohl(node->area_));
+  node->area_ = ToHostFormat(node->area_);
 
   for (i = 0; i < record.num_neighbors; i++) {
     // Read neighbor.
@@ -100,7 +92,7 @@ uint16_t Reader::ReadNode(const uint32_t offset, NodeRecord& record, Node *node)
     if (res != 1) {
       return READ_FAILED;
     }
-    node->neighbors_->insert(RidOfZeros(ntohl(temp)));
+    node->neighbors_->insert(ToHostFormat(temp));
   }
 
   // Read total population.
@@ -108,44 +100,79 @@ uint16_t Reader::ReadNode(const uint32_t offset, NodeRecord& record, Node *node)
   if (res != 1) {
     return READ_FAILED;
   }
-  node->SetTotalPop(RidOfZeros(ntohl(temp)));
+  node->SetTotalPop(ToHostFormat(temp));
 
   // Read AA population.
   res = fread(&temp, sizeof(uint32_t), 1, file_);
   if (res != 1) {
     return READ_FAILED;
   }
-  node->SetAAPop(RidOfZeros(ntohl(temp)));
+  node->SetAAPop(ToHostFormat(temp));
 
   // Read AI population.
   res = fread(&temp, sizeof(uint32_t), 1, file_);
   if (res != 1) {
     return READ_FAILED;
   }
-  node->SetAIPop(RidOfZeros(ntohl(temp)));
+  node->SetAIPop(ToHostFormat(temp));
 
   // Read AS population.
   res = fread(&temp, sizeof(uint32_t), 1, file_);
   if (res != 1) {
     return READ_FAILED;
   }
-  node->SetASPop(RidOfZeros(ntohl(temp)));
+  node->SetASPop(ToHostFormat(temp));
 
   // Read CA popuation.
   res = fread(&temp, sizeof(uint32_t), 1, file_);
   if (res != 1) {
     return READ_FAILED;
   }
-  node->SetCAPop(RidOfZeros(ntohl(temp)));
+  node->SetCAPop(ToHostFormat(temp));
 
   // Read other population.
   res = fread(&temp, sizeof(uint32_t), 1, file_);
   if (res != 1) {
     return READ_FAILED;
   }
-  node->SetOtherPop(RidOfZeros(ntohl(temp)));
+  node->SetOtherPop(ToHostFormat(temp));
 
   return SUCCESS;
 }
+
+uint32_t Reader::ToHostFormat(uint32_t x) {
+  uint32_t ret;
+  char *byte = (char *) &x;
+  x = htonl(x);
+  ret = x;
+
+  // Read all 4 bytes.
+  for (int i = 0; i < 4; i++) {
+    // If the leading byte is 0, remove it.
+    if (*byte == 0) {
+      ret = ret >> 8;
+    } else {
+      break;
+    }
+    byte++;
+  }
+
+  return ret;
+}
+
+// bool ValidateCheckSum(FILE *file, uint32_t checksum) {
+//   boost::crc_32_type crc;
+//   unsigned char byte;
+
+//   if (file == nullptr || fseek(file, sizeof(Header), SEEK_SET) != 0) {
+//     return false;
+//   }
+
+//   while (fread(&byte, 1, 1, file) != 0) {
+//     crc.process_byte(byte);
+//   }
+
+//   return crc.checksum() == checksum;
+// }
 
 }     // namespace rakan

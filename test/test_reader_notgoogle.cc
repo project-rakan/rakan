@@ -102,8 +102,7 @@ int main(int argc, char *argv[]) {
     PrintNodeRecord(node_recs[i]);
   }
 
-  offset = 18 + 8 * header.num_nodes;
-  // offset = sizeof(Header) + sizeof(NodeRecord) * header.num_nodes;
+  offset = sizeof(Header) + sizeof(NodeRecord) * header.num_nodes;
   vector<Node *> nodes(header.num_nodes);
   for (int i = 0; i < 3; i++) {
     Node *node = new Node;
