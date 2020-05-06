@@ -16,11 +16,11 @@ using std::unordered_map;
 
 namespace rakan {
 
-int32_t RidOfZeros(uint32_t x) {
-  int32_t copy = x;
+uint32_t RidOfZeros(uint32_t x) {
+  uint32_t copy = x;
   char *byte = (char *) &x;
 
-  for (int i = 0; i < 8; i++) {
+  for (int i = 0; i < 4; i++) {
     if (*byte == 0x0) {
       copy = copy >> 8;
     } else {
@@ -70,8 +70,7 @@ uint16_t Reader::ReadNodeRecord(const uint32_t offset, NodeRecord *record) const
 
 uint16_t Reader::ReadNode(const uint32_t offset, NodeRecord& record, Node *node) const {
   size_t res;
-  uint32_t i;
-  unsigned char buf[4];
+  uint32_t i, temp;
 
   if (file_ == nullptr) {
     return INVALID_FILE;
@@ -82,69 +81,69 @@ uint16_t Reader::ReadNode(const uint32_t offset, NodeRecord& record, Node *node)
   }
 
   // Read node id.
-  res = fread(buf, sizeof(uint32_t), 1, file_);
+  res = fread(&node->id_, sizeof(uint32_t), 1, file_);
   if (res != 1) {
     return READ_FAILED;
   }
-  node->id_ = RidOfZeros(ntohl(*(reinterpret_cast<uint32_t *> (buf))));
+  node->id_ = RidOfZeros(ntohl(node->id_));
 
   // Read area.
-  res = fread(buf, sizeof(uint32_t), 1, file_);
+  res = fread(&node->area_, sizeof(uint32_t), 1, file_);
   if (res != 1) {
     return READ_FAILED;
   }
-  node->area_ = RidOfZeros(ntohl(*(reinterpret_cast<uint32_t *> (buf))));
+  node->area_ = RidOfZeros(ntohl(node->area_));
 
   for (i = 0; i < record.num_neighbors; i++) {
     // Read neighbor.
-    res = fread(buf, sizeof(uint32_t), 1, file_);
+    res = fread(&temp, sizeof(uint32_t), 1, file_);
     if (res != 1) {
       return READ_FAILED;
     }
-    node->neighbors_->insert(RidOfZeros(ntohl(*(reinterpret_cast<uint32_t *> (buf)))));
+    node->neighbors_->insert(RidOfZeros(ntohl(temp)));
   }
 
   // Read total population.
-  res = fread(buf, sizeof(uint32_t), 1, file_);
+  res = fread(&temp, sizeof(uint32_t), 1, file_);
   if (res != 1) {
     return READ_FAILED;
   }
-  node->SetTotalPop(RidOfZeros(ntohl(*(reinterpret_cast<uint32_t *> (buf)))));
+  node->SetTotalPop(RidOfZeros(ntohl(temp)));
 
   // Read AA population.
-  res = fread(buf, sizeof(uint32_t), 1, file_);
+  res = fread(&temp, sizeof(uint32_t), 1, file_);
   if (res != 1) {
     return READ_FAILED;
   }
-  node->SetAAPop(RidOfZeros(ntohl(*(reinterpret_cast<uint32_t *> (buf)))));
+  node->SetAAPop(RidOfZeros(ntohl(temp)));
 
   // Read AI population.
-  res = fread(buf, sizeof(uint32_t), 1, file_);
+  res = fread(&temp, sizeof(uint32_t), 1, file_);
   if (res != 1) {
     return READ_FAILED;
   }
-  node->SetAIPop(RidOfZeros(ntohl(*(reinterpret_cast<uint32_t *> (buf)))));
+  node->SetAIPop(RidOfZeros(ntohl(temp)));
 
   // Read AS population.
-  res = fread(buf, sizeof(uint32_t), 1, file_);
+  res = fread(&temp, sizeof(uint32_t), 1, file_);
   if (res != 1) {
     return READ_FAILED;
   }
-  node->SetASPop(RidOfZeros(ntohl(*(reinterpret_cast<uint32_t *> (buf)))));
+  node->SetASPop(RidOfZeros(ntohl(temp)));
 
   // Read CA popuation.
-  res = fread(buf, sizeof(uint32_t), 1, file_);
+  res = fread(&temp, sizeof(uint32_t), 1, file_);
   if (res != 1) {
     return READ_FAILED;
   }
-  node->SetCAPop(RidOfZeros(ntohl(*(reinterpret_cast<uint32_t *> (buf)))));
+  node->SetCAPop(RidOfZeros(ntohl(temp)));
 
   // Read other population.
-  res = fread(buf, sizeof(uint32_t), 1, file_);
+  res = fread(&temp, sizeof(uint32_t), 1, file_);
   if (res != 1) {
     return READ_FAILED;
   }
-  node->SetOtherPop(RidOfZeros(ntohl(*(reinterpret_cast<uint32_t *> (buf)))));
+  node->SetOtherPop(RidOfZeros(ntohl(temp)));
 
   return SUCCESS;
 }

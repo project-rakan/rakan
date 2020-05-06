@@ -15,25 +15,20 @@ namespace rakan {
 class Node {
  public:
   // Default constructor.
-  Node() {}
+  Node();
 
   // Constructor with a unique ID.
-  Node(const uint32_t id) : id_(id) {}
+  Node(const uint32_t id);
 
   // Constructor with a unique ID and a district ID.
-  Node(const uint32_t id, const uint32_t district)
-      : id_(id),
-        district_(district) {}
+  Node(const uint32_t id, const uint32_t district);
 
   // Constructor with a unique ID, a district ID, and a set
   // of neighbors. Assumes the neighbors are dynamically
   // allocated via new.
   Node(const uint32_t id,
        const uint32_t district,
-       unordered_set<uint32_t> *neighbors)
-      : id_(id),
-        district_(district),
-        neighbors_(neighbors) {}
+       unordered_set<uint32_t> *neighbors);
 
   // Destructor.
   ~Node() { delete neighbors_; }

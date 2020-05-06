@@ -44,12 +44,11 @@ void PrintSet(unordered_set<uint32_t> *set) {
   for (auto& element : *set) {
     cout << element << ", ";
   }
-  cout << endl;
 }
 
 void PrintMap(unordered_map<string, uint32_t> *map) {
   for (auto element : *map) {
-    cout << element.first << ": " << element.second << endl;
+    cout << "        " << element.first << ": " << element.second << endl;
   }
  }
 
@@ -57,9 +56,9 @@ void PrintNode(Node *node) {
   cout << "Node = {" << endl;
   cout << "    id = " << node->GetID() << endl;
   cout << "    area_ = " << node->GetArea() << endl;
-  cout << "    neighbors = {" << endl;
+  cout << "    neighbors = {";
   PrintSet(node->GetNeighbors());
-  cout << "    }" << endl;
+  cout << "}" << endl;
   cout << "    demographics = {" << endl;
   PrintMap(node->GetDemographics());
   cout << "    }" << endl;
@@ -103,7 +102,8 @@ int main(int argc, char *argv[]) {
     PrintNodeRecord(node_recs[i]);
   }
 
-  offset = sizeof(Header) + sizeof(NodeRecord) * header.num_nodes;
+  offset = 18 + 8 * header.num_nodes;
+  // offset = sizeof(Header) + sizeof(NodeRecord) * header.num_nodes;
   vector<Node *> nodes(header.num_nodes);
   for (int i = 0; i < 3; i++) {
     Node *node = new Node;
