@@ -1,12 +1,18 @@
 #include "Runner.h"
 
-#include <inttypes.h>
-#include <iostream>
+#include <inttypes.h>       // for uint32_t, etc.
+#include <iostream>         // for cerr
+#include <stdio.h>          // for FILE *, fopen, fseek, fread, etc.
+#include <vector>           // for std::vector
 
-#include "ErrorCodes.h"
-#include "Graph.h"
-#include "Node.h"
-#include "Reader.h"
+#include "ErrorCodes.h"     // for SUCCESS, READ_FAIL, SEEK_FAIL, etc.
+#include "Graph.h"          // for class Graph
+#include "Node.h"           // for class Node
+#include "Reader.h"         // for class Reader, structs
+
+using std::cerr;
+using std::endl;
+using std::vector;
 
 int main(int argc, char *argv[]) {
   if (argc != 2) {
@@ -21,29 +27,43 @@ int main(int argc, char *argv[]) {
   }
 
   // Initialize this engine.
-  Init(file);
+  Graph *graph = rakan::Init(file);
 }
 
 namespace rakan {
 
-void Init(FILE *file) {
+Graph* Init(FILE *file) {
+  uint32_t i, record_offset, node_offset;
+  Graph *graph;
   Reader reader(file);
   Header header;
-  vector<NodeRecord *> node_recs;
+  NodeRecord rec;
 
-  if (reader.ReadHeader(&header) != SUCCESS) {
-    perror("ReadHeader failed");
-    return EXIT_FAILURE;
+  Verify(reader.ReadHeader(&header));
+  graph = new Graph(header.num_nodes, header.num_districts);
+
+  // Calculate the offsets of the first NodeRecord and Node.
+  // Refer to the index file design for actual number of bytes.
+  record_offset = sizeof(Header);
+  node_offset = sizeof(Header) + sizeof(NodeRecord) * header.num_nodes;
+
+  // Read all the nodes and populate the graph with them.
+  for (i = 0; i < header.num_nodes; i++) {
+    Node *node = new Node;
+    Verify(reader.ReadNodeRecord(record_offset, &rec));
+    Verify(reader.ReadNode(node_offset + rec.node_pos,
+                           rec.num_neighbors,
+                           node));
+    graph->AddNode(*node);
+    record_offset += sizeof(NodeRecord);
   }
 
-  for (int i = 0; i < header.num_nodes; i++) {
-    NodeRecord *rec = new NodeRecord;
-    if (reader.ReadNodeRecord(offset, rec) != SUCCESS) {
-      perror("ReadNodeRecord failed");
-      return EXIT_FAILURE;
-    }
-    node_recs[i] = rec;
-    offset += sizeof(NodeRecord);
+  return graph;
+}
+
+void Verify(uint16_t result) {
+  if (result != SUCCESS) {
+    exit(EXIT_FAILURE);
   }
 }
 

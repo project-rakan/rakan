@@ -22,7 +22,10 @@ class Graph {
   // Constructors and destructors
   /////////////////////////////////////////////////////////////////////////////
 
-  // Default constructor. Supplies the number of nodes and districts on this
+  // Default constructor.
+  Graph() {}
+
+  // Supplies the number of nodes and districts on this
   // graph. Number of nodes and districts must be non-negative.
   //
   // Arguments:

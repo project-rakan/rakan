@@ -59,7 +59,7 @@ uint16_t Reader::ReadNodeRecord(const uint32_t offset,
 }
 
 uint16_t Reader::ReadNode(const uint32_t offset,
-                          NodeRecord& record,
+                          const uint32_t num_neighbors,
                           Node *node) {
   size_t res;
   uint32_t i, temp;
@@ -68,7 +68,7 @@ uint16_t Reader::ReadNode(const uint32_t offset,
     return INVALID_FILE;
   }
 
-  if (fseek(file_, offset + record.node_pos, SEEK_SET) != 0) {
+  if (fseek(file_, offset, SEEK_SET) != 0) {
     return SEEK_FAILED;
   }
 
@@ -86,7 +86,7 @@ uint16_t Reader::ReadNode(const uint32_t offset,
   }
   node->area_ = ToHostFormat(node->area_);
 
-  for (i = 0; i < record.num_neighbors; i++) {
+  for (i = 0; i < num_neighbors; i++) {
     // Read neighbor.
     res = fread(&temp, sizeof(uint32_t), 1, file_);
     if (res != 1) {

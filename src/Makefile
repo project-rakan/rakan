@@ -3,17 +3,17 @@
 
 CXX = g++
 OBJS = Graph.o Node.o Reader.o
-EXE  = test_reader
+EXE  = runner
 HEADER = Graph.h Node.h Reader.h
 CPPFLAGS = -Wall -g -std=c++11
 
 # default target
 $(EXE): $(OBJS)
-	$(CXX) $(CPPFLAGS) -o $(EXE) $(OBJS) ../test/test_reader_notgoogle.cc
+	$(CXX) $(CPPFLAGS) -o $(EXE) $(OBJS) Runner.cc
 
 # source files
 %.o: %.cc $(HEADERS)
-	$(CXX) $(CPPFLAGS) -c $< 
+	$(CXX) $(CPPFLAGS) -c $<
 
 # phony target - remove generated files and backups
 clean:

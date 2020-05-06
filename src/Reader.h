@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include <netinet/in.h>       // For htonl(), ntohl()
-#include <stdio.h>            // for (FILE *)
+#include <stdio.h>            // for FILE *
 #include <inttypes.h>         // for uint32_t, etc.
 #include <string>             // for std::string
 
@@ -44,10 +44,13 @@ typedef struct node_record_struct {
 class Reader {
  public:
   // Default constructor.
+  Reader() {}
+
+  // File constructor.
   //
   // Arguments:
   //  - file: the file to read from
-  Reader(FILE *file = nullptr) : file_(file) {}
+  Reader(FILE *file) : file_(file) {}
 
   // Default destructor.
   ~Reader() {}
@@ -76,7 +79,7 @@ class Reader {
   //  - READ_FAILED if reading file failed
   uint16_t ReadNodeRecord(const uint32_t offset, NodeRecord *record);
 
-  uint16_t ReadNode(const uint32_t offset, NodeRecord& record, Node *node);
+  uint16_t ReadNode(const uint32_t offset, const uint32_t num_neighbors, Node *node);
 
  private:
   // The file we're currently reading.
