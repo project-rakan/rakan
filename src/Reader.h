@@ -18,6 +18,8 @@ using std::string;
 namespace rakan {
 
 extern const uint32_t kMagicNumber;
+extern const uint32_t kHeaderSize;
+extern const uint32_t kNodeRecordSize;
 
 // A header struct that contains all data in the header
 // section of the index file.

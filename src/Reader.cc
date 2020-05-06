@@ -1,5 +1,7 @@
 #include "./Reader.h"
 
+#include <iostream>
+
 #include <arpa/inet.h>        // For ntohl()
 #include <bits/stdc++.h>      // for std::unordered_set
 #include <inttypes.h>         // for uint32_t
@@ -16,6 +18,8 @@ using std::unordered_map;
 namespace rakan {
 
 const uint32_t kMagicNumber = 0xBEEFCAFE;
+const uint32_t kHeaderSize = sizeof(uint32_t) * 4 + sizeof(char) * 2;
+const uint32_t kNodeRecordSize = sizeof(uint32_t) * 2;
 
 uint16_t Reader::ReadHeader(Header *header) {
   size_t res;
@@ -52,6 +56,8 @@ uint16_t Reader::ReadNodeRecord(const uint32_t offset,
   if (res != 1) {
     return READ_FAILED;
   }
+  // std::cout << std::hex << "record->num_neighbors = " << record->num_neighbors << endl;
+  // std::cout << std::hex << "ecord->node_pos = " << record->node_pos << endl;
   record->num_neighbors = ToHostFormat(record->num_neighbors);
   record->node_pos = ToHostFormat(record->node_pos);
 
@@ -141,13 +147,13 @@ uint16_t Reader::ReadNode(const uint32_t offset,
 }
 
 uint32_t Reader::ToHostFormat(uint32_t x) {
-  uint32_t ret;
+  uint32_t ret, i;
   char *byte = (char *) &x;
   x = htonl(x);
   ret = x;
 
   // Read all 4 bytes.
-  for (int i = 0; i < 4; i++) {
+  for (i = 0; i < 4; i++) {
     // If the leading byte is 0, remove it.
     if (*byte == 0) {
       ret = ret >> 8;

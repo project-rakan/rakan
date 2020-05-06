@@ -1,5 +1,6 @@
 #include "Runner.h"
 
+#include <assert.h>         // for assert()
 #include <inttypes.h>       // for uint32_t, etc.
 #include <iostream>         // for cerr
 #include <stdio.h>          // for FILE *, fopen, fseek, fread, etc.
@@ -22,12 +23,15 @@ int main(int argc, char *argv[]) {
   // Open index file as a binary.
   FILE *file = fopen(argv[1], "rb");
   if (file == nullptr) {
-    perror("Cannot open file: ");
     return EXIT_FAILURE;
   }
 
   // Initialize this engine.
   Graph *graph = rakan::Init(file);
+
+  // Clean up and exit.
+  fclose(file);
+  return EXIT_SUCCESS;
 }
 
 namespace rakan {
@@ -44,8 +48,8 @@ Graph* Init(FILE *file) {
 
   // Calculate the offsets of the first NodeRecord and Node.
   // Refer to the index file design for actual number of bytes.
-  record_offset = sizeof(Header);
-  node_offset = sizeof(Header) + sizeof(NodeRecord) * header.num_nodes;
+  record_offset = kHeaderSize;
+  node_offset = kHeaderSize + kNodeRecordSize * header.num_nodes;
 
   // Read all the nodes and populate the graph with them.
   for (i = 0; i < header.num_nodes; i++) {
@@ -55,7 +59,7 @@ Graph* Init(FILE *file) {
                            rec.num_neighbors,
                            node));
     graph->AddNode(*node);
-    record_offset += sizeof(NodeRecord);
+    record_offset += kNodeRecordSize;
   }
 
   return graph;
