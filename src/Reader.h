@@ -1,19 +1,14 @@
-#ifndef READER_H_
-#define READER_H_
+#ifndef SRC_READER_H_
+#define SRC_READER_H_
 
-#include <iostream>
-
-#include <netinet/in.h>       // For htonl(), ntohl()
-#include <stdio.h>            // for FILE *
 #include <inttypes.h>         // for uint32_t, etc.
-#include <string>             // for std::string
+#include <stdio.h>            // for FILE *
 
-#include "./Graph.h"          // for Graph class
-#include "./Node.h"           // for Node class
+#include "src/Graph.h"          // for Graph class
+#include "src/Node.h"           // for Node class
 
 using rakan::Graph;
 using rakan::Node;
-using std::string;
 
 namespace rakan {
 
@@ -52,7 +47,7 @@ class Reader {
   //
   // Arguments:
   //  - file: the file to read from
-  Reader(FILE *file) : file_(file) {}
+  explicit Reader(FILE *file) : file_(file) {}
 
   // Default destructor.
   ~Reader() {}
@@ -68,7 +63,7 @@ class Reader {
   //  - READ_FAILED if reading file failed
   uint16_t ReadHeader(Header *header);
 
-  // Reads the node records in the file. Fills the 
+  // Reads the node records in the file.
   //
   // Arguments:
   //  - offset: the offset to start reading the node record
@@ -81,7 +76,9 @@ class Reader {
   //  - READ_FAILED if reading file failed
   uint16_t ReadNodeRecord(const uint32_t offset, NodeRecord *record);
 
-  uint16_t ReadNode(const uint32_t offset, const uint32_t num_neighbors, Node *node);
+  uint16_t ReadNode(const uint32_t offset,
+                    const uint32_t num_neighbors,
+                    Node *node);
 
  private:
   // The file we're currently reading.
@@ -95,4 +92,4 @@ class Reader {
 
 }         // namespace rakan
 
-#endif    // READER_H_
+#endif    // SRC_READER_H_

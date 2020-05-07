@@ -1,18 +1,18 @@
-#ifndef GRAPH_H_
-#define GRAPH_H_
+#ifndef SRC_GRAPH_H_
+#define SRC_GRAPH_H_
 
-#include <bits/stdc++.h>    // for std::unordered_set
 #include <inttypes.h>       // for uint32_t
 #include <stdio.h>          // for FILE *
-#include <memory>           // for std::unique_ptr
+
+#include <string>           // for std::string
+#include <unordered_set>    // for std::unordered_set
 #include <unordered_map>    // for std::unordered_map
-#include <vector>           // for std::vector
 
-#include "Node.h"           // for Node class
+#include "src/Node.h"           // for Node class
 
+using std::string;
 using std::unordered_set;
 using std::unordered_map;
-using std::vector;
 
 namespace rakan {
 
@@ -23,7 +23,7 @@ class Graph {
   /////////////////////////////////////////////////////////////////////////////
 
   // Default constructor.
-  Graph() {}
+  Graph() : is_empty_(true), state_pop_(0) {}
 
   // Supplies the number of nodes and districts on this
   // graph. Number of nodes and districts must be non-negative.
@@ -48,7 +48,7 @@ class Graph {
   // Returns:
   //  - true iff adding node successful
   //  - false if node cannot be added
-  bool AddNode(Node& node);
+  bool AddNode(const Node& node);
 
   // Adds an edge between the two supplied nodes. If either node does not
   // exist, adds nodes before adding edge.
@@ -60,7 +60,9 @@ class Graph {
   // Returns:
   //  - true iff adding edge successful
   //  - false if the edge cannot be added
-  bool AddEdge(Node& node1, Node& node2);
+  bool AddEdge(Node *node1, Node *node2);
+
+  void AddStatePop(uint32_t val) { state_pop_ += val; }
 
   /////////////////////////////////////////////////////////////////////////////
   // Queries
@@ -118,6 +120,8 @@ class Graph {
 
   uint32_t GetNumDistricts() const { return num_districts_; }
 
+  uint32_t GetStatePop() const { return state_pop_; }
+
   // Gets the set of nodes in the given district.
   //
   // Arguments:
@@ -155,7 +159,7 @@ class Graph {
   //
   // Returns:
   //  - the total population of the given district
-  uint32_t GetTotalPop(const uint32_t district) const;
+  uint32_t GetDistrictPop(const uint32_t district) const;
 
   // Gets the total minority population of the given district.
   //
@@ -178,6 +182,7 @@ class Graph {
  private:
   uint32_t num_nodes_;
   uint32_t num_districts_;
+  uint32_t state_pop_;
   bool is_empty_;
 
   // An array of all the nodes on this graph. The index of the array is
@@ -188,6 +193,8 @@ class Graph {
   // is the district ID, and the pointer at the index points
   // to a set of nodes in that district.
   unordered_set<int> **nodes_in_district_;
+
+  unordered_set<int> **area_of_district_;
 
   // An array of pointers to sets. The index of the array
   // is the district ID, and the pointer at the index points
@@ -200,7 +207,7 @@ class Graph {
   // to each key contains a set of node IDs that are neighbors
   // to the perimeter node.
   unordered_map<int, unordered_set<int> *> **perim_nodes_to_neighbors_;
-  
+
   // A map of the district ID to another map of the demographics
   // in that district.
   unordered_map<int, unordered_map<string, int> *> *demographics_;
@@ -228,4 +235,4 @@ class Graph {
 
 }         // namespace rakan
 
-#endif    // GRAPH_H_
+#endif    // SRC_GRAPH_H_

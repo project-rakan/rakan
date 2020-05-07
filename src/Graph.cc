@@ -1,29 +1,33 @@
-#include "./Graph.h"
+#include "src/Graph.h"
 
-#include <bits/stdc++.h>    // for std::unordered_set
 #include <inttypes.h>       // for uint32_t
 #include <stdio.h>          // for FILE *, stderr
+#include <string>           // for std::string
+#include <unordered_set>    // for std::unordered_set
 #include <unordered_map>    // for std::unordered_map
 #include <vector>           // for std::vector
 
 #include "ErrorCodes.h"     // for error codes
 #include "Node.h"           // for Node class
 
+using std::string;
 using std::unordered_set;
 using std::unordered_map;
 
 namespace rakan {
 
-Graph::Graph(const uint32_t num_nodes, const uint32_t num_districts) {
-  // Initialize number fields.
-  num_nodes_ = num_nodes;
-  num_districts_ = num_districts;
-
+Graph::Graph(const uint32_t num_nodes, const uint32_t num_districts)
+    : is_empty_(true),
+      num_nodes_(num_nodes),
+      num_districts_(num_districts),
+      state_pop_(0) {
   // Initialize array of pointers fields.
   nodes_ = new Node*[num_nodes_];
   nodes_in_district_ = new unordered_set<int>*[num_districts_];
+  area_of_district_ = new unordered_set<int>*[num_districts_];
   nodes_on_perim_ = new unordered_set<int>*[num_districts_];
-  perim_nodes_to_neighbors_ = new unordered_map<int, unordered_set<int> *>*[num_districts_];
+  perim_nodes_to_neighbors_ =
+                new unordered_map<int, unordered_set<int> *>*[num_districts_];
 
   // Initialize other array fields.
   demographics_ = new unordered_map<int, unordered_map<string, int> *>;
@@ -62,8 +66,8 @@ Graph::~Graph() {
   // Delete all map pointers in perim_nodes_to_neighbors_.
   for (i = 0; i < num_districts_; i++) {
     // Delete the set pointer.
-    for (auto& iterator : *perim_nodes_to_neighbors_[i]) {
-      delete iterator.second; 
+    for (auto& kv : *perim_nodes_to_neighbors_[i]) {
+      delete kv.second;
     }
     // Delete the map pointer.
     delete perim_nodes_to_neighbors_[i];
@@ -71,7 +75,7 @@ Graph::~Graph() {
   delete[] perim_nodes_to_neighbors_;
 }
 
-bool Graph::AddNode(Node& node) {
+bool Graph::AddNode(const Node& node) {
   if (node.id_ > num_nodes_) {
     return false;
   }
@@ -80,16 +84,16 @@ bool Graph::AddNode(Node& node) {
   return true;
 }
 
-bool Graph::AddEdge(Node& node1, Node& node2) {
-  if (!ContainsNode(node1)) {
-    AddNode(node1);
+bool Graph::AddEdge(Node *node1, Node *node2) {
+  if (!ContainsNode(*node1)) {
+    AddNode(*node1);
   }
 
-  if (!ContainsNode(node2)) {
-    AddNode(node2);
+  if (!ContainsNode(*node2)) {
+    AddNode(*node2);
   }
 
-  return node1.AddNeighbor(node2);
+  return node1->AddNeighbor(*node2);
 }
 
 bool Graph::ContainsNode(const Node& node) const {
@@ -127,7 +131,7 @@ unordered_set<int>* Graph::GetPerimNodeNeighbors(const uint32_t district,
   return (*perim_nodes_to_neighbors_[district]->find(node)).second;
 }
 
-uint32_t Graph::GetTotalPop(const uint32_t district) const {
+uint32_t Graph::GetDistrictPop(const uint32_t district) const {
   return pop_by_district_[district];
 }
 

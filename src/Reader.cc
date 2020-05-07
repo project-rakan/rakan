@@ -1,6 +1,4 @@
-#include "./Reader.h"
-
-#include <iostream>
+#include "src/Reader.h"
 
 #include <arpa/inet.h>        // For ntohl()
 #include <bits/stdc++.h>      // for std::unordered_set
@@ -8,9 +6,9 @@
 #include <stdio.h>            // for FILE *, fread, fseek
 #include <unordered_map>      // for std::unordered_map
 
-#include "./ErrorCodes.h"     // for error codes
-#include "./Graph.h"          // for Graph class
-#include "./Node.h"           // for Node class
+#include "src/ErrorCodes.h"     // for error codes
+#include "src/Graph.h"          // for Graph class
+#include "src/Node.h"           // for Node class
 
 using std::unordered_set;
 using std::unordered_map;
@@ -42,7 +40,7 @@ uint16_t Reader::ReadHeader(Header *header) {
 
 uint16_t Reader::ReadNodeRecord(const uint32_t offset,
                                 NodeRecord *record) {
-  int res;
+  size_t res;
 
   if (file_ == nullptr) {
     return INVALID_FILE;
@@ -146,7 +144,7 @@ uint16_t Reader::ReadNode(const uint32_t offset,
 
 uint32_t Reader::ToHostFormat(uint32_t x) {
   uint32_t ret, i;
-  char *byte = (char *) &x;
+  char *byte = reinterpret_case<char *>(&x);
   x = htonl(x);
   ret = x;
 

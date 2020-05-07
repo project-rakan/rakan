@@ -1,8 +1,9 @@
-#include "./Node.h"
+#include "src/Node.h"
 
-#include <bits/stdc++.h>      // for std::unordered_set.insert
 #include <inttypes.h>         // for uint32_t
 #include <stdio.h>            // for FILE *, fread, fseek
+
+#include <unordered_set>      // for std::unordered_set
 #include <unordered_map>      // for std::unordered_map
 
 using std::unordered_set;
@@ -15,7 +16,7 @@ Node::Node() {
   demographics_ = new unordered_map<string, uint32_t>;
 }
 
-Node::Node(const uint32_t id) : id_(id) {
+explicit Node::Node(const uint32_t id) : id_(id) {
   neighbors_ = new unordered_set<uint32_t>;
   demographics_ = new unordered_map<string, uint32_t>;
 }
@@ -40,9 +41,10 @@ bool Node::operator==(const Node& other) const {
           this->demographics_ == other.demographics_);
 }
 
-bool Node::AddNeighbor(Node& other) {
-  return (this->neighbors_->insert(other.id_).second &&
-          other.neighbors_->insert(this->id_).second);
+bool Node::AddNeighbor(const Node& other) {
+  this->neighbors_->insert(other.id_).second;
+  other.AddNeighbor(*this);
+  return true;
 }
 
 }   // namespace rakan

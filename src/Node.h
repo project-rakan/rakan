@@ -1,9 +1,9 @@
-#ifndef NODE_H_
-#define NODE_H_
+#ifndef SRC_NODE_H_
+#define SRC_NODE_H_
 
-#include <bits/stdc++.h>      // for std::unordered_set
 #include <inttypes.h>         // for uint32_t
 #include <string>             // for std::string
+#include <unordered_set>      // for std::unordered_set
 #include <unordered_map>      // for std::unordered_map
 
 using std::string;
@@ -22,7 +22,7 @@ class Node {
   Node();
 
   // Constructor with a unique ID.
-  Node(const uint32_t id);
+  explicit Node(const uint32_t id);
 
   // Constructor with a unique ID and a district ID.
   Node(const uint32_t id, const uint32_t district);
@@ -62,6 +62,8 @@ class Node {
 
   unordered_map<string, uint32_t>* GetDemographics() { return demographics_; }
 
+  uint32_t GetTotalPop() { return demographics_["total"]; }
+
   /////////////////////////////////////////////////////////////////////////////
   // Mutators
   /////////////////////////////////////////////////////////////////////////////
@@ -76,8 +78,8 @@ class Node {
   // Returns:
   //  - true iff the relationship is new
   //  - false otherwise
-  bool AddNeighbor(Node& other);
-  
+  bool AddNeighbor(const Node& other);
+
   void SetDistrict(const uint32_t district) { district_ = district; }
 
   // Sets the total population in this node to be val.
@@ -88,31 +90,31 @@ class Node {
   // Sets the African American population in this node to
   // be val.
   void SetAAPop(const uint32_t val) {
-    demographics_->insert(std::make_pair<>("aa", val));
+    demographics_->insert({"aa", val});
   }
 
   // Sets the American Indian population in this node to
   // be val.
   void SetAIPop(const uint32_t val) {
-    demographics_->insert(std::make_pair<>("ai", val));
+    demographics_->insert({"ai", val});
   }
 
   // Sets the Asian population in this node to be val.
   void SetASPop(const uint32_t val) {
-    demographics_->insert(std::make_pair<>("as", val));
+    demographics_->insert({"as", val});
   }
 
   // Sets the Caucasian population in this node to be val.
   void SetCAPop(const uint32_t val) {
-    demographics_->insert(std::make_pair<>("cs", val));
+    demographics_->insert({"cs", val});
   }
 
   // Sets the other population in this node to be val.
   void SetOtherPop(const uint32_t val) {
-    demographics_->insert(std::make_pair<>("other", val));
+    demographics_->insert({"other", val});
   }
 
- private: 
+ private:
   // The unique node ID.
   uint32_t id_;
 
@@ -135,4 +137,4 @@ class Node {
 
 }         // namespace rakan
 
-#endif    // NODE_H_
+#endif    // SRC_NODE_H_

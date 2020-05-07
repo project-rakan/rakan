@@ -1,5 +1,5 @@
-#ifndef RUNNER_H_
-#define RUNNER_H_
+#ifndef SRC_RUNNER_H_
+#define SRC_RUNNER_H_
 
 #include <bits/stdc++.h>      // for std::unordered_set
 #include <inttypes.h>         // for uint32_t
@@ -16,39 +16,32 @@ using std::unordered_map;
 
 namespace rakan {
 
-///////////////////////////////////////////////////////////////////////////////
-// Building methods
-///////////////////////////////////////////////////////////////////////////////
-Graph* Init(FILE *file);
+class Runner {
+ public:
+  Runner();
 
-void SeedDistricts();
+  Graph* LoadGraph(FILE *file);
 
-void Verify(uint16_t result);
+  void SeedDistricts();
 
-///////////////////////////////////////////////////////////////////////////////
-// Scoring methods
-///////////////////////////////////////////////////////////////////////////////
-void ScoreCompactness();
+  void Verify(uint16_t result);
 
-void ScorePopulationDistribution();
+  double ScoreCompactness(uint32_t num_nodes, uint32_t num_districts);
 
-void ScoreExistingBorders();
+  double ScorePopulationDistribution(uint32_t *pop_by_district,
+                                     uint32_t num_districts);
 
-void ScoreVRA();
+  double ScoreExistingBorders();
 
-void LogScore();
+  double ScoreVRA();
 
-void MetropolisHastings();
+  double LogScore();
 
-void Walk();
+  void MetropolisHastings();
 
-///////////////////////////////////////////////////////////////////////////////
-// Queue methods
-///////////////////////////////////////////////////////////////////////////////
-void MessageQueue();
-
-void RetrieveQueue();
+  void Walk();
+};        // class Runner
 
 }         // namespace rakan
 
-#endif    // RUNNER_H_
+#endif    // SRC_RUNNER_H_
