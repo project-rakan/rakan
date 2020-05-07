@@ -16,7 +16,7 @@ Node::Node() {
   demographics_ = new unordered_map<string, uint32_t>;
 }
 
-explicit Node::Node(const uint32_t id) : id_(id) {
+Node::Node(const uint32_t id) : id_(id) {
   neighbors_ = new unordered_set<uint32_t>;
   demographics_ = new unordered_map<string, uint32_t>;
 }
@@ -43,7 +43,6 @@ bool Node::operator==(const Node& other) const {
 
 bool Node::AddNeighbor(const Node& other) {
   this->neighbors_->insert(other.id_).second;
-  other.AddNeighbor(*this);
   return true;
 }
 

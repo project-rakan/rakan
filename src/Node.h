@@ -62,7 +62,7 @@ class Node {
 
   unordered_map<string, uint32_t>* GetDemographics() { return demographics_; }
 
-  uint32_t GetTotalPop() { return demographics_["total"]; }
+  uint32_t GetTotalPop() { return (*demographics_)["total"]; }
 
   /////////////////////////////////////////////////////////////////////////////
   // Mutators
@@ -132,6 +132,7 @@ class Node {
 
   // Needed for populating data structures in graph from file.
   friend class Graph;
+  friend class Reader;
   friend class Runner;
 };        // class Node
 
