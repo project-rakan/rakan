@@ -112,6 +112,12 @@ class Graph {
   //  - nullptr if the node does not exist
   Node* GetNode(const uint32_t id) const;
 
+  Node** GetNodes() const { return nodes_; }
+
+  uint32_t GetNumNodes() const { return num_nodes_; }
+
+  uint32_t GetNumDistricts() const { return num_districts_; }
+
   // Gets the set of nodes in the given district.
   //
   // Arguments:

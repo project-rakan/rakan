@@ -78,6 +78,8 @@ class Node {
   //  - false otherwise
   bool AddNeighbor(Node& other);
   
+  void SetDistrict(const uint32_t district) { district_ = district; }
+
   // Sets the total population in this node to be val.
   void SetTotalPop(const uint32_t val) {
     demographics_->insert({"total", val});

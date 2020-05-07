@@ -66,7 +66,7 @@ uint16_t Reader::ReadNode(const uint32_t offset,
                           const uint32_t num_neighbors,
                           Node *node) {
   size_t res;
-  uint32_t i, temp, bytes_read;
+  uint32_t i, temp;
 
   if (file_ == nullptr) {
     return INVALID_FILE;
