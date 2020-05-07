@@ -19,6 +19,30 @@ using std::vector;
 
 namespace rakan {
 
+uint16_t Runner::LoadGraph(unordered_map<uint32_t, uint32_t> *map) {
+  map::size_type size;
+  // The number of precincts in the graph
+  size = map->size();
+  uint32_t num_nodes = (uint32_t) size;
+  // Iterator to count all of the districts in the 
+  map::iterator it = map.begin();
+
+  unordered_set<uint32_t> districts;
+  while(it != map.end()) {
+    districts.insert(it->second);
+    
+    it++;
+  }
+  uint32_t num_districts = districts.size();
+  graph_ = new Graph(num_nodes, num_districts);
+  it = map.begin();
+  while(it != map.end()) {
+    Node* n = new Node(it->first);
+    
+    it++;
+  }
+}
+
 uint16_t Runner::LoadGraph(FILE *file) {
   Reader reader(file);
   Header header;
@@ -85,7 +109,6 @@ uint16_t Runner::SeedDistricts() {
 
   uint32_t i, size, districts, random_num;
   unordered_set<Node *> set;
-  Vector<Node *> linkage;
 
   // Move all of the nodes inside of the graph into a set,
   districts = graph_->GetNumDistricts();
@@ -111,14 +134,21 @@ uint16_t Runner::SeedDistricts() {
   size = set.size();
   while (set.size() > 0) {
     // BFS from seed until a node still in the original set is found.
-
+    Node* = BFS(graph, i);
     // Check to ensure that there is no endless looping.
     if (size - 1 == set.size()) {
       size = set.size();
+      i++;
+    } else {
+      break;
     }
   }
 
   return SUCCESS;
+}
+
+Node* Runner::BFS(Graph* graph, uint32_t district_num) {
+  graph->
 }
 
 double Runner::ScoreCompactness() {
