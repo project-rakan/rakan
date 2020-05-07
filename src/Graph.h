@@ -102,6 +102,16 @@ class Graph {
   // Accessors
   /////////////////////////////////////////////////////////////////////////////
 
+  // Gets the node on this graph by its ID.
+  //
+  // Arguments:
+  //  - id: the id of the node to get
+  //
+  // Returns:
+  //  - a pointer to the node if it exists on this graph
+  //  - nullptr if the node does not exist
+  Node* GetNode(const uint32_t id) const;
+
   // Gets the set of nodes in the given district.
   //
   // Arguments:

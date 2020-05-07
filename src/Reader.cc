@@ -28,12 +28,12 @@ uint16_t Reader::ReadHeader(Header *header) {
     return INVALID_FILE;
   }
 
-  res = fread(header, sizeof(Header), 1, file_);
+  res = fread(header, kHeaderSize, 1, file_);
   if (res != 1) {
     return READ_FAILED;
   }
-  header->magic_number = ToHostFormat(header->magic_number);
-  header->checksum = ToHostFormat(header->checksum);
+  header->magic_number = htonl(header->magic_number);
+  header->checksum = htonl(header->checksum);
   header->num_nodes = ToHostFormat(header->num_nodes);
   header->num_districts = ToHostFormat(header->num_districts);
 
@@ -52,14 +52,12 @@ uint16_t Reader::ReadNodeRecord(const uint32_t offset,
     return SEEK_FAILED;
   }
 
-  res = fread(record, sizeof(NodeRecord), 1, file_);
+  res = fread(record, kNodeRecordSize, 1, file_);
   if (res != 1) {
     return READ_FAILED;
   }
-  // std::cout << std::hex << "record->num_neighbors = " << record->num_neighbors << endl;
-  // std::cout << std::hex << "ecord->node_pos = " << record->node_pos << endl;
-  record->num_neighbors = ToHostFormat(record->num_neighbors);
-  record->node_pos = ToHostFormat(record->node_pos);
+  record->num_neighbors = htonl(record->num_neighbors);
+  record->node_pos = htonl(record->node_pos);
 
   return SUCCESS;
 }
@@ -68,7 +66,7 @@ uint16_t Reader::ReadNode(const uint32_t offset,
                           const uint32_t num_neighbors,
                           Node *node) {
   size_t res;
-  uint32_t i, temp;
+  uint32_t i, temp, bytes_read;
 
   if (file_ == nullptr) {
     return INVALID_FILE;
@@ -83,14 +81,14 @@ uint16_t Reader::ReadNode(const uint32_t offset,
   if (res != 1) {
     return READ_FAILED;
   }
-  node->id_ = ToHostFormat(node->id_);
+  node->id_ = htonl(node->id_);
 
   // Read area.
   res = fread(&node->area_, sizeof(uint32_t), 1, file_);
   if (res != 1) {
     return READ_FAILED;
   }
-  node->area_ = ToHostFormat(node->area_);
+  node->area_ = htonl(node->area_);
 
   for (i = 0; i < num_neighbors; i++) {
     // Read neighbor.
@@ -98,7 +96,7 @@ uint16_t Reader::ReadNode(const uint32_t offset,
     if (res != 1) {
       return READ_FAILED;
     }
-    node->neighbors_->insert(ToHostFormat(temp));
+    node->neighbors_->insert(htonl(temp));
   }
 
   // Read total population.
@@ -106,42 +104,42 @@ uint16_t Reader::ReadNode(const uint32_t offset,
   if (res != 1) {
     return READ_FAILED;
   }
-  node->SetTotalPop(ToHostFormat(temp));
+  node->SetTotalPop(htonl(temp));
 
   // Read AA population.
   res = fread(&temp, sizeof(uint32_t), 1, file_);
   if (res != 1) {
     return READ_FAILED;
   }
-  node->SetAAPop(ToHostFormat(temp));
+  node->SetAAPop(htonl(temp));
 
   // Read AI population.
   res = fread(&temp, sizeof(uint32_t), 1, file_);
   if (res != 1) {
     return READ_FAILED;
   }
-  node->SetAIPop(ToHostFormat(temp));
+  node->SetAIPop(htonl(temp));
 
   // Read AS population.
   res = fread(&temp, sizeof(uint32_t), 1, file_);
   if (res != 1) {
     return READ_FAILED;
   }
-  node->SetASPop(ToHostFormat(temp));
+  node->SetASPop(htonl(temp));
 
   // Read CA popuation.
   res = fread(&temp, sizeof(uint32_t), 1, file_);
   if (res != 1) {
     return READ_FAILED;
   }
-  node->SetCAPop(ToHostFormat(temp));
+  node->SetCAPop(htonl(temp));
 
   // Read other population.
   res = fread(&temp, sizeof(uint32_t), 1, file_);
   if (res != 1) {
     return READ_FAILED;
   }
-  node->SetOtherPop(ToHostFormat(temp));
+  node->SetOtherPop(htonl(temp));
 
   return SUCCESS;
 }

@@ -71,4 +71,8 @@ void Verify(uint16_t result) {
   }
 }
 
+uint16_t SeedDistricts(Graph *graph) {
+  return SUCCESS;
 }
+
+}   // namespace rakan

@@ -107,6 +107,13 @@ bool Graph::NodeExistsInDistrict(const Node& node,
           != nodes_in_district_[district]->end());
 }
 
+Node* Graph::GetNode(const uint32_t id) const {
+  if (id > num_nodes_ || id < 0) {
+    return nullptr;
+  }
+  return nodes_[id];
+}
+
 unordered_set<int>* Graph::GetNodesInDistrict(const uint32_t district) const {
   return nodes_in_district_[district];
 }
