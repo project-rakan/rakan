@@ -132,7 +132,7 @@ class Node {
 
   // Needed for populating data structures in graph from file.
   friend class Graph;
-  friend class Reader;
+  friend class Runner;
 };        // class Node
 
 }         // namespace rakan

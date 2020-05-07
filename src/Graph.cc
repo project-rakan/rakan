@@ -24,15 +24,15 @@ Graph::Graph(const uint32_t num_nodes, const uint32_t num_districts)
   // Initialize array of pointers fields.
   nodes_ = new Node*[num_nodes_];
   nodes_in_district_ = new unordered_set<int>*[num_districts_];
-  area_of_district_ = new unordered_set<int>*[num_districts_];
   nodes_on_perim_ = new unordered_set<int>*[num_districts_];
   perim_nodes_to_neighbors_ =
                 new unordered_map<int, unordered_set<int> *>*[num_districts_];
 
   // Initialize other array fields.
   demographics_ = new unordered_map<int, unordered_map<string, int> *>;
-  pop_by_district_ = new uint32_t[num_districts_];
-  min_pop_by_district_ = new uint32_t[num_districts_];
+  pop_of_district_ = new uint32_t[num_districts_];
+  min_pop_of_district_ = new uint32_t[num_districts_];
+  area_of_district_ = new uint32_t[num_districts_];
 }
 
 Graph::~Graph() {
@@ -132,15 +132,15 @@ unordered_set<int>* Graph::GetPerimNodeNeighbors(const uint32_t district,
 }
 
 uint32_t Graph::GetDistrictPop(const uint32_t district) const {
-  return pop_by_district_[district];
+  return pop_of_district_[district];
 }
 
 uint32_t Graph::GetMinorityPop(const uint32_t district) const {
-  return min_pop_by_district_[district];
+  return min_pop_of_district_[district];
 }
 
-unordered_set<int>** Graph::GetAllNodesPerDistrict() const {
-  return nodes_in_district;
+uint32_t Graph::GetDistrictArea(const uint32_t district) const {
+  return area_of_district_[district];
 }
 
 }     // namespace rakan

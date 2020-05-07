@@ -1,5 +1,6 @@
 #include "src/Runner.h"
 
+#include <math.h>           // for pow(), log(), fmin()
 #include <inttypes.h>       // for uint32_t, etc.
 #include <stdio.h>          // for FILE *, fopen, fseek, fread, etc.
 
@@ -16,40 +17,21 @@ using std::cerr;
 using std::endl;
 using std::vector;
 
-int main(int argc, char *argv[]) {
-  if (argc != 6) {
-    cerr << "Usage: ./" << argv[0] << " filepath alpha beta gamma eta" << endl;
-  }
-
-  // Open index file as a binary.
-  FILE *file = fopen(argv[1], "rb");
-  if (file == nullptr) {
-    return EXIT_FAILURE;
-  }
-
-  // Initialize this engine.
-  Graph *graph = rakan::LoadGraph(file);
-  graph->SetAlpha(argv[1]);
-  graph->SetBeta(argv[2]);
-  graph->SetGamma(argv[3]);
-  graph->SetEta(argv[4]);
-
-  // Clean up and exit.
-  fclose(file);
-  return EXIT_SUCCESS;
-}
-
 namespace rakan {
 
-Graph* LoadGraph(FILE *file) {
-  uint32_t i, record_offset, node_offset;
-  Graph *graph;
+uint16_t Runner::LoadGraph(FILE *file) {
   Reader reader(file);
   Header header;
   NodeRecord rec;
+  uint32_t i, res, record_offset, node_offset;
 
-  Verify(reader.ReadHeader(&header));
-  graph = new Graph(header.num_nodes, header.num_districts);
+  res = reader.ReadHeader(&header);
+  if (res != SUCCESS) {
+    cerr << "ReadHeader failed: error code " << res << endl;
+    return res;
+  }
+
+  graph_ = new Graph(header.num_nodes, header.num_districts);
 
   // Calculate the offsets of the first NodeRecord and Node.
   // Refer to the index file design for actual number of bytes.
@@ -59,25 +41,30 @@ Graph* LoadGraph(FILE *file) {
   // Read all the nodes and populate the graph with them.
   for (i = 0; i < header.num_nodes; i++) {
     Node *node = new Node;
-    Verify(reader.ReadNodeRecord(record_offset, &rec));
-    Verify(reader.ReadNode(node_offset + rec.node_pos,
-                           rec.num_neighbors,
-                           node));
+
+    res = reader.ReadNodeRecord(record_offset, &rec);
+    if (res != SUCCESS) {
+      cerr << "ReadNodeRecord failed: error code " << res << endl;
+      return res;
+    }
+
+    res = reader.ReadNode(node_offset + rec.node_pos,
+                          rec.num_neighbors,
+                          node);
+    if (res != SUCCESS) {
+      cerr << "ReadNode failed: error code " << res << endl;
+      return res;
+    }
+
     graph->AddNode(*node);
     graph->AddStatePop(node->GetTotalPop());
     record_offset += kNodeRecordSize;
   }
 
-  return graph;
+  return SUCCESS;
 }
 
-void Verify(uint16_t result) {
-  if (result != SUCCESS) {
-    exit(EXIT_FAILURE);
-  }
-}
-
-uint16_t SeedDistricts(Graph *graph) {
+uint16_t Runner::SeedDistricts() {
   // 1. Put all nodes into a set 𝒰, and assign all nodes to belong to a
   //    non-existent district (such as -1 or # of districts + 1)
   // 2. For each district 𝑑 in possible districts:
@@ -96,34 +83,32 @@ uint16_t SeedDistricts(Graph *graph) {
   // of this method is required, or a check that the size of 𝒰 changes every
   // iteration of step 3 is required.
 
-  uint32_t i;
+  uint32_t i, size, districts, random_num;
   unordered_set<Node *> set;
   Vector<Node *> linkage;
 
   // Move all of the nodes inside of the graph into a set,
-  uint32_t districts = graph->GetNumDistricts();
-  for (i = 0; i < graph->GetNumNodes(); i++) {
-    Node* node = graph->GetNode(i);
+  districts = graph_->GetNumDistricts();
+  for (i = 0; i < graph_->GetNumNodes(); i++) {
+    Node* node = graph_->GetNode(i);
     node->SetDistrict(districts + 1);
-    set.insert(graph->GetNode(i));
-    linkage.insert(linkage.begin(), graph->GetNode(i));
+    set.insert(graph_->GetNode(i));
+    linkage.insert(linkage.begin(), graph_->GetNode(i));
   }
 
-  uint32_t randomNumber;
-  uint32_t lastrand = 0;
   // Create a seeding for each district to be able to begin a BFS
   // search from that district to create a random redistricting.
   for (i = 1; i <= districts; i++) {
-    randomNumber = (rand_r() % graph->GetNumNodes()) + 1;
-    linkage[randomNumber]->SetDistrict(i);
-    set.erase(linkage[randomNumber]);
-    linkage[randomNumber] = linkage[set.size() - 1];
+    random_num = (rand_r() % graph_->GetNumNodes()) + 1;
+    linkage[random_num]->SetDistrict(i);
+    set.erase(linkage[random_num]);
+    linkage[random_num] = linkage[set.size() - 1];
     linkage.pop_back();
   }
 
   // create a possible redistricting using our random seeding.
   i = 1;
-  uint32_t size = set.size();
+  size = set.size();
   while (set.size() > 0) {
     // BFS from seed until a node still in the original set is found.
 
@@ -136,14 +121,50 @@ uint16_t SeedDistricts(Graph *graph) {
   return SUCCESS;
 }
 
-double ScoreCompactness(uint32_t num_nodes, uint32_t num_districts) {
-  return (num_nodes / num_districts);
+double Runner::ScoreCompactness() {
+  graph_->GetNumNodes() / graph_->GetDistrictArea());
+
+  // TODO
+
+  return 0;
 }
 
-double ScorePopulationDistribution(uint32_t *pop_by_district,
-                                   uint32_t num_districts) {
-  uint32_t i, total_pop;
-  for ()
+double Runner::ScorePopulationDistribution() {
+  uint32_t i, total_pop, avg_pop;
+  double sum;
+  
+  total_pop = graph_->GetStatePop();
+  avg_pop = total_pop / graph_->GetNumDistricts();
+
+  for (i = 0; i < graph_->GetNumDistricts(); i++) {
+    sum += pow((graph_->GetDistrictPop(i) - avg_pop), 2);
+  }
+
+  return sum / total_pop;
+}
+
+double Runner::ScoreExistingBorders() {
+  // TODO
+  return 0;
+}
+
+double Runner::ScoreVRA() {
+  uint32_t i, min_pop_percentage;
+  double sum;
+
+  for (i = 0; i < graph_->GetNumDistricts(); i++) {
+    min_pop_percentage = graph_->GetMinorityPop(i) / graph_->GetDistrictPop(i);
+    sum += fmin(0, 0.5 - min_pop_percentage);
+  }
+
+  return sum;
+}
+
+double Runner::LogScore() {
+  return (graph_->alpha_ * ScoreCompactness()
+        + graph_->beta_ * ScorePopulationDistribution()
+        + graph_->gamma_ * ScoreExistingBorders()
+        + graph_->eta_ * ScoreVRA());
 }
 
 }   // namespace rakan

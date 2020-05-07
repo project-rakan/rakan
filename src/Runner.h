@@ -18,18 +18,15 @@ namespace rakan {
 
 class Runner {
  public:
-  Runner();
-
-  Graph* LoadGraph(FILE *file);
+  uint16_t LoadGraph(FILE *file);
 
   void SeedDistricts();
 
   void Verify(uint16_t result);
 
-  double ScoreCompactness(uint32_t num_nodes, uint32_t num_districts);
+  double ScoreCompactness();
 
-  double ScorePopulationDistribution(uint32_t *pop_by_district,
-                                     uint32_t num_districts);
+  double ScorePopulationDistribution();
 
   double ScoreExistingBorders();
 
@@ -40,6 +37,9 @@ class Runner {
   void MetropolisHastings();
 
   void Walk();
+
+ private:
+  Graph *graph_;
 };        // class Runner
 
 }         // namespace rakan

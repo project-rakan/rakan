@@ -122,6 +122,8 @@ class Graph {
 
   uint32_t GetStatePop() const { return state_pop_; }
 
+  uint32_t GetDistrictArea(const uint32_t district) const;
+
   // Gets the set of nodes in the given district.
   //
   // Arguments:
@@ -194,8 +196,6 @@ class Graph {
   // to a set of nodes in that district.
   unordered_set<int> **nodes_in_district_;
 
-  unordered_set<int> **area_of_district_;
-
   // An array of pointers to sets. The index of the array
   // is the district ID, and the pointer at the index points
   // to a set of nodes on the perimeter of that district.
@@ -215,12 +215,14 @@ class Graph {
   // An array of populations. The index of the array is the district
   // ID. The value at that index corresponds to the population in
   // that district.
-  uint32_t *pop_by_district_;
+  uint32_t *pop_of_district_;
 
   // An array of minority populations. The index of the array is
   // the district ID. The value at that index corresponds to the
   // minority population in that district.
-  uint32_t *min_pop_by_district_;
+  uint32_t *min_pop_of_district_;
+
+  uint32_t *area_of_district_;
 
   // Metric parameters.
   double alpha_;
@@ -229,8 +231,7 @@ class Graph {
   double eta_;
 
   // Needed for populating data structures in graph from file.
-  friend class Node;
-  friend class Reader;
+  friend class Runner;
 };        // class Graph
 
 }         // namespace rakan
