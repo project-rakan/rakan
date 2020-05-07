@@ -72,6 +72,7 @@ void Verify(uint16_t result) {
 }
 
 uint16_t SeedDistricts(Graph *graph) {
+  
   // 1. Put all nodes into a set 𝒰, and assign all nodes to belong to a non-existent
   //    district (such as -1 or # of districts + 1)
   // 2. For each district 𝑑 in possible districts:
@@ -90,10 +91,41 @@ uint16_t SeedDistricts(Graph *graph) {
 
   uint32_t i;
   unordered_set<Node *> set;
+  Vector<Node *> linkage;
 
-  // for (i = 0; i < graph->GetNumNodes(); i++) {
-  //   set.insert()
-  // }
+  // Move all of the nodes inside of the graph into a set, 
+  uint32_t districts = graph->GetNumDistricts();
+  for (i = 0; i < graph->GetNumNodes(); i++) {
+    Node* node = graph->GetNode(i);
+    node->SetDistrict(districts + 1);
+    set.insert(graph->GetNode(i));
+    linkage.insert(linkage.begin(), graph->GetNode(i));
+  }
+
+  uint32_t randomNumber;
+  uint32_t lastrand = 0;
+  // Create a seeding for each district to be able to begin a BFS
+  // search from that district to create a random redistricting.
+  for (i = 1; i <= districts; i++) {
+    randomNumber = (rand() % graph->GetNumNodes()) + 1;
+    linkage[randomNumber]->SetDistrict(i);
+    set.erase(linkage[randomNumber]);
+    linkage[randomNumber] = linkage[set.size() - 1];
+    linkage.pop_back();
+  }
+
+  // create a possible redistricting using our random seeding.
+  i = 1;
+  uint32_t size = set.size();
+  while(set.size() > 0) {
+    // BFS from seed until a node still in the original set is found.
+    
+    // Check to ensure that there is no endless looping.
+    if (size - 1 == set.size()) {
+      size = set.size();
+    }
+  }
+  
 
   return SUCCESS;
 }

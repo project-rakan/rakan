@@ -135,4 +135,8 @@ uint32_t Graph::GetMinorityPop(const uint32_t district) const {
   return min_pop_by_district_[district];
 }
 
+unordered_set<int>** Graph::GetAllNodesPerDistrict() const {
+  return nodes_in_district;
+}
+
 }     // namespace rakan
