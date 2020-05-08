@@ -23,7 +23,7 @@ class Graph {
   /////////////////////////////////////////////////////////////////////////////
 
   // Default constructor.
-  Graph() : is_empty_(true), state_pop_(0) {}
+  Graph() = default;
 
   // Supplies the number of nodes and districts on this
   // graph. Number of nodes and districts must be non-negative.
@@ -31,7 +31,7 @@ class Graph {
   // Arguments:
   //  - num_nodes: the number of nodes on this graph
   //  - num_districts: the number of districts on this graph
-  Graph(const uint32_t num_nodes, const uint32_t num_districts);
+  Graph(const uint32_t num_nodes, const uint32_t num_districts, const uint32_t state_pop);
 
   // Default destructor. Also destructs nodes on this graph.
   ~Graph();
@@ -48,7 +48,7 @@ class Graph {
   // Returns:
   //  - true iff adding node successful
   //  - false if node cannot be added
-  bool AddNode(const Node& node);
+  bool AddNode(Node *node);
 
   // Adds an edge between the two supplied nodes. If either node does not
   // exist, adds nodes before adding edge.
@@ -121,8 +121,6 @@ class Graph {
   uint32_t GetNumDistricts() const { return num_districts_; }
 
   uint32_t GetStatePop() const { return state_pop_; }
-
-  uint32_t GetDistrictArea(const uint32_t district) const;
 
   // Gets the set of nodes in the given district.
   //
@@ -221,8 +219,6 @@ class Graph {
   // the district ID. The value at that index corresponds to the
   // minority population in that district.
   uint32_t *min_pop_of_district_;
-
-  uint32_t *area_of_district_;
 
   // Metric parameters.
   double alpha_;

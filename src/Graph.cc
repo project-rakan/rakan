@@ -16,11 +16,10 @@ using std::unordered_map;
 
 namespace rakan {
 
-Graph::Graph(const uint32_t num_nodes, const uint32_t num_districts)
-    : is_empty_(true),
-      num_nodes_(num_nodes),
+Graph::Graph(const uint32_t num_nodes, const uint32_t num_districts, const uint32_t state_pop)
+    : num_nodes_(num_nodes),
       num_districts_(num_districts),
-      state_pop_(0) {
+      state_pop_(state_pop) {
   // Initialize array of pointers fields.
   nodes_ = new Node*[num_nodes_];
   nodes_in_district_ = new unordered_set<int>*[num_districts_];
@@ -32,7 +31,6 @@ Graph::Graph(const uint32_t num_nodes, const uint32_t num_districts)
   demographics_ = new unordered_map<int, unordered_map<string, int> *>;
   pop_of_district_ = new uint32_t[num_districts_];
   min_pop_of_district_ = new uint32_t[num_districts_];
-  area_of_district_ = new uint32_t[num_districts_];
 }
 
 Graph::~Graph() {
@@ -42,8 +40,8 @@ Graph::~Graph() {
   delete demographics_;
 
   // Delete non-pointer arrays.
-  delete[] pop_by_district_;
-  delete[] min_pop_by_district_;
+  delete[] pop_of_district_;
+  delete[] min_pop_of_district_;
 
   // Delete all node pointers in nodes_.
   for (i = 0; i < num_nodes_; i++) {
@@ -75,22 +73,22 @@ Graph::~Graph() {
   delete[] perim_nodes_to_neighbors_;
 }
 
-bool Graph::AddNode(const Node& node) {
-  if (node.id_ > num_nodes_) {
+bool Graph::AddNode(Node *node) {
+  if (node->id_ > num_nodes_) {
     return false;
   }
 
-  nodes_[node.id_] = &node;
+  nodes_[node->id_] = node;
   return true;
 }
 
 bool Graph::AddEdge(Node *node1, Node *node2) {
   if (!ContainsNode(*node1)) {
-    AddNode(*node1);
+    AddNode(node1);
   }
 
   if (!ContainsNode(*node2)) {
-    AddNode(*node2);
+    AddNode(node2);
   }
 
   return node1->AddNeighbor(*node2);
@@ -137,10 +135,6 @@ uint32_t Graph::GetDistrictPop(const uint32_t district) const {
 
 uint32_t Graph::GetMinorityPop(const uint32_t district) const {
   return min_pop_of_district_[district];
-}
-
-uint32_t Graph::GetDistrictArea(const uint32_t district) const {
-  return area_of_district_[district];
 }
 
 }     // namespace rakan

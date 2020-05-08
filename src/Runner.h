@@ -20,9 +20,9 @@ class Runner {
  public:
   uint16_t LoadGraph(FILE *file);
 
-  void SeedDistricts();
+  uint16_t LoadPreMadeGraph(unordered_map<uint32_t, uint32_t> *map);
 
-  void Verify(uint16_t result);
+  uint16_t SeedDistricts();
 
   double ScoreCompactness();
 

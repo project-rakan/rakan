@@ -144,7 +144,7 @@ uint16_t Reader::ReadNode(const uint32_t offset,
 
 uint32_t Reader::ToHostFormat(uint32_t x) {
   uint32_t ret, i;
-  char *byte = reinterpret_case<char *>(&x);
+  char *byte = reinterpret_cast<char *>(&x);
   x = htonl(x);
   ret = x;
 

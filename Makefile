@@ -4,30 +4,23 @@ ARFLAGS = rcs
 CXX = g++
 
 # define useful flags to cc/ld/etc.
-CFLAGS += -g -Wall -Wpedantic -I. -I.. -O0
+CFLAGS += -g -Wall -Wpedantic -I. -I.. -O0 -std=c++11
 LDFLAGS += -L. -lhw1
 CPPUNITFLAGS = -L/googletest -lgtest
 
 # define common dependencies
-OBJS = src/Runner.o src/Graph.o src/Node.o src/Reader.o src/ReaderUtils.o
-HEADERS = src/Runner.h src/Graph.o src/Node.o src/Reader.o src/ReaderUtils.o
-TESTOBJS = test/test_suite.o
+OBJS = src/Runner.o src/Graph.o src/Node.o src/Reader.o
+HEADERS = src/Runner.h src/Graph.h src/Node.h src/Reader.h
 
 # compile everything; this is the default rule that fires if a user
 # just types "make" in the same directory as this Makefile
-all: test/test_suite
+all: rakan
 
-test/test_suite: $(TESTOBJS) libhw1.a
-	$(CXX) $(CFLAGS) -o test/test_suite $(TESTOBJS) \
-	$(CPPUNITFLAGS) $(LDFLAGS) -lpthread $(LDFLAGS)
+rakan: $(OBJS)
+	$(CXX) $(CFLAGS) -o $<
 
 src/%.o: src/%.cc $(HEADERS)
-	$(CXX) $(CFLAGS) -std=c++11 -c $<
-
-test/test_suite.o: test/%.cc $(HEADERS)
-	$(CXX) $(CFLAGS) -std=c++11 -c $<
+	$(CXX) $(CFLAGS) -c $<
 
 clean:
-	/bin/rm -f src/*.o test/*.o src/*~ test/*~ *.gcno *.gcda *.gcov \
-	test/test_suite
-
+	/bin/rm -f ./*.o src/*.o src/*~ test/*~ *.gcno *.gcda *.gcov
