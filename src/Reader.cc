@@ -1,4 +1,4 @@
-#include "src/Reader.h"
+#include "./Reader.h"
 
 #include <arpa/inet.h>        // For ntohl()
 #include <bits/stdc++.h>      // for std::unordered_set
@@ -6,9 +6,9 @@
 #include <stdio.h>            // for FILE *, fread, fseek
 #include <unordered_map>      // for std::unordered_map
 
-#include "src/ErrorCodes.h"     // for error codes
-#include "src/Graph.h"          // for Graph class
-#include "src/Node.h"           // for Node class
+#include "./ErrorCodes.h"     // for error codes
+#include "./Graph.h"          // for Graph class
+#include "./Node.h"           // for Node class
 
 using std::unordered_set;
 using std::unordered_map;

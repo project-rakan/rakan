@@ -1,4 +1,4 @@
-#include "src/Node.h"
+#include "./Node.h"
 
 #include <inttypes.h>         // for uint32_t
 #include <stdio.h>            // for FILE *, fread, fseek

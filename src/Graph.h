@@ -8,7 +8,7 @@
 #include <unordered_set>    // for std::unordered_set
 #include <unordered_map>    // for std::unordered_map
 
-#include "src/Node.h"           // for Node class
+#include "./Node.h"           // for Node class
 
 using std::string;
 using std::unordered_set;

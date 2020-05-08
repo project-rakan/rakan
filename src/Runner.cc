@@ -1,26 +1,31 @@
-#include "src/Runner.h"
+#include "./Runner.h"
 
 #include <math.h>               // for pow(), log(), fmin()
 #include <inttypes.h>           // for uint32_t, etc.
 #include <stdio.h>              // for FILE *, fopen, fseek, fread, etc.
 #include <stdlib.h>             // for rand()
 
+#include <algorithm>            // for find()
 #include <iostream>             // for cerr
+#include <queue>                // for queue
 #include <unordered_set>        // for std::unordered_set
 #include <vector>               // for std::vector
 
-#include "src/ErrorCodes.h"     // for SUCCESS, READ_FAIL, SEEK_FAIL, etc.
-#include "src/Graph.h"          // for class Graph
-#include "src/Node.h"           // for class Node
-#include "src/Reader.h"         // for class Reader, structs
+#include "./ErrorCodes.h"     // for SUCCESS, READ_FAIL, SEEK_FAIL, etc.
+#include "./Graph.h"          // for class Graph
+#include "./Node.h"           // for class Node
+#include "./Reader.h"         // for class Reader, structs
 
 using std::cerr;
 using std::endl;
 using std::vector;
+using std::queue;
+using std::unordered_map;
+using std::unordered_set;
 
 namespace rakan {
 
-static Node* BFS(const Node *start, unordered_set<Node *> *set);
+static Node* BFS(Node *start, queue<Node *> *set);
 
 uint16_t Runner::LoadPreMadeGraph(unordered_map<uint32_t, uint32_t> *map) {
   return SUCCESS;
@@ -72,55 +77,67 @@ uint16_t Runner::LoadGraph(FILE *file) {
 }
 
 uint16_t Runner::SeedDistricts() {
-  uint32_t i, random_node_index, num_nodes, num_districts;
-  unordered_set<Node *> unused, used;
-  unordered_map<int, Node*> seed_nodes;
-  Node *seed_node, *node, *found_node;
+  int32_t prev_random_index, random_index;
+  uint32_t i, num_nodes, num_districts;
+  queue<Node *> unused;
+  unordered_set<Node *> seed_nodes;
+  Node *found_node;
 
   num_districts = graph_->GetNumDistricts();
   num_nodes = graph_->GetNumNodes();
 
   // iterate through the array of nodes and put them into the set
   for (i = 0; i < num_nodes; i++) {
-    unused.insert(graph_->GetNode(i));
+    unused.push(graph_->GetNode(i));
   }
 
   // iterate through all the possible districts
   // randomly assign a node to be the seed node of that district
+  prev_random_index = -1;
   for (i = 0; i < num_districts; i++) {
     // get a random node index
-    random_node_index = rand() % num_nodes;
-    node = graph_->GetNode(random_node_index);
-
-    // this node is not already a seed node
-    if (used.find(node) == used.end()) {
-      node->SetDistrict(i);
-      seed_nodes.insert({i, node});
-    } else {
-      i--;
+    random_index = rand() % num_nodes;
+    if (random_index != prev_random_index) {
+      seed_nodes.insert(graph_->GetNode(random_index));
     }
+    prev_random_index = random_index;
   }
 
-  // for (auto node : seed_nodes) {
-  //   unused.erase(node);
-  // }
-
-  while (used.size() < num_nodes) {
-    // for all possible districts…
-    for (i = 0; i < num_districts; i++) {
-      seed_node = seed_nodes.find(i)->second;
+  while (unused.size() > 0) {
+    uint32_t check = unused.size();
+    for (auto &seed_node : seed_nodes) {
       found_node = BFS(seed_node, &unused);
       if (found_node != nullptr) {
-        found_node->SetDistrict(i);
-        unused.erase(node);
+        found_node->SetDistrict(seed_node->GetDistrict());
       }
+    }
+    if (unused.size() == check) {
+      return SEEDING_FAILED;
     }
   }
 
   return SUCCESS;
 }
 
-static Node* BFS(const Node *start, unordered_set<Node *> *set) {
+static Node* BFS(Node *start, queue<Node *> *queue) {
+  Node *current_node = start;
+  // uint32_t num_nodes = set->size();
+
+  // while (current_node != nullptr) {
+  //   // if current node is in the unused set
+  //   // return it
+  //   if (set->find(current_node) != set->end()) {
+  //     return current_node;
+  //   }
+
+  //   // if current node is already used, go into its neighbor
+  //   for (auto &neighbor : current_node->GetNeighbors()) {
+
+  //   }
+  //   current_node = current_node
+  //   num_nodes--;
+  // }
+
   return nullptr;
 }
 

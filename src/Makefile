@@ -2,14 +2,14 @@
 # DO NOT PUSH TO PRODUCTION.
 
 CXX = g++
-OBJS = Graph.o Node.o Reader.o
-EXE  = runner
-HEADER = Graph.h Node.h Reader.h
+OBJS = rakan.o Graph.o Node.o Reader.o Runner.o
+EXE  = rakan
+HEADER = Graph.h Node.h Reader.h Runner.h
 CPPFLAGS = -Wall -g -std=c++11
 
 # default target
 $(EXE): $(OBJS)
-	$(CXX) $(CPPFLAGS) -o $(EXE) $(OBJS) Runner.cc
+	$(CXX) $(CPPFLAGS) -o $(EXE) $(OBJS)
 
 # source files
 %.o: %.cc $(HEADERS)

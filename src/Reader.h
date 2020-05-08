@@ -4,8 +4,8 @@
 #include <inttypes.h>         // for uint32_t, etc.
 #include <stdio.h>            // for FILE *
 
-#include "src/Graph.h"          // for Graph class
-#include "src/Node.h"           // for Node class
+#include "./Graph.h"          // for Graph class
+#include "./Node.h"           // for Node class
 
 using rakan::Graph;
 using rakan::Node;

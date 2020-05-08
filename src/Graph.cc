@@ -1,4 +1,4 @@
-#include "src/Graph.h"
+#include "./Graph.h"
 
 #include <inttypes.h>       // for uint32_t
 #include <stdio.h>          // for FILE *, stderr
@@ -7,8 +7,8 @@
 #include <unordered_map>    // for std::unordered_map
 #include <vector>           // for std::vector
 
-#include "ErrorCodes.h"     // for error codes
-#include "Node.h"           // for Node class
+#include "./ErrorCodes.h"     // for error codes
+#include "./Node.h"           // for Node class
 
 using std::string;
 using std::unordered_set;

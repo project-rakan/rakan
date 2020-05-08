@@ -18,6 +18,8 @@ namespace rakan {
 
 class Runner {
  public:
+  Runner() = default;
+
   uint16_t LoadGraph(FILE *file);
 
   uint16_t LoadPreMadeGraph(unordered_map<uint32_t, uint32_t> *map);
@@ -37,6 +39,8 @@ class Runner {
   void MetropolisHastings();
 
   void Walk();
+
+  Graph *GetGraph() { return graph_; }
 
  private:
   Graph *graph_;
