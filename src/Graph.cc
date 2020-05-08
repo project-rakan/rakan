@@ -28,16 +28,17 @@ Graph::Graph(const uint32_t num_nodes, const uint32_t num_districts, const uint3
                 new unordered_map<int, unordered_set<int> *>*[num_districts_];
 
   // Initialize other array fields.
-  demographics_ = new unordered_map<int, unordered_map<string, int> *>;
   pop_of_district_ = new uint32_t[num_districts_];
   min_pop_of_district_ = new uint32_t[num_districts_];
+
+  for (int i = 0; i < num_districts_; i++) {
+    pop_of_district_[i] = 0;
+    min_pop_of_district_[i] = 0;
+  }
 }
 
 Graph::~Graph() {
   uint32_t i;
-
-  // Delete non-array.
-  delete demographics_;
 
   // Delete non-pointer arrays.
   delete[] pop_of_district_;

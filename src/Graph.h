@@ -206,10 +206,6 @@ class Graph {
   // to the perimeter node.
   unordered_map<int, unordered_set<int> *> **perim_nodes_to_neighbors_;
 
-  // A map of the district ID to another map of the demographics
-  // in that district.
-  unordered_map<int, unordered_map<string, int> *> *demographics_;
-
   // An array of populations. The index of the array is the district
   // ID. The value at that index corresponds to the population in
   // that district.

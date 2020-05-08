@@ -23,9 +23,9 @@ using std::queue;
 using std::unordered_map;
 using std::unordered_set;
 
-namespace rakan {
-
 static Node* BFS(Graph *graph, Node *start, unordered_set<Node *> *set);
+
+namespace rakan {
 
 uint16_t Runner::LoadPreMadeGraph(unordered_map<uint32_t, uint32_t> *map) {
   return SUCCESS;
@@ -77,27 +77,25 @@ uint16_t Runner::LoadGraph(FILE *file) {
 }
 
 uint16_t Runner::SeedDistricts() {
+  uint32_t i;
   int32_t prev_random_index, random_index;
-  uint32_t i, num_nodes, num_districts;
   unordered_set<Node *> unused, seed_nodes;
-  Node *found_node;
-
-  num_districts = graph_->GetNumDistricts();
-  num_nodes = graph_->GetNumNodes();
+  Node *found_node, *seed_node;
 
   // iterate through the array of nodes and put them into the set
-  for (i = 0; i < num_nodes; i++) {
-    unused.insert(graph_->GetNode(i));
+  for (i = 0; i < graph_->num_nodes_; i++) {
+    unused.insert(graph_->nodes_[i]);
   }
 
   // iterate through all the possible districts
   // randomly assign a node to be the seed node of that district
   prev_random_index = -1;
-  for (i = 0; i < num_districts; i++) {
+  for (i = 0; i < graph_->num_districts_; i++) {
     // get a random node index
-    random_index = rand() % num_nodes;
+    random_index = rand() % graph_->num_nodes_;
     if (random_index != prev_random_index) {
-      seed_nodes.insert(graph_->GetNode(random_index));
+      seed_node = graph_->nodes_[random_index];
+      seed_nodes.insert(seed_node);
     }
     prev_random_index = random_index;
   }
@@ -123,26 +121,34 @@ uint16_t Runner::SeedDistricts() {
   return SUCCESS;
 }
 
-static Node* BFS(Graph *graph, Node *start, unordered_set<Node *> *set) {
-  Node *current_node;
-  queue<Node *> q;
-  q.push(start);
+uint16_t Runner::PopulateGraphData() {
+  Node *current_node, *neighbor_node;
+  uint32_t i, current_district;
 
-  while (!q.empty()) {
-    current_node = q.front();
+  for (i = 0; i < graph_->num_nodes_; i++) {
+    current_node = graph_->nodes_[i];
+    current_district = current_node->district_;
 
-    if (set->find(current_node) != set->end()) {
-      return current_node;
-    }
+    // insert the current node into its appropriate district set
+    graph_->nodes_in_district_[current_district]->insert(current_node->id_);
 
-    // add its neighbors to queue
+    // update demographics
+    graph_->pop_of_district_[current_district] += current_node->GetTotalPop();
+    graph_->min_pop_of_district_[current_district] += current_node->GetMinPop();
 
-    for (auto neighbor : *current_node->GetNeighbors()) {
-      q.push(graph->GetNode(neighbor));
+    for (auto &neighbor_id : *current_node->neighbors_) {
+      neighbor_node = graph_->nodes_[neighbor_id];
+      // if the neighbor is in a different district, current_node
+      // is on the perimeter
+      if (neighbor_node->district_ != current_district) {
+        graph_->nodes_on_perim_[current_district]->insert(i);
+        (*graph_->perim_nodes_to_neighbors_[current_district])[i]
+                                                        ->insert(neighbor_id);
+      }
     }
   }
 
-  return nullptr;
+  return SUCCESS;
 }
 
 double Runner::ScoreCompactness() {
@@ -192,3 +198,23 @@ double Runner::LogScore() {
 }
 
 }   // namespace rakan
+
+static Node* BFS(Graph *graph, Node *start, unordered_set<Node *> *set) {
+  Node *current_node;
+  queue<Node *> q;
+  q.push(start);
+
+  while (!q.empty()) {
+    current_node = q.front();
+
+    if (set->find(current_node) != set->end()) {
+      return current_node;
+    }
+
+    for (auto neighbor : *current_node->GetNeighbors()) {
+      q.push(graph->GetNode(neighbor));
+    }
+  }
+
+  return nullptr;
+}

@@ -26,6 +26,8 @@ class Runner {
 
   uint16_t SeedDistricts();
 
+  uint16_t PopulateGraphData();
+
   double ScoreCompactness();
 
   double ScorePopulationDistribution();
