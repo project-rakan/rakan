@@ -25,7 +25,7 @@ using std::unordered_set;
 
 namespace rakan {
 
-static Node* BFS(Node *start, queue<Node *> *set);
+static Node* BFS(Graph *graph, Node *start, unordered_set<Node *> *set);
 
 uint16_t Runner::LoadPreMadeGraph(unordered_map<uint32_t, uint32_t> *map) {
   return SUCCESS;
@@ -79,8 +79,7 @@ uint16_t Runner::LoadGraph(FILE *file) {
 uint16_t Runner::SeedDistricts() {
   int32_t prev_random_index, random_index;
   uint32_t i, num_nodes, num_districts;
-  queue<Node *> unused;
-  unordered_set<Node *> seed_nodes;
+  unordered_set<Node *> unused, seed_nodes;
   Node *found_node;
 
   num_districts = graph_->GetNumDistricts();
@@ -88,7 +87,7 @@ uint16_t Runner::SeedDistricts() {
 
   // iterate through the array of nodes and put them into the set
   for (i = 0; i < num_nodes; i++) {
-    unused.push(graph_->GetNode(i));
+    unused.insert(graph_->GetNode(i));
   }
 
   // iterate through all the possible districts
@@ -103,12 +102,17 @@ uint16_t Runner::SeedDistricts() {
     prev_random_index = random_index;
   }
 
+  for (auto &node : seed_nodes) {
+    unused.erase(node);
+  }
+
   while (unused.size() > 0) {
     uint32_t check = unused.size();
     for (auto &seed_node : seed_nodes) {
-      found_node = BFS(seed_node, &unused);
+      found_node = BFS(graph_, seed_node, &unused);
       if (found_node != nullptr) {
         found_node->SetDistrict(seed_node->GetDistrict());
+        unused.erase(found_node);
       }
     }
     if (unused.size() == check) {
@@ -119,24 +123,24 @@ uint16_t Runner::SeedDistricts() {
   return SUCCESS;
 }
 
-static Node* BFS(Node *start, queue<Node *> *queue) {
-  Node *current_node = start;
-  // uint32_t num_nodes = set->size();
+static Node* BFS(Graph *graph, Node *start, unordered_set<Node *> *set) {
+  Node *current_node;
+  queue<Node *> q;
+  q.push(start);
 
-  // while (current_node != nullptr) {
-  //   // if current node is in the unused set
-  //   // return it
-  //   if (set->find(current_node) != set->end()) {
-  //     return current_node;
-  //   }
+  while (!q.empty()) {
+    current_node = q.front();
 
-  //   // if current node is already used, go into its neighbor
-  //   for (auto &neighbor : current_node->GetNeighbors()) {
+    if (set->find(current_node) != set->end()) {
+      return current_node;
+    }
 
-  //   }
-  //   current_node = current_node
-  //   num_nodes--;
-  // }
+    // add its neighbors to queue
+
+    for (auto neighbor : *current_node->GetNeighbors()) {
+      q.push(graph->GetNode(neighbor));
+    }
+  }
 
   return nullptr;
 }
