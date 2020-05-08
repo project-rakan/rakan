@@ -13,5 +13,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - run: ./cpplint.py Graph.h
+    - run: ./cpplint.py Graph.cc
+    - run: ./cpplint.py Node.h
+    - run: ./cpplint.py Node.cc
+    - run: ./cpplint.py Reader.h
+    - run: ./cpplint.py Reader.cc
+    - run: ./cpplint.py Runner.h
+    - run: ./cpplint.py Runner.cc
     - name: make
       run: make
