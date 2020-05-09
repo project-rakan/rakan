@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
   Runner runner;
   runner.LoadGraph(file);
 
-  float alpha, beta, gamma, eta;
+  double alpha, beta, gamma, eta;
   sscanf(argv[2], "%f", &alpha);
   sscanf(argv[3], "%f", &beta);
   sscanf(argv[4], "%f", &gamma);

@@ -5,12 +5,14 @@
 #include <inttypes.h>         // for uint32_t
 #include <stdio.h>            // for FILE *, fread, fseek
 #include <unordered_map>      // for std::unordered_map
+#include <utility>            // for std::pair
 #include <vector>             // for std::vector
 
 #include "./ErrorCodes.h"     // for error codes
 #include "./Graph.h"          // for Graph class
 #include "./Node.h"           // for Node class
 
+using std::pair;
 using std::unordered_set;
 using std::unordered_map;
 
@@ -38,7 +40,9 @@ class Runner {
 
   double LogScore();
 
-  void MetropolisHastings();
+  int MetropolisHastings();
+
+  double MakeMove(Node *node, int new_district_id);
 
   void Walk();
 
@@ -46,6 +50,7 @@ class Runner {
 
  private:
   Graph *graph_;
+  double score_;
 };        // class Runner
 
 }         // namespace rakan

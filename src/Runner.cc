@@ -6,9 +6,12 @@
 #include <stdlib.h>             // for rand()
 
 #include <algorithm>            // for find()
+#include <chrono>               // for system_clock:now()
 #include <iostream>             // for cerr
 #include <queue>                // for queue
+#include <random>               // for uniform_real_distribution()
 #include <unordered_set>        // for std::unordered_set
+#include <utility>              // for std::pair
 #include <vector>               // for std::vector
 
 #include "./ErrorCodes.h"     // for SUCCESS, READ_FAIL, SEEK_FAIL, etc.
@@ -125,6 +128,7 @@ uint16_t Runner::PopulateGraphData() {
   Node *current_node, *neighbor_node;
   uint32_t i, current_district;
 
+  // O(N)
   for (i = 0; i < graph_->num_nodes_; i++) {
     current_node = graph_->nodes_[i];
     current_district = current_node->district_;
@@ -136,11 +140,18 @@ uint16_t Runner::PopulateGraphData() {
     graph_->pop_of_district_[current_district] += current_node->GetTotalPop();
     graph_->min_pop_of_district_[current_district] += current_node->GetMinPop();
 
+    // O(N)
     for (auto &neighbor_id : *current_node->neighbors_) {
       neighbor_node = graph_->nodes_[neighbor_id];
       // if the neighbor is in a different district, current_node
       // is on the perimeter
       if (neighbor_node->district_ != current_district) {
+        if (std::find(graph_->perim_edges_->begin(),
+                      graph_->perim_edges_->end(),
+                      std::make_pair<int, int>(neighbor_id, i))
+                      == graph_->perim_edges_->end()) {
+          graph_->perim_edges_->push_back({i, neighbor_id});
+        }
         graph_->nodes_on_perim_[current_district]->insert(i);
         (*graph_->perim_nodes_to_neighbors_[current_district])[i]
                                                         ->insert(neighbor_id);
@@ -152,22 +163,30 @@ uint16_t Runner::PopulateGraphData() {
 }
 
 double Runner::ScoreCompactness() {
-  // graph_->GetNumNodes() / graph_->GetDistrictArea());
+  uint32_t i, num_foreign_neighbors = 0;
+  double current_score, best_score = INFINITY, worst_score = -INFINITY;
 
-  // TODO
+  for (i = 0; i < graph_->num_districts_; i++) {
+    for (auto &pair : *graph_->perim_nodes_to_neighbors_[i]) {
+      num_foreign_neighbors += pair.second->size();
+    }
+    current_score = num_foreign_neighbors / graph_->nodes_in_district_[i]->size();
+    worst_score = fmax(worst_score, current_score);
+    best_score = fmin(best_score, current_score);
+  }
 
-  return 0;
+  return (worst_score - best_score) / 2;
 }
 
 double Runner::ScorePopulationDistribution() {
   uint32_t i, total_pop, avg_pop;
   double sum;
   
-  total_pop = graph_->GetStatePop();
-  avg_pop = total_pop / graph_->GetNumDistricts();
+  total_pop = graph_->state_pop_;
+  avg_pop = total_pop / graph_->num_districts_;
 
-  for (i = 0; i < graph_->GetNumDistricts(); i++) {
-    sum += pow((graph_->GetDistrictPop(i) - avg_pop), 2);
+  for (i = 0; i < graph_->num_districts_; i++) {
+    sum += pow((graph_->pop_of_district_[i] - avg_pop), 2);
   }
 
   return sum / total_pop;
@@ -191,10 +210,82 @@ double Runner::ScoreVRA() {
 }
 
 double Runner::LogScore() {
-  return (graph_->alpha_ * ScoreCompactness()
+  score_ = (graph_->alpha_ * ScoreCompactness()
         + graph_->beta_ * ScorePopulationDistribution()
         + graph_->gamma_ * ScoreExistingBorders()
         + graph_->eta_ * ScoreVRA());
+  return score_;
+}
+
+int Runner::MetropolisHastings() {
+  double old_score, new_score, ratio;
+  uint32_t random_index, random_number, old_district, new_district;
+  std::pair<int, int> edge;
+  Node *node;
+
+  unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+  std::default_random_engine generator(seed);
+  std::uniform_real_distribution<double> index(0, graph_->perim_edges_->size());
+
+  random_index = floor(index(generator));
+  edge = (*graph_->perim_edges_)[random_index];
+
+  std::uniform_real_distribution<double> number(0.0, 1.0);
+  random_number = floor(number(generator));
+  if (random_number > graph_->perim_edges_->size() / 2) {
+    node = graph_->nodes_[edge.first];
+    new_district = graph_->nodes_[edge.second]->id_;
+  } else {
+    node = graph_->nodes_[edge.second];
+    new_district = graph_->nodes_[edge.first]->id_;
+  }
+
+  old_score = score_;
+  old_district = node->district_;
+  new_score = MakeMove(node, new_district);
+
+  if (new_score > old_score) {
+    std::uniform_real_distribution<double> decimal_number(0.0, 1.0);
+    ratio = decimal_number(generator);
+    if (ratio <= (old_score / new_score)) {
+      MakeMove(node, old_district);
+      score_ = old_score;
+    }
+
+    // TODO: SEND CHANGES TO QUEUE
+  }
+
+  score_ = new_score;
+
+  return old_score - new_score;
+}
+
+double Runner::MakeMove(Node *node, int new_district_id) {
+  unordered_set<int> *neighbors;
+
+  // remove the node from its current district
+  graph_->nodes_in_district_[node->district_]->erase(node->id_);
+  // remove the node from the set of perim nodes
+  graph_->nodes_on_perim_[node->district_]->erase(node->id_);
+  neighbors = (*graph_->perim_nodes_to_neighbors_[node->district_])[node->id_];
+  graph_->perim_nodes_to_neighbors_[node->district_]->erase(node->id_);
+
+  // update old district population now that node is removed
+  graph_->pop_of_district_[node->id_] -= (*node->demographics_)["total"];
+  graph_->min_pop_of_district_[node->id_] -= ((*node->demographics_)["total"] - (*node->demographics_)["ca"]);
+
+  // add the node to its new district
+  node->district_ = new_district_id;
+  graph_->nodes_in_district_[node->district_]->insert(node->id_);
+  graph_->nodes_on_perim_[node->district_]->insert(node->id_);
+  graph_->perim_nodes_to_neighbors_[node->district_]->insert({node->id_, neighbors});
+
+  // update new district population
+  graph_->pop_of_district_[node->id_] += (*node->demographics_)["total"];
+  graph_->min_pop_of_district_[node->id_] += ((*node->demographics_)["total"] - (*node->demographics_)["ca"]);
+
+  // return the score of this redistricting
+  return LogScore();
 }
 
 }   // namespace rakan

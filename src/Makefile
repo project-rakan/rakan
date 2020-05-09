@@ -6,6 +6,7 @@ OBJS = rakan.o Graph.o Node.o Reader.o Runner.o
 EXE  = rakan
 HEADER = Graph.h Node.h Reader.h Runner.h
 CPPFLAGS = -Wall -g -std=c++11
+#LFLAGS = -lamqpcpp -lpthread -shared -ldl -fPIC
 
 # default target
 $(EXE): $(OBJS)

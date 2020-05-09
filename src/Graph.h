@@ -7,12 +7,16 @@
 #include <string>           // for std::string
 #include <unordered_set>    // for std::unordered_set
 #include <unordered_map>    // for std::unordered_map
+#include <utility>          // for std::pair
+#include <vector>           // for std::vector
 
-#include "./Node.h"           // for Node class
+#include "./Node.h"         // for Node class
 
+using std::pair;
 using std::string;
 using std::unordered_set;
 using std::unordered_map;
+using std::vector;
 
 namespace rakan {
 
@@ -198,6 +202,8 @@ class Graph {
   // is the district ID, and the pointer at the index points
   // to a set of nodes on the perimeter of that district.
   unordered_set<int> **nodes_on_perim_;
+
+  vector<pair<int, int>> *perim_edges_;
 
   // An array of maps. The index of the map is the district
   // ID. Each district map stores node IDs as keys, and each

@@ -28,6 +28,7 @@ Graph::Graph(const uint32_t num_nodes, const uint32_t num_districts, const uint3
                 new unordered_map<int, unordered_set<int> *>*[num_districts_];
 
   // Initialize other array fields.
+  perim_edges_ = new vector<pair<int, int>>;
   pop_of_district_ = new uint32_t[num_districts_];
   min_pop_of_district_ = new uint32_t[num_districts_];
 
@@ -39,6 +40,8 @@ Graph::Graph(const uint32_t num_nodes, const uint32_t num_districts, const uint3
 
 Graph::~Graph() {
   uint32_t i;
+
+  delete perim_edges_;
 
   // Delete non-pointer arrays.
   delete[] pop_of_district_;
