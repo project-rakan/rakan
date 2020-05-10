@@ -80,14 +80,13 @@ class Reader {
                     const uint32_t num_neighbors,
                     Node *node);
 
+  FILE *GetFile() { return file_; }
+
  private:
   // The file we're currently reading.
   FILE *file_;
 
   uint32_t ToHostFormat(uint32_t x);
-
-  // Needed for unit tests.
-  friend class Test_Reader;
 };        // class Reader
 
 }         // namespace rakan

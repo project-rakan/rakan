@@ -14,7 +14,7 @@
 #include <utility>              // for std::pair
 #include <vector>               // for std::vector
 
-#include "./ErrorCodes.h"     // for SUCCESS, READ_FAIL, SEEK_FAIL, etc.
+#include "./ReturnCodes.h"     // for SUCCESS, READ_FAIL, SEEK_FAIL, etc.
 #include "./Graph.h"          // for class Graph
 #include "./Node.h"           // for class Node
 #include "./Reader.h"         // for class Reader, structs
@@ -30,7 +30,11 @@ static Node* BFS(Graph *graph, Node *start, unordered_set<Node *> *set);
 
 namespace rakan {
 
-uint16_t Runner::LoadPreMadeGraph(unordered_map<uint32_t, uint32_t> *map) {
+uint16_t Runner::SetDistricts(unordered_map<uint32_t, uint32_t> *map) {
+  for (int i = 0; i < graph_->num_nodes_; i++) {
+    graph_->nodes_[i]->district_ = (*map)[graph_->nodes_[i]->id_];
+  }
+
   return SUCCESS;
 }
 
@@ -201,7 +205,7 @@ double Runner::ScoreVRA() {
   uint32_t i, min_pop_percentage;
   double sum;
 
-  for (i = 0; i < graph_->GetNumDistricts(); i++) {
+  for (i = 0; i < graph_->num_districts_; i++) {
     min_pop_percentage = graph_->GetMinorityPop(i) / graph_->GetDistrictPop(i);
     sum += fmin(0, 0.5 - min_pop_percentage);
   }
@@ -217,7 +221,7 @@ double Runner::LogScore() {
   return score_;
 }
 
-int Runner::MetropolisHastings() {
+double Runner::MetropolisHastings() {
   double old_score, new_score, ratio;
   uint32_t random_index, random_number, old_district, new_district;
   std::pair<int, int> edge;
@@ -252,7 +256,10 @@ int Runner::MetropolisHastings() {
       score_ = old_score;
     }
 
-    // TODO: SEND CHANGES TO QUEUE
+    num_steps_++;
+    if (num_steps_ >= 100) {
+      // TODO: SEND CHANGES TO QUEUE
+    }
   }
 
   score_ = new_score;
@@ -286,6 +293,16 @@ double Runner::MakeMove(Node *node, int new_district_id) {
 
   // return the score of this redistricting
   return LogScore();
+}
+
+double Runner::Walk(int num_steps) {
+  int sum = 0;
+
+  for (int i = 0; i < num_steps; i++) {
+    sum += MetropolisHastings();
+  }
+
+  return sum;
 }
 
 }   // namespace rakan
