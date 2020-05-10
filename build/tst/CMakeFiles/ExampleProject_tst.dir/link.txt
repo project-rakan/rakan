@@ -1,1 +1,0 @@
-/opt/rh/devtoolset-7/root/usr/bin/c++  -g   CMakeFiles/ExampleProject_tst.dir/test_graph.cc.o CMakeFiles/ExampleProject_tst.dir/test_node.cc.o CMakeFiles/ExampleProject_tst.dir/test_reader.cc.o CMakeFiles/ExampleProject_tst.dir/test_suite.cc.o  -o ExampleProject_tst ../src/libExampleProject_lib.a ../lib/libgtestd.a -lpthread 

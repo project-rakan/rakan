@@ -1,1 +1,0 @@
-/opt/rh/devtoolset-7/root/usr/bin/c++  -g   CMakeFiles/ExampleProject_run.dir/Graph.cc.o CMakeFiles/ExampleProject_run.dir/Node.cc.o CMakeFiles/ExampleProject_run.dir/Reader.cc.o CMakeFiles/ExampleProject_run.dir/Runner.cc.o CMakeFiles/ExampleProject_run.dir/rakan.cc.o  -o ExampleProject_run 
