@@ -1,0 +1,21 @@
+FROM ubuntu:latest
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Prepare to install 3.7 + GDAL libraries
+RUN apt-get update --fix-missing
+RUN apt-get install -y software-properties-common apt-utils
+RUN add-apt-repository ppa:ubuntugis/ppa
+RUN add-apt-repository ppa:deadsnakes/ppa
+RUN apt-get update --fix-missing
+
+# Install the packages for GDAL
+RUN apt-get install libgdal-dev gdal-bin -y
+# Install the packages for python
+RUN apt-get install python3.7 python3-pip python3.7-dev -y
+
+RUN python3.7 -m pip install pika
+
+WORKDIR /app/
+COPY ./example.py /app/example.py
+CMD [ "python3.7", "/app/example.py" ]
