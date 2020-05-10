@@ -1,0 +1,2 @@
+/opt/rh/devtoolset-7/root/usr/bin/ar qc libExampleProject_lib.a  CMakeFiles/ExampleProject_lib.dir/Graph.cc.o CMakeFiles/ExampleProject_lib.dir/Node.cc.o CMakeFiles/ExampleProject_lib.dir/Reader.cc.o CMakeFiles/ExampleProject_lib.dir/Runner.cc.o CMakeFiles/ExampleProject_lib.dir/rakan.cc.o
+/opt/rh/devtoolset-7/root/usr/bin/ranlib libExampleProject_lib.a

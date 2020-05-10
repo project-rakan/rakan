@@ -6,7 +6,7 @@
 #include <stdio.h>            // for FILE *, fread, fseek
 #include <unordered_map>      // for std::unordered_map
 
-#include "./ErrorCodes.h"     // for error codes
+#include "./ReturnCodes.h"     // for return codes
 #include "./Graph.h"          // for Graph class
 #include "./Node.h"           // for Node class
 

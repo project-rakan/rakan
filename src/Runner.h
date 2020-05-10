@@ -8,7 +8,6 @@
 #include <utility>            // for std::pair
 #include <vector>             // for std::vector
 
-#include "./ErrorCodes.h"     // for error codes
 #include "./Graph.h"          // for Graph class
 #include "./Node.h"           // for Node class
 
@@ -20,11 +19,11 @@ namespace rakan {
 
 class Runner {
  public:
-  Runner() = default;
+  Runner() : num_steps_(0) {}
 
   uint16_t LoadGraph(FILE *file);
 
-  uint16_t LoadPreMadeGraph(unordered_map<uint32_t, uint32_t> *map);
+  uint16_t SetDistricts(unordered_map<uint32_t, uint32_t> *map);
 
   uint16_t SeedDistricts();
 
@@ -40,15 +39,16 @@ class Runner {
 
   double LogScore();
 
-  int MetropolisHastings();
+  double MetropolisHastings();
 
   double MakeMove(Node *node, int new_district_id);
 
-  void Walk();
+  double Walk(int num_steps);
 
   Graph *GetGraph() { return graph_; }
 
  private:
+  int num_steps_;
   Graph *graph_;
   double score_;
 };        // class Runner
