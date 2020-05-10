@@ -1,4 +1,6 @@
-FROM ubuntu:latest
+FROM ubuntu:18.04
+
+ENV DEBIAN_FRONTEND=noninteractive
 
 # House keeping + development tools
 RUN apt-get update --fix-missing
