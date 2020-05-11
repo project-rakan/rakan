@@ -16,7 +16,7 @@
 #define JUDGE_MAP 1
 #define BLOCKING_RETRY_DURATION 0.1
 #define XAYAH_QUEUE "xayah"
-#define BLADECALLER_QUEUE "bladecaller"
+#define BLADECALLER_DATABASE "bladecaller"
 
 #ifndef BATTLEDANCE_QUEUE_H_
 #define BATTLEDANCE_QUEUE_H_
@@ -51,7 +51,10 @@ typedef struct MapScoreRequestStruct {
 typedef struct MapScoreResponseStruct {
     char guid[128];
     double score;
-    double probability;
+    double compactness;
+    double distribution;
+    double borderRespect;
+    double vra;
 } MapScoreResponse;
 
 typedef struct MapJobUpdateStruct {
@@ -143,18 +146,17 @@ class Queue {
         jsonPayload << "{";
         jsonPayload << "\"guid\": \"" << mapScoreResponse.guid << "\",";
         jsonPayload << "\"score\": " << mapScoreResponse.score << ",";
-        jsonPayload << "\"probability\": " << mapScoreResponse.probability << "";
+        jsonPayload << "\"compactness\": " << mapScoreResponse.compactness << ",";
+        jsonPayload << "\"distribution\": " << mapScoreResponse.distribution << ",";
+        jsonPayload << "\"borderRespect\": " << mapScoreResponse.borderRespect << ",";
+        jsonPayload << "\"vra\": " << mapScoreResponse.vra << ",";
         jsonPayload << "}";
 
-        // Setup the call backs to do: connect to TWO queues and push TWO messages
-        channel->declareQueue(XAYAH_QUEUE, AMQP::passive)
+        // Setup the call back to communicate to bladecaller distribution scores, so bladecaller can calculate a probability
+        channel->declareQueue(BLADECALLER_DATABASE, AMQP::passive)
         .onSuccess([&connection, &channel, &jsonPayload](const std::string &name, uint32_t messagecount, uint32_t consumercount) {
-            channel->declareQueue(BLADECALLER_QUEUE, AMQP::passive)
-            .onSuccess([&connection, &channel, &jsonPayload](const std::string &name, uint32_t messagecount, uint32_t consumercount) {
-                channel->publish("", XAYAH_QUEUE, jsonPayload.str());
-                channel->publish("", BLADECALLER_QUEUE, jsonPayload.str());
-                connection->close();
-            });
+            channel->publish("", BLADECALLER_DATABASE, jsonPayload.str());
+            connection->close();
         });
 
         // fire off the async commands
@@ -191,10 +193,10 @@ class Queue {
         // Setup the call backs to do: connect to TWO queues and push TWO messages
         channel->declareQueue(XAYAH_QUEUE, AMQP::passive)
         .onSuccess([&connection, &channel, &jsonPayload](const std::string &name, uint32_t messagecount, uint32_t consumercount) {
-            channel->declareQueue(BLADECALLER_QUEUE, AMQP::passive)
+            channel->declareQueue(BLADECALLER_DATABASE, AMQP::passive)
             .onSuccess([&connection, &channel, &jsonPayload](const std::string &name, uint32_t messagecount, uint32_t consumercount) {
                 channel->publish("", XAYAH_QUEUE, jsonPayload.str());
-                channel->publish("", BLADECALLER_QUEUE, jsonPayload.str());
+                channel->publish("", BLADECALLER_DATABASE, jsonPayload.str());
                 connection->close();
             });
         });
