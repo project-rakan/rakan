@@ -55,6 +55,10 @@ typedef struct MapScoreResponseStruct {
     double distribution;
     double borderRespect;
     double vra;
+    double alpha;
+    double beta;
+    double gamma;
+    double eta;
 } MapScoreResponse;
 
 typedef struct MapJobUpdateStruct {
@@ -150,6 +154,10 @@ class Queue {
         jsonPayload << "\"distribution\": " << mapScoreResponse.distribution << ",";
         jsonPayload << "\"borderRespect\": " << mapScoreResponse.borderRespect << ",";
         jsonPayload << "\"vra\": " << mapScoreResponse.vra << ",";
+        jsonPayload << "\"alpha\": " << mapScoreResponse.alpha << ",";
+        jsonPayload << "\"beta\": " << mapScoreResponse.beta << ",";
+        jsonPayload << "\"gamma\": " << mapScoreResponse.gamma << ",";
+        jsonPayload << "\"eta\": " << mapScoreResponse.eta;
         jsonPayload << "}";
 
         // Setup the call back to communicate to bladecaller distribution scores, so bladecaller can calculate a probability
