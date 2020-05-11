@@ -196,6 +196,8 @@ double Runner::ScoreCompactness() {
     best_score = fmin(best_score, current_score);
   }
 
+  // std::cout << "Compactness score = " << (worst_score - best_score) / 2 << std::endl;
+
   return (worst_score - best_score) / 2;
 }
 
@@ -209,6 +211,8 @@ double Runner::ScorePopulationDistribution() {
   for (i = 0; i < graph_->num_districts_; i++) {
     sum += pow((graph_->pop_of_district_[i] - avg_pop), 2);
   }
+
+  // std::cout << "Population distribution score = " << sum / total_pop << std::endl;
 
   return sum / total_pop;
 }
@@ -226,6 +230,8 @@ double Runner::ScoreVRA() {
     min_pop_percentage = graph_->GetMinorityPop(i) / graph_->GetDistrictPop(i);
     sum += fmin(0, 0.5 - min_pop_percentage);
   }
+
+  // std::cout << "VRA score = " << sum << std::endl;
 
   return sum;
 }
@@ -289,6 +295,7 @@ double Runner::MetropolisHastings() {
       update->gamma = graph_->gamma_;
       update->eta = graph_->eta_;
       queue_.SubmitRunUpdate(*update);
+      std::cout << "sent update to queue" << std::endl;
       num_steps_ = 0;
       changes_->clear();
     }

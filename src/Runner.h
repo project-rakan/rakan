@@ -20,7 +20,9 @@ namespace rakan {
 
 class Runner {
  public:
-  Runner(Queue &queue) : num_steps_(0), queue_(queue) {}
+  Runner(Queue &queue) : num_steps_(0), queue_(queue) {
+    changes_ = new unordered_map<int, int>;
+  }
 
   uint16_t LoadGraph(FILE *file);
 

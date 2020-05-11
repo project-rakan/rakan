@@ -147,26 +147,6 @@ uint16_t Reader::ReadNode(const uint32_t offset,
   return SUCCESS;
 }
 
-uint32_t Reader::ToHostFormat(uint32_t x) {
-  uint32_t ret, i;
-  char *byte = reinterpret_cast<char *>(&x);
-  x = htonl(x);
-  ret = x;
-
-  // Read all 4 bytes.
-  for (i = 0; i < 4; i++) {
-    // If the leading byte is 0, remove it.
-    if (*byte == 0) {
-      ret = ret >> 8;
-    } else {
-      break;
-    }
-    byte++;
-  }
-
-  return ret;
-}
-
 // bool ValidateCheckSum(FILE *file, uint32_t checksum) {
 //   boost::crc_32_type crc;
 //   unsigned char byte;

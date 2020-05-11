@@ -29,8 +29,8 @@ void print_seeding(Graph *g) {
 }
 
 int main(int argc, char *argv[]) {
-  if (argc != 7) {
-    cerr << "usage: " << argv[0] << " filepath alpha beta gamma eta num_steps" << endl;
+  if (argc != 6) {
+    cerr << "usage: " << argv[0] << " filepath alpha beta gamma eta" << endl;
   }
 
   FILE *file = fopen(argv[1], "rb");
@@ -49,10 +49,11 @@ int main(int argc, char *argv[]) {
   g->SetEta(atof(argv[5]));
 
   int i = 0;
-  while (i < atoi(argv[6])) {
-    cout << "step " << i << endl;
-    cout << "score = " << runner.Walk(1) << endl;
-    i++;
+  while (1) {
+    // cout << "step " << i << endl;
+    // cout << "score = " << runner.Walk(1) << endl;
+    runner.Walk(500);
+    // i++;
   }
 
   return EXIT_SUCCESS;
