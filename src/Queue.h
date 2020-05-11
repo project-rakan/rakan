@@ -221,7 +221,6 @@ class Queue {
         delete queueConnection->connection;
         delete queueConnection->channel;
         delete queueConnection;
-
     }
 
 };

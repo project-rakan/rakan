@@ -183,6 +183,11 @@ class Graph {
   void SetGamma(const double val) { gamma_ = val; }
   void SetEta(const double val) { eta_ = val; }
 
+  double GetAlpha() { return alpha_; }
+  double GetBeta() { return beta_; }
+  double GetGamma() { return gamma_; }
+  double GetEta() { return eta_; }
+
  private:
   uint32_t num_nodes_;
   uint32_t num_districts_;

@@ -6,38 +6,21 @@
 #include "./Reader.h"
 #include "./Runner.h"
 
+#include "./Queue.h"
+
 using rakan::Runner;
 
+using battledance::Queue;
+using battledance::Task;
 using std::cerr;
 using std::endl;
 
 int main(int argc, char *argv[]) {
-  if (argc != 6) {
-    cerr << "Usage: " << argv[0] << " filepath alpha beta gamma eta" << endl;
+  Queue queue("amqp://guest:guest@bladecaller_queue", "rakan");
+
+  while (1) {
+    Task task = queue.GetNextTask();
   }
 
-  // Open index file as a binary.
-  FILE *file = fopen(argv[1], "rb");
-  if (file == nullptr) {
-    return EXIT_FAILURE;
-  }
-
-  // Initialize this engine.
-  Runner runner;
-  runner.LoadGraph(file);
-
-  double alpha, beta, gamma, eta;
-  sscanf(argv[2], "%f", &alpha);
-  sscanf(argv[3], "%f", &beta);
-  sscanf(argv[4], "%f", &gamma);
-  sscanf(argv[5], "%f", &eta);
-
-  runner.GetGraph()->SetAlpha(alpha);
-  runner.GetGraph()->SetBeta(beta);
-  runner.GetGraph()->SetGamma(gamma);
-  runner.GetGraph()->SetEta(eta);
-
-  // Clean up and exit.
-  fclose(file);
   return EXIT_SUCCESS;
 }
