@@ -185,7 +185,7 @@ uint16_t Runner::PopulateGraphData() {
 
 double Runner::ScoreCompactness() {
   uint32_t i, num_foreign_neighbors = 0;
-  double current_score, sum = 0;
+  double current_score = 0, sum = 0;
 
   for (i = 0; i < graph_->num_districts_; i++) {
     for (auto &pair : *graph_->perim_nodes_to_neighbors_[i]) {
@@ -202,7 +202,7 @@ double Runner::ScoreCompactness() {
 
 double Runner::ScorePopulationDistribution() {
   uint32_t i, total_pop, avg_pop;
-  double sum;
+  double sum = 0;
   
   total_pop = graph_->state_pop_;
   avg_pop = total_pop / graph_->num_districts_;
@@ -211,9 +211,9 @@ double Runner::ScorePopulationDistribution() {
     sum += pow((graph_->pop_of_district_[i] - avg_pop), 1);
   }
 
-  std::cout << "Population distribution score = " << sum / total_pop << std::endl;
+  std::cout << "Population distribution score = " << sum / graph_->num_districts_ << std::endl;
 
-  return sum / total_pop;
+  return sum / graph_->num_districts_;
 }
 
 double Runner::ScoreExistingBorders() {
@@ -222,12 +222,14 @@ double Runner::ScoreExistingBorders() {
 }
 
 double Runner::ScoreVRA() {
-  uint32_t i, min_pop_percentage;
-  double sum;
+  uint32_t i;
+  double sum = 0, min_pop_percentage;
 
   for (i = 0; i < graph_->num_districts_; i++) {
-    min_pop_percentage = graph_->GetMinorityPop(i) / graph_->GetDistrictPop(i);
-    sum += fmin(0, 0.5 - min_pop_percentage);
+    min_pop_percentage = ((double)graph_->GetMinorityPop(i)) / ((double)graph_->GetDistrictPop(i));
+    if ((0.5 - min_pop_percentage) > 0) {
+      sum += min_pop_percentage;
+    }
   }
 
   std::cout << "VRA score = " << sum << std::endl;

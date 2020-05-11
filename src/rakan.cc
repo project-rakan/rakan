@@ -49,10 +49,10 @@ int main(int argc, char *argv[]) {
   g->SetEta(atof(argv[5]));
 
   int i = 0;
-  while (1) {
+  for (int i = 0; i < 10; i++) {
     // cout << "step " << i << endl;
     // cout << "score = " << runner.Walk(1) << endl;
-    runner.Walk(500);
+    runner.Walk(3);
     // i++;
   }
 
