@@ -36,7 +36,7 @@ typedef struct StartMapJobRequestStruct {
     double beta;
     double gamma;
     double eta;
-} StartMapJobRequestStruct;
+} StartMapJobRequest;
 
 typedef struct MapScoreRequestStruct {
     char guid[128];

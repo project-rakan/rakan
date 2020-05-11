@@ -195,7 +195,7 @@ double Runner::ScoreCompactness() {
     sum += current_score;
   }
 
-  std::cout << "Compactness score = " << sum << std::endl;
+  // std::cout << "Compactness score = " << sum << std::endl;
 
   return sum;
 }
@@ -211,7 +211,7 @@ double Runner::ScorePopulationDistribution() {
     sum += pow((graph_->pop_of_district_[i] - avg_pop), 1);
   }
 
-  std::cout << "Population distribution score = " << sum / graph_->num_districts_ << std::endl;
+  // std::cout << "Population distribution score = " << sum / graph_->num_districts_ << std::endl;
 
   return sum / graph_->num_districts_;
 }
@@ -239,9 +239,9 @@ double Runner::ScoreVRA() {
 
 double Runner::LogScore() {
   score_ = (graph_->alpha_ * ScoreCompactness()
-        + graph_->beta_ * ScorePopulationDistribution()
-        + graph_->gamma_ * ScoreExistingBorders()
-        + graph_->eta_ * ScoreVRA());
+          + graph_->beta_ * ScorePopulationDistribution()
+          + graph_->gamma_ * ScoreExistingBorders()
+          + graph_->eta_ * ScoreVRA());
   return score_;
 }
 
@@ -258,26 +258,12 @@ bool Runner::IsDistrictSevered(Node *proposed_node) {
   // put all neighbors of the same district together
   for (auto &neighbor : *proposed_node->neighbors_) {
     map[graph_->nodes_[neighbor]->district_].push_back(graph_->nodes_[neighbor]);
-    // std::cout << "district " << graph_->nodes_[neighbor]->district_;
-    // std::cout << " = " << graph_->nodes_[neighbor]->id_ << std::endl;
   }
 
   // for all district-neighbor pairs, search for path between them
   for (auto &pair : map) {
     for (int i = 0; i < map[pair.first].size() - 1; i++) {
-      // std::cout << "checking if path exists between " << map[pair.first][i]->id_ << " and " << map[pair.first][i+1]->id_ << std::endl;
       if (!DoesPathExist(map[pair.first][i], map[pair.first][i+1])) {
-        // std::cout << "NOOOOOOO" << std::endl;
-        // std::cout << map[pair.first][i] << "'s neighbors: [";
-        // for (auto &n : *map[pair.first][i]->neighbors_) {
-        //   std::cout << n << ",";
-        // }
-        // std::cout << "]" << std::endl;
-        // std::cout << map[pair.first][i+1] << "'s neighbors: [";
-        // for (auto &n : *map[pair.first][i+1]->neighbors_) {
-        //   std::cout << n << ",";
-        // }
-        // std::cout << "]" << std::endl;
         proposed_node->district_ = old_district;
         return true;
       }
@@ -295,7 +281,6 @@ bool Runner::DoesPathExist(Node *start, Node *target) {
   q.push(start);
   
   while (!q.empty()) {
-    // std::cout << "q.size() == " << q.size() << std::endl;
     current_node = q.front();
     q.pop();
 
@@ -342,30 +327,37 @@ double Runner::MetropolisHastings() {
       new_district = graph_->nodes_[edge.first]->district_;
     }
 
-    old_score = LogScore();
     old_district = node->district_;
     is_valid = !IsEmptyDistrict(old_district) && !IsDistrictSevered(node);
   }
 
+  old_score = LogScore();
+  // std::cout << "making move on node " << node->id_ << " to district " << new_district << std::endl;
   new_score = MakeMove(node, new_district);
-  std::cout << "old_score = " << old_score << ", new_score = " << new_score << std::endl;
+  // std::cout << "old_score = " << old_score << ", new_score = " << new_score << std::endl;
 
   if (new_score > old_score) {
     std::uniform_real_distribution<double> decimal_number(0.0, 1.0);
     ratio = decimal_number(generator);
     if (ratio <= (old_score / new_score)) {
+      // std::cout << "move rejected" << std::endl;
       MakeMove(node, old_district);
       score_ = old_score;
+    } else {
+      // std::cout << "move accepted" << std::endl;
+      score_ = new_score;
     }
 
     (*changes_)[node->id_] = node->district_;
     num_steps_++;
-    if (num_steps_ >= 100) {
+    // if (num_steps_ >= 100) {
       MapJobUpdate *update = new MapJobUpdate;
       for (int i = 0; i < 128; i++) {
         update->guid[i] = i;
       }
       strcpy(update->state, "IA");
+      strcpy(update->guid, guid_.c_str());
+      // update->guid = *guid;
       update->map = *changes_;
       update->alpha = graph_->alpha_;
       update->beta = graph_->beta_;
@@ -373,12 +365,14 @@ double Runner::MetropolisHastings() {
       update->eta = graph_->eta_;
       queue_.SubmitRunUpdate(*update);
       std::cout << "sent update to queue" << std::endl;
-      num_steps_ = 0;
+      // num_steps_ = 0;
       changes_->clear();
-    }
+    // }
+  } else {
+    // std::cout << "move accepted" << std::endl;
+    score_ = new_score;
   }
 
-  score_ = new_score;
   return old_score - new_score;
 }
 
@@ -410,8 +404,9 @@ double Runner::MakeMove(Node *node, int new_district_id) {
   return LogScore();
 }
 
-double Runner::Walk(int num_steps) {
+double Runner::Walk(int num_steps, string guid) {
   int sum = 0;
+  guid_ = guid;
 
   for (int i = 0; i < num_steps; i++) {
     sum += MetropolisHastings();

@@ -10,6 +10,7 @@
 
 using rakan::Runner;
 
+using battledance::StartMapJobRequest;
 using battledance::Queue;
 using battledance::Task;
 using std::cout;
@@ -29,31 +30,34 @@ void print_seeding(Graph *g) {
 }
 
 int main(int argc, char *argv[]) {
-  if (argc != 6) {
-    cerr << "usage: " << argv[0] << " filepath alpha beta gamma eta" << endl;
+  if (argc != 2) {
+    cerr << "usage: " << argv[0] << " num_steps" << endl;
   }
 
-  FILE *file = fopen(argv[1], "rb");
   Queue queue("amqp://guest:guest@bladecaller_queue", "rakan");
-
   Runner runner(queue);
-  runner.LoadGraph(file);
-  runner.SeedDistricts();
-  runner.PopulateGraphData();
-  // print_seeding(runner.GetGraph());
 
-  Graph *g = runner.GetGraph();
-  g->SetAlpha(atof(argv[2]));
-  g->SetBeta(atof(argv[3]));
-  g->SetGamma(atof(argv[4]));
-  g->SetEta(atof(argv[5]));
+  while (1) {
+    Task task = queue.GetNextTask();
+    if (task.task_id == START_MAP) {
+      StartMapJobRequest *request = reinterpret_cast<StartMapJobRequest *>(task.payload);
 
-  int i = 0;
-  for (int i = 0; i < 10; i++) {
-    // cout << "step " << i << endl;
-    // cout << "score = " << runner.Walk(1) << endl;
-    runner.Walk(3);
-    // i++;
+      // ideally would pull idx file from database
+      FILE *file = fopen("../tst/iowa.idx", "rb");
+      runner.LoadGraph(file);
+
+      Graph *g = runner.GetGraph();
+      g->SetAlpha(request->alpha);
+      g->SetBeta(request->beta);
+      g->SetGamma(request->gamma);
+      g->SetEta(request->eta);
+
+      runner.SeedDistricts();
+      runner.PopulateGraphData();
+      runner.Walk(atoi(argv[1]), request->guid);
+    } else {
+      // TODO
+    }
   }
 
   return EXIT_SUCCESS;
