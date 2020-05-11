@@ -185,20 +185,19 @@ uint16_t Runner::PopulateGraphData() {
 
 double Runner::ScoreCompactness() {
   uint32_t i, num_foreign_neighbors = 0;
-  double current_score, best_score = INFINITY, worst_score = -INFINITY;
+  double current_score, sum = 0;
 
   for (i = 0; i < graph_->num_districts_; i++) {
     for (auto &pair : *graph_->perim_nodes_to_neighbors_[i]) {
       num_foreign_neighbors += pair.second->size();
     }
-    current_score = num_foreign_neighbors / graph_->nodes_in_district_[i]->size();
-    worst_score = fmax(worst_score, current_score);
-    best_score = fmin(best_score, current_score);
+    current_score = pow(num_foreign_neighbors, 2) / graph_->nodes_in_district_[i]->size();
+    sum += current_score;
   }
 
-  // std::cout << "Compactness score = " << (worst_score - best_score) / 2 << std::endl;
+  // std::cout << "Compactness score = " << sum << std::endl;
 
-  return (worst_score - best_score) / 2;
+  return sum;
 }
 
 double Runner::ScorePopulationDistribution() {
@@ -244,33 +243,108 @@ double Runner::LogScore() {
   return score_;
 }
 
+bool Runner::IsEmptyDistrict(int old_district) {
+  return graph_->nodes_in_district_[old_district]->size() <= 1;
+}
+
+bool Runner::IsDistrictSevered(Node *proposed_node) {
+  unordered_map<int, vector<Node *>> map;
+  Node *start;
+  int old_district = proposed_node->district_;
+  proposed_node->district_ = graph_->num_districts_ + 1;
+
+  // put all neighbors of the same district together
+  for (auto &neighbor : *proposed_node->neighbors_) {
+    map[graph_->nodes_[neighbor]->district_].push_back(graph_->nodes_[neighbor]);
+    // std::cout << "district " << graph_->nodes_[neighbor]->district_;
+    // std::cout << " = " << graph_->nodes_[neighbor]->id_ << std::endl;
+  }
+
+  // for all district-neighbor pairs, search for path between them
+  for (auto &pair : map) {
+    for (int i = 0; i < map[pair.first].size() - 1; i++) {
+      // std::cout << "checking if path exists between " << map[pair.first][i]->id_ << " and " << map[pair.first][i+1]->id_ << std::endl;
+      if (!DoesPathExist(map[pair.first][i], map[pair.first][i+1])) {
+        // std::cout << "NOOOOOOO" << std::endl;
+        // std::cout << map[pair.first][i] << "'s neighbors: [";
+        // for (auto &n : *map[pair.first][i]->neighbors_) {
+        //   std::cout << n << ",";
+        // }
+        // std::cout << "]" << std::endl;
+        // std::cout << map[pair.first][i+1] << "'s neighbors: [";
+        // for (auto &n : *map[pair.first][i+1]->neighbors_) {
+        //   std::cout << n << ",";
+        // }
+        // std::cout << "]" << std::endl;
+        proposed_node->district_ = old_district;
+        return true;
+      }
+    }
+  }
+
+  proposed_node->district_ = old_district;
+  return false;
+}
+
+bool Runner::DoesPathExist(Node *start, Node *target) {
+  queue<Node *> q;
+  unordered_set<Node *> processed;
+  Node *current_node;
+  q.push(start);
+  
+  while (!q.empty()) {
+    // std::cout << "q.size() == " << q.size() << std::endl;
+    current_node = q.front();
+    q.pop();
+
+    if (current_node == target) {
+      return true;
+    }
+    processed.insert(current_node);
+
+    for (auto &neighbor : *current_node->neighbors_) {
+      if (graph_->nodes_[neighbor]->district_ == current_node->district_ &&
+          std::find(processed.begin(), processed.end(), graph_->nodes_[neighbor]) == processed.end()) {
+        q.push(graph_->nodes_[neighbor]);
+      }
+    }
+  }
+
+  return false;
+}
+
 double Runner::MetropolisHastings() {
   double old_score, new_score, ratio;
   uint32_t random_index, random_number, old_district, new_district;
   std::pair<int, int> edge;
   Node *node;
+  bool is_valid = false;
 
+  // random number generators initialization
   unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
   std::default_random_engine generator(seed);
   std::uniform_real_distribution<double> index(0, graph_->perim_edges_->size());
-
-  random_index = floor(index(generator));
-  // edge = (*graph_->perim_edges_)[random_index];
-  edge.first = (*graph_->perim_edges_)[random_index].first;
-  edge.second = (*graph_->perim_edges_)[random_index].second;
-
   std::uniform_real_distribution<double> number(0.0, graph_->perim_edges_->size());
-  random_number = floor(number(generator));
-  if (random_number > graph_->perim_edges_->size() / 2) {
-    node = graph_->nodes_[edge.first];
-    new_district = graph_->nodes_[edge.second]->district_;
-  } else {
-    node = graph_->nodes_[edge.second];
-    new_district = graph_->nodes_[edge.first]->district_;
+
+  while (!is_valid) {
+    random_index = floor(index(generator));
+    edge.first = (*graph_->perim_edges_)[random_index].first;
+    edge.second = (*graph_->perim_edges_)[random_index].second;
+
+    random_number = floor(number(generator));
+    if (random_number > graph_->perim_edges_->size() / 2) {
+      node = graph_->nodes_[edge.first];
+      new_district = graph_->nodes_[edge.second]->district_;
+    } else {
+      node = graph_->nodes_[edge.second];
+      new_district = graph_->nodes_[edge.first]->district_;
+    }
+
+    old_score = LogScore();
+    old_district = node->district_;
+    is_valid = !IsEmptyDistrict(old_district) && !IsDistrictSevered(node);
   }
 
-  old_score = LogScore();
-  old_district = node->district_;
   new_score = MakeMove(node, new_district);
 
   if (new_score > old_score) {
@@ -279,6 +353,8 @@ double Runner::MetropolisHastings() {
     if (ratio <= (old_score / new_score)) {
       MakeMove(node, old_district);
       score_ = old_score;
+    } else {
+      // std::cout << "making move on node " << node->id_ << " to district " << new_district << std::endl;
     }
 
     (*changes_)[node->id_] = node->district_;
@@ -299,6 +375,8 @@ double Runner::MetropolisHastings() {
       num_steps_ = 0;
       changes_->clear();
     }
+  } else {
+    // std::cout << "making move on node " << node->id_ << " to district " << new_district << std::endl; 
   }
 
   score_ = new_score;

@@ -42,11 +42,19 @@ class Runner {
 
   double LogScore();
 
+  bool IsValid();
+
   double MetropolisHastings();
 
   double MakeMove(Node *node, int new_district_id);
 
   double Walk(int num_steps);
+
+  bool IsEmptyDistrict(int old_district);
+
+  bool IsDistrictSevered(Node *proposed_node);
+
+  bool DoesPathExist(Node *start, Node *target);
 
   Graph *GetGraph() { return graph_; }
 
