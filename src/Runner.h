@@ -22,7 +22,7 @@ namespace rakan {
 
 class Runner {
  public:
-  Runner(Queue &queue) : num_steps_(0), queue_(queue) {
+  Runner(Queue * queue) : num_steps_(0), queue_(queue) {
     changes_ = new unordered_map<int, int>;
   }
 
@@ -64,7 +64,7 @@ class Runner {
   Graph *GetGraph() { return graph_; }
 
  private:
-  Queue queue_;
+  Queue * queue_;
   string guid_;
   int num_steps_;
   unordered_map<int, int> *changes_;

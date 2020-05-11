@@ -336,41 +336,51 @@ double Runner::MetropolisHastings() {
   new_score = MakeMove(node, new_district);
   // std::cout << "old_score = " << old_score << ", new_score = " << new_score << std::endl;
 
+  bool accepted = false;
+
   if (new_score > old_score) {
+    // Need to check if proposal is to be accepted via stochastic process
+  
     std::uniform_real_distribution<double> decimal_number(0.0, 1.0);
     ratio = decimal_number(generator);
+  
     if (ratio <= (old_score / new_score)) {
+      // Reject move
       // std::cout << "move rejected" << std::endl;
       MakeMove(node, old_district);
       score_ = old_score;
     } else {
+      // Accept Move
       // std::cout << "move accepted" << std::endl;
       score_ = new_score;
+      accepted = true;
     }
-
-    (*changes_)[node->id_] = node->district_;
-    num_steps_++;
-    // if (num_steps_ >= 100) {
-      MapJobUpdate *update = new MapJobUpdate;
-      for (int i = 0; i < 128; i++) {
-        update->guid[i] = i;
-      }
-      strcpy(update->state, "IA");
-      strcpy(update->guid, guid_.c_str());
-      // update->guid = *guid;
-      update->map = *changes_;
-      update->alpha = graph_->alpha_;
-      update->beta = graph_->beta_;
-      update->gamma = graph_->gamma_;
-      update->eta = graph_->eta_;
-      queue_.SubmitRunUpdate(*update);
-      std::cout << "sent update to queue" << std::endl;
-      // num_steps_ = 0;
-      changes_->clear();
     // }
   } else {
     // std::cout << "move accepted" << std::endl;
     score_ = new_score;
+    accepted = true;
+  }
+  
+  (*changes_)[node->id_] = node->district_;
+  num_steps_++;
+
+  if (accepted) {
+    // if (num_steps_ >= 100) {
+    MapJobUpdate *update = new MapJobUpdate;
+    strcpy(update->state, "IA");
+    strcpy(update->guid, guid_.c_str());
+    // update->guid = *guid;
+    update->map = *changes_;
+    update->alpha = graph_->alpha_;
+    update->beta = graph_->beta_;
+    update->gamma = graph_->gamma_;
+    update->eta = graph_->eta_;
+    std::cout << "about to send update" << std::endl;
+    queue_->SubmitRunUpdate(*update);
+    std::cout << "sent update to queue" << std::endl;
+    // num_steps_ = 0;
+    changes_->clear();
   }
 
   return old_score - new_score;

@@ -34,8 +34,8 @@ int main(int argc, char *argv[]) {
     cerr << "usage: " << argv[0] << " num_steps" << endl;
   }
 
-  Queue queue("amqp://guest:guest@bladecaller_queue", "rakan");
-  Runner runner(queue);
+  Queue queue("amqp://norton:Norton00@bladecaller_queue", "rakan");
+  Runner runner(&queue);
 
   while (1) {
     Task task = queue.GetNextTask();
