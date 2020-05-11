@@ -122,10 +122,43 @@ class Queue {
 
         tearDownConnection(queueConnection);
 
-        // TODO: parse the payload
-
+        // parse the payload
+        StartMapJobRequestStruct * request = new StartMapJobRequestStruct;
+        vector<string> pairs = body.split(";");
+        for(int i = 0; i < pairs.size(); i++) {
+            vector<string> key_val = pairs[i].split(":");
+            int j  = 0;
+            string result;
+            while (j < key_val[1].length) {
+                if (key_val[1][j] !=  ' ') {
+                    result += key_val[1][j];
+                }
+                j++;
+            }
+            if (key_val[0].lower() == "guid") {
+                char s[128];
+                strcpy(s, result);
+                request->guid = s;
+            } else if (key_val[0].lower() == "state") {
+                char s[2];
+                strcpy(s, result;
+                request->state = s;
+            } else if (key_val[0].lower() == "alpha") {
+                string::size_type sz;
+                request->alpha = stod(result, &sz);
+            } else if (key_val[0].lower() == "beta") {
+                string::size_type sz;
+                request->beta = stod(result, &sz);
+            } else if (key_val[0].lower() == "gamma") {
+                string::size_type sz;
+                request->gamma = stod(result, &sz);
+            } else if (key_val[0].lower() == "eta") {
+                string::size_type sz;
+                request->eta = stod(result, &sz);
+            }
+        }
         Task task = Task();
-        task.payload = nullptr;
+        task.payload = request;
         task.task_id = START_MAP;
         return task;
     }
