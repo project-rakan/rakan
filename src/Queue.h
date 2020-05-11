@@ -97,13 +97,14 @@ class Queue {
         AMQP::TcpConnection * connection = queueConnection->connection;
 
         auto identifier = identifier_;
+        std::string body;
 
         // Setup the call backs to do: connect to the queue and get one message
         channel->declareQueue(identifier_, AMQP::passive)
-        .onSuccess([&connection, &channel, &done, &identifier](const std::string &name, uint32_t messagecount, uint32_t consumercount) {
+        .onSuccess([&connection, &channel, &done, &identifier, &body](const std::string &name, uint32_t messagecount, uint32_t consumercount) {
             channel->get(identifier, AMQP::noack)
-            .onReceived([&connection, &done, &identifier](const AMQP::Message &msg, uint64_t tag, bool redelivered) {
-                auto body = std::string(msg.body());
+            .onReceived([&connection, &done, &identifier, &body](const AMQP::Message &msg, uint64_t tag, bool redelivered) {
+                body = std::string(msg.body());
                 body.resize(msg.bodySize());
                 done = true;
                 connection->close();
