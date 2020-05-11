@@ -195,7 +195,7 @@ double Runner::ScoreCompactness() {
     sum += current_score;
   }
 
-  // std::cout << "Compactness score = " << sum << std::endl;
+  std::cout << "Compactness score = " << sum << std::endl;
 
   return sum;
 }
@@ -208,10 +208,10 @@ double Runner::ScorePopulationDistribution() {
   avg_pop = total_pop / graph_->num_districts_;
 
   for (i = 0; i < graph_->num_districts_; i++) {
-    sum += pow((graph_->pop_of_district_[i] - avg_pop), 2);
+    sum += pow((graph_->pop_of_district_[i] - avg_pop), 1);
   }
 
-  // std::cout << "Population distribution score = " << sum / total_pop << std::endl;
+  std::cout << "Population distribution score = " << sum / total_pop << std::endl;
 
   return sum / total_pop;
 }
@@ -230,7 +230,7 @@ double Runner::ScoreVRA() {
     sum += fmin(0, 0.5 - min_pop_percentage);
   }
 
-  // std::cout << "VRA score = " << sum << std::endl;
+  std::cout << "VRA score = " << sum << std::endl;
 
   return sum;
 }
@@ -346,6 +346,7 @@ double Runner::MetropolisHastings() {
   }
 
   new_score = MakeMove(node, new_district);
+  std::cout << "old_score = " << old_score << ", new_score = " << new_score << std::endl;
 
   if (new_score > old_score) {
     std::uniform_real_distribution<double> decimal_number(0.0, 1.0);
@@ -353,8 +354,6 @@ double Runner::MetropolisHastings() {
     if (ratio <= (old_score / new_score)) {
       MakeMove(node, old_district);
       score_ = old_score;
-    } else {
-      // std::cout << "making move on node " << node->id_ << " to district " << new_district << std::endl;
     }
 
     (*changes_)[node->id_] = node->district_;
@@ -375,12 +374,9 @@ double Runner::MetropolisHastings() {
       num_steps_ = 0;
       changes_->clear();
     }
-  } else {
-    // std::cout << "making move on node " << node->id_ << " to district " << new_district << std::endl; 
   }
 
   score_ = new_score;
-
   return old_score - new_score;
 }
 

@@ -24,6 +24,9 @@ class Runner {
     changes_ = new unordered_map<int, int>;
   }
 
+  // for testing
+  uint16_t LoadGraph(Graph *graph) { graph_ = graph; }
+
   uint16_t LoadGraph(FILE *file);
 
   uint16_t SetDistricts(unordered_map<uint32_t, uint32_t> *map);
