@@ -404,6 +404,9 @@ double Runner::MakeMove(Node *node, int new_district_id) {
   node->district_ = new_district_id;
   graph_->nodes_in_district_[node->district_]->insert(node->id_);
   graph_->nodes_on_perim_[node->district_]->insert(node->id_);
+  if (graph_->perim_nodes_to_neighbors_[node->district_] == nullptr) {
+    std::cout << "nullptr" << std::endl;
+  }
   graph_->perim_nodes_to_neighbors_[node->district_]->insert({node->id_, neighbors});
 
   // update new district population
