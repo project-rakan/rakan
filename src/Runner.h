@@ -10,6 +10,7 @@
 
 #include "./Graph.h"          // for Graph class
 #include "./Node.h"           // for Node class
+#include "./Queue.h"
 
 using std::pair;
 using std::unordered_set;
@@ -19,7 +20,7 @@ namespace rakan {
 
 class Runner {
  public:
-  Runner() : num_steps_(0) {}
+  Runner(Queue &queue) : num_steps_(0), queue_(queue) {}
 
   uint16_t LoadGraph(FILE *file);
 
@@ -48,7 +49,9 @@ class Runner {
   Graph *GetGraph() { return graph_; }
 
  private:
+  Queue queue_;
   int num_steps_;
+  unordered_map<int, int> *changes_;
   Graph *graph_;
   double score_;
 };        // class Runner

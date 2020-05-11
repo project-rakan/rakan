@@ -22,10 +22,22 @@ Graph::Graph(const uint32_t num_nodes, const uint32_t num_districts, const uint3
       state_pop_(state_pop) {
   // Initialize array of pointers fields.
   nodes_ = new Node*[num_nodes_];
+
   nodes_in_district_ = new unordered_set<int>*[num_districts_];
+  for (int i = 0; i < num_districts_; i++) {
+    nodes_in_district_[i] = new unordered_set<int>;
+  }
+
   nodes_on_perim_ = new unordered_set<int>*[num_districts_];
+  for (int i = 0; i < num_districts_; i++) {
+    nodes_on_perim_[i] = new unordered_set<int>;
+  }
+
   perim_nodes_to_neighbors_ =
                 new unordered_map<int, unordered_set<int> *>*[num_districts_];
+  for (int i = 0; i < num_districts_; i++) {
+    perim_nodes_to_neighbors_[i] = new unordered_map<int, unordered_set<int> *>;
+  }
 
   // Initialize other array fields.
   perim_edges_ = new vector<pair<int, int>>;

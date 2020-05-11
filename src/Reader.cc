@@ -26,14 +26,19 @@ uint16_t Reader::ReadHeader(Header *header) {
     return INVALID_FILE;
   }
 
-  res = fread(header, kHeaderSize, 1, file_);
+  res = fread(&header->magic_number, sizeof(uint32_t), 1, file_);
+  header->magic_number = htonl(header->magic_number);
   if (res != 1) {
     return READ_FAILED;
   }
-  header->magic_number = htonl(header->magic_number);
+  // header->magic_number = htonl(header->magic_number);
+  res = fread(&header->checksum, sizeof(uint32_t), 1, file_);
   header->checksum = htonl(header->checksum);
-  header->num_nodes = ToHostFormat(header->num_nodes);
-  header->num_districts = ToHostFormat(header->num_districts);
+  res = fread(&header->state, sizeof(char) * 2, 1, file_);
+  res = fread(&header->num_nodes, sizeof(uint32_t), 1, file_);
+  header->num_nodes = htonl(header->num_nodes);
+  res = fread(&header->num_districts, sizeof(uint32_t), 1, file_);
+  header->num_districts = htonl(header->num_districts);
 
   return SUCCESS;
 }
