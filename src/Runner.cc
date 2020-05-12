@@ -100,6 +100,7 @@ uint16_t Runner::SeedDistricts() {
       seed_node->SetDistrict(i);
       seed_nodes.insert(seed_node);
       random_indexes.push_back(random_index);
+      changes_.insert({seed_node->id_, i});
     } else {
       i--;
     }
@@ -118,14 +119,15 @@ uint16_t Runner::SeedDistricts() {
         found_node->SetDistrict(i);
         unused.erase(found_node);
         last_found[i] = found_node;
-      } else {
-
+        changes_.insert({found_node->id_, i});
       }
     }
     if (unused.size() == check) {
       return SEED_FAILED;
     }
   }
+
+  SubmitToQueue(*changes_);
 
   return SUCCESS;
 }
