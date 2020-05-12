@@ -51,7 +51,7 @@ class Runner {
 
   double MetropolisHastings();
 
-  double MakeMove(Node *node, int new_district_id);
+  uint16_t MakeMove(Node *node, int new_district_id);
 
   double Walk(int num_steps, string guid);
 

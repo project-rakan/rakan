@@ -155,7 +155,7 @@ class Graph {
   //
   // Returns:
   //  - a pointer to the set of neighbor nodes of perim_node
-  unordered_set<int>* GetPerimNodeNeighbors(const uint32_t district,
+  unordered_set<uint32_t>* GetPerimNodeNeighbors(const uint32_t district,
                                             const uint32_t node) const;
 
   // Gets the total population of the given district.
@@ -175,6 +175,48 @@ class Graph {
   // Returns:
   //  - the total minority population of the given district
   uint32_t GetMinorityPop(const uint32_t district) const;
+
+  bool RemoveNodeFromDistrict(Node *node, int district) {
+    if (nodes_in_district_[district]->find(node->id_) ==
+        nodes_in_district_[district]->end()) {
+      return false;
+    }
+    nodes_in_district_[district]->erase(node->id_);
+    pop_of_district_[district] -= node->GetTotalPop();
+    min_pop_of_district_[district] -= node->GetMinPop();
+    // node->district_ = num_districts_ + 1;   // invalid
+    return true;
+  }
+
+  bool RemoveNodeFromDistrictPerim(Node *node, int district) {
+    if (nodes_on_perim_[district]->find(node->id_) ==
+        nodes_on_perim_[district]->end()) {
+      return false;
+    }
+    nodes_on_perim_[district]->erase(node->id_);
+    return true;
+  }
+
+  bool AddNodeToDistrict(Node *node, int district) {
+    if (nodes_in_district_[district]->find(node->id_) !=
+        nodes_in_district_[district]->end()) {
+      return false;
+    }
+    node->district_ = district;
+    nodes_in_district_[district]->insert(node->id_);
+    pop_of_district_[district] += node->GetTotalPop();
+    min_pop_of_district_[district] += node->GetMinPop();
+    return true;
+  }
+
+  bool AddNodeToDistrictPerim(Node *node, int district) {
+   if (nodes_on_perim_[node->district_]->find(node->id_) !=
+       nodes_on_perim_[node->district_]->end()) {
+     return false;
+   }
+   nodes_on_perim_[node->district_]->insert(node->id_);
+   return true;
+  }
 
   /////////////////////////////////////////////////////////////////////////////
   // Variable Mutators
@@ -217,7 +259,7 @@ class Graph {
   // node must be on the perimeter of the district. Corresponding
   // to each key contains a set of node IDs that are neighbors
   // to the perimeter node.
-  unordered_map<int, unordered_set<int> *> **perim_nodes_to_neighbors_;
+  // unordered_map<int, unordered_set<uint32_t> *> **perim_nodes_to_neighbors_;
 
   // An array of populations. The index of the array is the district
   // ID. The value at that index corresponds to the population in

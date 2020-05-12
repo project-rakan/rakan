@@ -1,0 +1,14 @@
+FROM rabbitmq:3-management
+
+ENV AMQP_URL amqp://rabbitmq?connection_attempts=5&retry_delay=5
+ENV RABBITMQ_USER norton
+ENV RABBITMQ_PASSWORD Norton00
+
+ADD rabbitmq.conf /etc/rabbitmq/
+ADD definitions.json /etc/rabbitmq/
+
+COPY ./docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+EXPOSE 15672
+
+CMD ["/docker-entrypoint.sh"]
