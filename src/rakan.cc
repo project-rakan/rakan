@@ -30,7 +30,15 @@ int main(int argc, char *argv[]) {
     // x->gamma = 0;
     // x->eta = 0;
 
+    std::cout << "awaiting next task..." << std::endl;
     Task task = queue.GetNextTask();
+    
+    if (task.task_id == NOOP) {
+      sleep(1);
+      continue;
+    }
+    
+    std::cout << "got the next task..." << std::endl;
     StartMapJobRequest *request = reinterpret_cast<StartMapJobRequest *>(task.payload);
 
     // ideally would pull idx file from database

@@ -1,1 +1,0 @@
-/usr/bin/c++  -g  -rdynamic CMakeFiles/rakan_tst.dir/test_graph.cc.o CMakeFiles/rakan_tst.dir/test_node.cc.o CMakeFiles/rakan_tst.dir/test_reader.cc.o CMakeFiles/rakan_tst.dir/test_suite.cc.o  -o rakan_tst ../src/librakan_lib.a ../lib/libgtestd.a -lpthread 

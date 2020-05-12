@@ -13,6 +13,7 @@
 
 #include <iostream>
 
+#define NOOP -1
 #define START_MAP 0
 #define JUDGE_MAP 1
 #define BLOCKING_RETRY_DURATION 0.1
@@ -103,6 +104,7 @@ class Queue {
     Task GetNextTask() {
         // access to the event loop
         bool done = false;
+        bool createTask = false;
 
         // Moment of truth...
         QueueConnectionRequirement * queueConnection = setUpConnection();
@@ -110,19 +112,35 @@ class Queue {
         AMQP::TcpChannel * channel = queueConnection->channel;
         AMQP::TcpConnection * connection = queueConnection->connection;
 
+        channel->onError([&connection, &evbase](const char* message) {
+            std::cerr << "Something went wrong: " << message << std::endl;
+            event_base_loopbreak(evbase);
+            connection->close();
+        });
+
         auto identifier = identifier_;
 
         string body;
         // Setup the call backs to do: connect to the queue and get one message
         channel->declareQueue(identifier_, AMQP::passive)
-        .onSuccess([&connection, &channel, &done, &identifier, &body](const std::string &name, uint32_t messagecount, uint32_t consumercount) {
+        .onSuccess([&connection, &channel, &done, &identifier, &body, &createTask](const std::string &name, uint32_t messagecount, uint32_t consumercount) {
             channel->get(identifier, AMQP::noack)
-            .onReceived([&connection, &done, &identifier, &body](const AMQP::Message &msg, uint64_t tag, bool redelivered) {
+            .onReceived([&connection, &done, &identifier, &body, &createTask](const AMQP::Message &msg, uint64_t tag, bool redelivered) {
                 body = std::string(msg.body());
                 body.resize(msg.bodySize());
                 done = true;
+                createTask = true;
+                connection->close();
+            })
+            .onEmpty([&connection, &done]() {
+                std::cout << "Queue is empty" << std::endl;
+                done = true;
                 connection->close();
             });
+        })
+        .onError([&connection, &done](const char* message) {
+            done = true;
+            connection->close();
         });
 
         // fire off the async commands
@@ -137,52 +155,60 @@ class Queue {
         tearDownConnection(queueConnection);
 
         // parse the payload
-        StartMapJobRequestStruct * request = new StartMapJobRequestStruct;
-        vector<string> pairs;
-        boost::split(pairs, body, boost::is_any_of(","));
-        for(uint32_t i = 0; i < pairs.size(); i++) {
-            if (pairs[i] == "") {
-            continue;
-            }
-            vector<string> key_val;
-            boost::split(key_val,pairs[i],boost::is_any_of(":"));
-            string result("");
-            for(uint32_t j = 0; j <  key_val[1].length(); j++) {
-            if (isalpha(key_val[1][j]) || key_val[1][j] == '.'
-            || (key_val[1][j] >= 48 && key_val[1][j] <= 57)) {
-            result += tolower(key_val[1][j]);
-            }
-            }
-            string key("");
-            for(uint32_t j = 0; j <  key_val[0].length(); j++) {
-            if (isalpha(key_val[0][j])) {
-            key += tolower(key_val[0][j]);
-            }
-            }
-            if (key == "guid") {
-            for (uint32_t k = 0; k < result.length(); k++) {
-            request->guid[k] = result[k];
-            }
-            } else if (key == "state") {
-            request->state[0] = result[0];
-            request->state[1] = result[1];
-            } else if (key == "alpha") {
-            string::size_type sz;
-            request->alpha = stod(result, &sz);
-            } else if (key == "beta") {
-            string::size_type sz;
-            request->beta = stod(result, &sz);
-            } else if (key == "gamma") {
-            string::size_type sz;
-            request->gamma = stod(result, &sz);
-            } else if (key == "eta") {
-            string::size_type sz;
-            request->eta = stod(result, &sz);
-            }
-        }
         Task task = Task();
-        task.payload = request;
-        task.task_id = START_MAP;
+
+        if (createTask) {
+            StartMapJobRequestStruct * request = new StartMapJobRequestStruct;
+            vector<string> pairs;
+            boost::split(pairs, body, boost::is_any_of(","));
+            for(uint32_t i = 0; i < pairs.size(); i++) {
+                if (pairs[i] == "") {
+                continue;
+                }
+                vector<string> key_val;
+                boost::split(key_val,pairs[i],boost::is_any_of(":"));
+                string result("");
+                for(uint32_t j = 0; j <  key_val[1].length(); j++) {
+                if (isalpha(key_val[1][j]) || key_val[1][j] == '.'
+                || (key_val[1][j] >= 48 && key_val[1][j] <= 57)) {
+                result += tolower(key_val[1][j]);
+                }
+                }
+                string key("");
+                for(uint32_t j = 0; j <  key_val[0].length(); j++) {
+                if (isalpha(key_val[0][j])) {
+                key += tolower(key_val[0][j]);
+                }
+                }
+                if (key == "guid") {
+                for (uint32_t k = 0; k < result.length(); k++) {
+                request->guid[k] = result[k];
+                }
+                } else if (key == "state") {
+                request->state[0] = result[0];
+                request->state[1] = result[1];
+                } else if (key == "alpha") {
+                string::size_type sz;
+                request->alpha = stod(result, &sz);
+                } else if (key == "beta") {
+                string::size_type sz;
+                request->beta = stod(result, &sz);
+                } else if (key == "gamma") {
+                string::size_type sz;
+                request->gamma = stod(result, &sz);
+                } else if (key == "eta") {
+                string::size_type sz;
+                request->eta = stod(result, &sz);
+                }
+            }
+            
+            task.payload = request;
+            task.task_id = START_MAP;
+        } else {
+            // Queue was empty
+            task.payload = nullptr;
+            task.task_id = NOOP;
+        }
         return task;
     }
 
