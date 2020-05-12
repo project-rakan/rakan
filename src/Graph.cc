@@ -16,11 +16,16 @@ using std::unordered_map;
 
 namespace rakan {
 
-Graph::Graph(const uint32_t num_nodes, const uint32_t num_districts, const uint32_t state_pop)
+///////////////////////////////////////////////////////////////////////////////
+// Constructors and destructors
+///////////////////////////////////////////////////////////////////////////////
+
+Graph::Graph(const uint32_t num_nodes,
+             const uint32_t num_districts,
+             const uint32_t state_pop)
     : num_nodes_(num_nodes),
       num_districts_(num_districts),
       state_pop_(state_pop) {
-  // Initialize array of pointers fields.
   nodes_ = new Node*[num_nodes_];
 
   nodes_in_district_ = new unordered_set<int>*[num_districts_];
@@ -39,7 +44,6 @@ Graph::Graph(const uint32_t num_nodes, const uint32_t num_districts, const uint3
     perim_nodes_to_neighbors_[i] = new unordered_map<int, unordered_set<uint32_t> *>;
   }
 
-  // Initialize other array fields.
   perim_edges_ = new vector<pair<int, int>>;
   pop_of_district_ = new uint32_t[num_districts_];
   min_pop_of_district_ = new uint32_t[num_districts_];
@@ -79,15 +83,16 @@ Graph::~Graph() {
 
   // Delete all map pointers in perim_nodes_to_neighbors_.
   for (i = 0; i < num_districts_; i++) {
-    // Delete the set pointer.
-    // for (auto& kv : *perim_nodes_to_neighbors_[i]) {
-    //   delete kv.second;
-    // }
-    // Delete the map pointer.
     delete perim_nodes_to_neighbors_[i];
   }
+
   delete[] perim_nodes_to_neighbors_;
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Graph mutators
+///////////////////////////////////////////////////////////////////////////////
 
 bool Graph::AddNode(Node *node) {
   if (node->id_ > num_nodes_) {
@@ -110,61 +115,47 @@ bool Graph::AddEdge(Node *node1, Node *node2) {
   return node1->AddNeighbor(*node2);
 }
 
-bool Graph::ContainsNode(const Node& node) const {
-  return *nodes_[node.id_] == node;
+void Graph::AddStatePop(uint32_t val) {
+  state_pop_ += val;
 }
 
-bool Graph::ContainsEdge(const Node& node1, const Node& node2) const {
-  return (node1.neighbors_->find(node2.id_)
-          != node1.neighbors_->end());
-}
-
-bool Graph::NodeExistsInDistrict(const Node& node,
-                                 const uint32_t district) const {
-  return (nodes_in_district_[district]->find(node.id_)
-          != nodes_in_district_[district]->end());
-}
-
-Node* Graph::GetNode(const uint32_t id) const {
-  if (id > num_nodes_ || id < 0) {
-    return nullptr;
+bool Graph::AddNodeToDistrict(Node *node, int district) {
+  if (nodes_in_district_[district]->find(node->id_) !=
+      nodes_in_district_[district]->end()) {
+    return false;
   }
-  return nodes_[id];
-}
-
-unordered_set<int>* Graph::GetNodesInDistrict(const uint32_t district) const {
-  return nodes_in_district_[district];
-}
-
-unordered_set<int>* Graph::GetPerimNodes(uint32_t district) const {
-  return nodes_on_perim_[district];
-}
-
-unordered_set<uint32_t>* Graph::GetPerimNodeNeighbors(const uint32_t district,
-                                                 const uint32_t node) const {
-  return (*perim_nodes_to_neighbors_[district]->find(node)).second;
-}
-
-uint32_t Graph::GetDistrictPop(const uint32_t district) const {
-  return pop_of_district_[district];
-}
-
-uint32_t Graph::GetMinorityPop(const uint32_t district) const {
-  return min_pop_of_district_[district];
+  node->district_ = district;
+  nodes_in_district_[district]->insert(node->id_);
+  pop_of_district_[district] += node->GetTotalPop();
+  min_pop_of_district_[district] += node->GetMinPop();
+  return true;
 }
 
 bool Graph::RemoveNodeFromDistrict(Node *node, int district) {
-  cout << "removing node " << std::dec << node->id_ << " from district " << district;
   if (nodes_in_district_[district]->find(node->id_) ==
       nodes_in_district_[district]->end()) {
-    cout << " failed" << endl;
     return false;
   }
   nodes_in_district_[district]->erase(node->id_);
   pop_of_district_[district] -= node->GetTotalPop();
   min_pop_of_district_[district] -= node->GetMinPop();
-  cout << " success" << endl;
-  node->district_ = num_districts_ + 1;   // invalid
+  node->district_ = num_districts_ + 1;
+  return true;
+}
+
+bool Graph::AddNodeToDistrictPerim(Node *node, int district) {
+  if (nodes_on_perim_[node->district_]->find(node->id_) !=
+      nodes_on_perim_[node->district_]->end()) {
+    return false;
+  }
+  nodes_on_perim_[node->district_]->insert(node->id_);
+
+  unordered_map<int, unordered_set<uint32_t> *> *map;
+  map = perim_nodes_to_neighbors_[district];
+  if (map->find(node->id_) != map->end()) {
+    return false;
+  }
+  map->insert({node->id_, node->neighbors_});
   return true;
 }
 
@@ -185,35 +176,90 @@ bool Graph::RemoveNodeFromDistrictPerim(Node *node, int district) {
   return true;
 }
 
-bool Graph::AddNodeToDistrict(Node *node, int district) {
-  cout << "adding node " << std::dec << node->id_ << " from district " << district;
-  if (nodes_in_district_[district]->find(node->id_) !=
-      nodes_in_district_[district]->end()) {
-    cout << " failed" << endl;
-    return false;
-  }
-  node->district_ = district;
-  nodes_in_district_[district]->insert(node->id_);
-  pop_of_district_[district] += node->GetTotalPop();
-  min_pop_of_district_[district] += node->GetMinPop();
-  cout << " success" << endl;
-  return true;
+
+///////////////////////////////////////////////////////////////////////////////
+// Queries
+///////////////////////////////////////////////////////////////////////////////
+
+bool Graph::ContainsNode(const Node& node) const {
+  return *nodes_[node.id_] == node;
 }
 
-bool Graph::AddNodeToDistrictPerim(Node *node, int district) {
-  if (nodes_on_perim_[node->district_]->find(node->id_) !=
-      nodes_on_perim_[node->district_]->end()) {
-    return false;
-  }
-  nodes_on_perim_[node->district_]->insert(node->id_);
+bool Graph::ContainsEdge(const Node& node1, const Node& node2) const {
+  return (node1.neighbors_->find(node2.id_)
+          != node1.neighbors_->end());
+}
 
-  unordered_map<int, unordered_set<uint32_t> *> *map;
-  map = perim_nodes_to_neighbors_[district];
-  if (map->find(node->id_) != map->end()) {
-    return false;
+bool Graph::NodeExistsInDistrict(const Node& node,
+                                 const uint32_t district) const {
+  return (nodes_in_district_[district]->find(node.id_)
+          != nodes_in_district_[district]->end());
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Accessors
+///////////////////////////////////////////////////////////////////////////////
+
+Node* Graph::GetNode(const uint32_t id) const {
+  if (id > num_nodes_ || id < 0) {
+    return nullptr;
   }
-  map->insert({node->id_, node->neighbors_});
-  return true;
+  return nodes_[id];
+}
+
+Node** Graph::GetNodes() const {
+  return nodes_;
+}
+
+uint32_t Graph::GetNumNodes() const {
+  return num_nodes_;
+}
+
+uint32_t Graph::GetNumDistricts() const {
+  return num_districts_;
+}
+
+uint32_t Graph::GetStatePop() const {
+  return state_pop_;
+}
+
+unordered_set<int>* Graph::GetNodesInDistrict(const uint32_t district) const {
+  if (district > num_districts_ || district < 0) {
+    return nullptr;
+  }
+  return nodes_in_district_[district];
+}
+
+unordered_set<int>* Graph::GetPerimNodes(uint32_t district) const {
+  if (district > num_districts_ || district < 0) {
+    return nullptr;
+  }
+  return nodes_on_perim_[district];
+}
+
+unordered_set<uint32_t>*
+    Graph::GetPerimNodeNeighbors(const uint32_t district,
+                                 const uint32_t node) const {
+  if (district > num_districts_ || district < 0 ||
+      node > num_nodes_ || node < 0) {
+    return nullptr;
+  }
+  return (*perim_nodes_to_neighbors_[district]->find(node)).second;
+}
+
+int32_t Graph::GetDistrictPop(const uint32_t district) const {
+  if (district > num_districts_ || district < 0) {
+    return -1;
+  }
+  return pop_of_district_[district];
+}
+
+int32_t Graph::GetMinorityPop(const uint32_t district) const {
+  if (district > num_districts_ || district < 0) {
+    return -1;
+  }
+  return min_pop_of_district_[district];
 }
 
 }     // namespace rakan

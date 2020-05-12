@@ -6,7 +6,9 @@
 #define INVALID_GRAPH 2
 #define READ_FAILED 3
 #define SEEK_FAILED 4
-#define SEEDING_FAILED 5
-// possibly more?
+#define LOAD_FAILED 5
+#define SEED_FAILED 6
+#define POPULATE_FAILED 7
+#define WALK_FAILED 8
 
 #endif    // ERROR_CODES_H_

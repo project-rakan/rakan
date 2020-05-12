@@ -123,7 +123,7 @@ uint16_t Runner::SeedDistricts() {
       }
     }
     if (unused.size() == check) {
-      return SEEDING_FAILED;
+      return SEED_FAILED;
     }
   }
 
@@ -159,6 +159,27 @@ uint16_t Runner::PopulateGraphData() {
       }
     }
   }
+
+  return SUCCESS;
+}
+
+uint16_t Runner::StartMapJob(StartMapJobRequest *request, uint32_t num_steps) {
+  FILE *file;
+  request_ = request;
+
+  if ((file = fopen("../tst/iowa.idx", "rb")) == nullptr) {
+    return INVALID_FILE;
+  }
+  if (LoadGraph(file) != SUCCESS) {
+    return LOAD_FAILED;
+  }
+  if (SeedDistricts() != SUCCESS) {
+    return SEED_FAILED;
+  }
+  if (PopulateGraphData() != SUCCESS) {
+    return POPULATE_FAILED;
+  }
+  Walk(num_steps);
 
   return SUCCESS;
 }
@@ -223,12 +244,13 @@ double Runner::ScoreVRA() {
 }
 
 double Runner::LogScore() {
-  score_ = (graph_->alpha_ * ScoreCompactness()
-          + graph_->beta_ * ScorePopulationDistribution()
-          + graph_->gamma_ * ScoreExistingBorders()
-          + graph_->eta_ * ScoreVRA());
+  score_ = (alpha_ * ScoreCompactness()
+          + beta_ * ScorePopulationDistribution()
+          + gamma_ * ScoreExistingBorders()
+          + eta_ * ScoreVRA());
   return score_;
 }
+
 
 //////////////////////////////////////////////////////////////////////////////
 // Algorithms
@@ -327,9 +349,8 @@ double Runner::Redistrict(Node *node, int new_district) {
   return LogScore();
 }
 
-double Runner::Walk(int num_steps, string guid) {
+double Runner::Walk(int num_steps) {
   int sum = 0;
-  guid_ = guid;
 
   for (int i = 0; i < num_steps; i++) {
     sum += MetropolisHastings();
@@ -406,13 +427,13 @@ bool Runner::DoesPathExist(Node *start, Node *target) {
 
 void Runner::SubmitToQueue(unordered_map<int, int> *changes) {
   MapJobUpdate *update = new MapJobUpdate;
-  strcpy(update->state, "IA");
-  strcpy(update->guid, guid_.c_str());
+  strcpy(update->state, request_->state);
+  strcpy(update->guid, request_->guid);
   update->map = *changes_;
-  update->alpha = graph_->alpha_;
-  update->beta = graph_->beta_;
-  update->gamma = graph_->gamma_;
-  update->eta = graph_->eta_;
+  update->alpha = alpha_;
+  update->beta = beta_;
+  update->gamma = gamma_;
+  update->eta = eta_;
   update->compactness = compactness_score_;
   update->distribution = distribution_score_;
   update->borderRespect = border_score_;

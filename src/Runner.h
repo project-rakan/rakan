@@ -12,6 +12,8 @@
 #include "./Node.h"           // for Node class
 #include "./Queue.h"          // for Queue class
 
+using battledance::Queue;
+using battledance::StartMapJobRequest;
 using std::string;
 using std::unordered_set;
 using std::unordered_map;
@@ -24,6 +26,10 @@ class Runner {
  //////////////////////////////////////////////////////////////////////////////
  // Construction / Initialization
  //////////////////////////////////////////////////////////////////////////////
+  /*
+  * Default constructor. Used ONLY for testing.
+  */
+  Runner() {}
 
   /*
   * Constructs a Runner instance. This Runner will only communicate
@@ -42,7 +48,7 @@ class Runner {
   * @param    file    The open FILE * that contains the information
   *                   to load the graph with
   * 
-  * @return SUCCESS if all loading successful, the appropriate error
+  * @return SUCCESS if all loading successful; the appropriate error
   *         code otherwise
   */
   uint16_t LoadGraph(FILE *file);
@@ -55,7 +61,7 @@ class Runner {
   * @param    map     The map to set the current graph's districts
   *                   to be
   * 
-  * @return SUCCESS if all assignment successful, the appropriate
+  * @return SUCCESS if all assignment successful; the appropriate
   *         error code otherwise
   */
   uint16_t SetDistricts(unordered_map<uint32_t, uint32_t> *map);
@@ -66,7 +72,7 @@ class Runner {
   * other nodes reachable from the seed nodes to the respective
   * district.
   * 
-  * @return SUCCESS iff all seeding and assignment successful,
+  * @return SUCCESS iff all seeding and assignment successful;
   *         SEEDING_FAILED otherwise
   */
   uint16_t SeedDistricts();
@@ -74,10 +80,23 @@ class Runner {
   /*
   * Populates the graph's data structures.
   * 
-  * @return SUCCESS iff all populating was successful, the appropriate
+  * @return SUCCESS iff all populating was successful; the appropriate
   *         error code otherwise
   */
   uint16_t PopulateGraphData();
+
+  /*
+  * Starts the given map job request. Loads the graph with the specified
+  * state in the request, walks on the graph num_steps number of times,
+  * and sends updates to the queue.
+  * 
+  * @param    request       the request to start
+  * @param    num_steps     the number of steps to take per walk
+  * 
+  * @return SUCCESS iff all walk successful; the appropraite error code
+  *         otherwise
+  */
+  uint16_t StartMapJob(StartMapJobRequest *request, uint32_t num_steps);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -153,20 +172,14 @@ class Runner {
   double Redistrict(Node *node, int new_district);
 
   /*
-  * Walks along the graph this Runner has loaded. Implements
-  * the Metropolis-Hastings algorithm on the graph a given
-  * number of times. Walk is triggered by a request with a
-  * specified GUID.
+  * Walks along the graph this Runner has loaded. Implements the
+  * Metropolis-Hastings algorithm on the graph a given number of times.
   * 
-  * @param    num_steps     The number of steps to take in
-  *                         this walk
-  * @param    guid          The GUID associated with the
-  *                         request that started this walk
+  * @param    num_steps     The number of steps to take in this walk
   * 
-  * @return a sum of all the scores accumulated during the
-  *         walk
+  * @return a sum of all the scores accumulated during the walk
   */
-  double Walk(int num_steps, string guid);
+  double Walk(int num_steps);
 
  //////////////////////////////////////////////////////////////////////////////
  // Queries
@@ -182,26 +195,26 @@ class Runner {
   bool IsEmptyDistrict(int district);
 
   /*
-  * Queries whether or not the district that the proposed node
-  * is in will be severed once the proposed node is removed.
+  * Queries whether or not the district that the proposed node is in will be
+  * severed once the proposed node is removed.
   * 
-  * @param    proposed_node   The node that will be hypothe-
-  *                           tically removed from its district
+  * @param    proposed_node   The node that will be hypothetically removed
+  *                           from its district
   * 
   * @return true iff the district will be severed
   */
   bool IsDistrictSevered(Node *proposed_node);
 
   /*
-  * Queries whether or not a path exists between the start node
-  * and the target node. Path is only valid if all nodes traversed
-  * in the path are in the same district.
+  * Queries whether or not a path exists between the start node and the target
+  * node. Path is only valid if all nodes traversed in the path are in the
+  * same district.
   *
   * @param   start   The node to start the search at
   * @param   target  The node to look for
   *
-  * @return true iff a path exists between start and target
-  *         and nodes traversed belong in the same district
+  * @return true iff a path exists between start and target and nodes traversed
+  * belong in the same district
   */
   bool DoesPathExist(Node *start, Node *target);
 
@@ -213,8 +226,8 @@ class Runner {
   /*
   * Submits the list of changes to the queue.
   *
-  * @param   changes   The map of changes this Runner has
-  *                    made since the last step
+  * @param   changes   The map of changes this Runner has made since the last
+  *                     step
   */
   void SubmitToQueue(unordered_map<int, int> *changes);
 
@@ -236,17 +249,24 @@ class Runner {
   */
   Graph *GetGraph() { return graph_; }
 
+  /*
+  * Sets the internal graph to be the given graph.
+  * 
+  * @param    graph   The graph to set the internal graph to
+  */
+  void SetGraph(Graph *graph) { graph_ = graph; }
+
  private:
   // The graph that is loaded and evaluated by this Runner.
   Graph *graph_;
 
   // The queue this Runner is hooked up to. This runner will solely
   // communicate with this queue.
-  Queue * queue_;
+  Queue *queue_;
 
-  // The GUID of the job currently in progress.
-  string guid_;
-  
+  // The current request in progress.
+  StartMapJobRequest *request_;
+
   // A map of the changes that have been made since the last walk.
   // Maps from a node ID to a district ID and assumes that this change
   // is new.
@@ -261,6 +281,12 @@ class Runner {
   double distribution_score_;
   double border_score_;
   double vra_score_;
+
+  // Weights of scoring metrics.
+  double alpha_;
+  double beta_;
+  double gamma_;
+  double eta_;
 };        // class Runner
 
 }         // namespace rakan

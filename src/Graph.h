@@ -4,18 +4,14 @@
 #include <inttypes.h>       // for uint32_t
 #include <stdio.h>          // for FILE *
 
-#include <string>           // for std::string
 #include <unordered_set>    // for std::unordered_set
 #include <unordered_map>    // for std::unordered_map
 #include <utility>          // for std::pair
 #include <vector>           // for std::vector
 
 #include "./Node.h"         // for Node class
-#include "./Queue.h"
 
-using battledance::Queue;
 using std::pair;
-using std::string;
 using std::unordered_set;
 using std::unordered_map;
 using std::vector;
@@ -24,185 +20,255 @@ namespace rakan {
 
 class Graph {
  public:
+
   /////////////////////////////////////////////////////////////////////////////
   // Constructors and destructors
   /////////////////////////////////////////////////////////////////////////////
 
-  // Default constructor.
+  /*
+  * Default constructor. Used ONLY for testing.
+  */
   Graph() = default;
 
-  // Supplies the number of nodes and districts on this
-  // graph. Number of nodes and districts must be non-negative.
-  //
-  // Arguments:
-  //  - num_nodes: the number of nodes on this graph
-  //  - num_districts: the number of districts on this graph
-  Graph(const uint32_t num_nodes, const uint32_t num_districts, const uint32_t state_pop);
+  /*
+  * Supplies the number of nodes and districts on this graph. Number of nodes,
+  * districts, and state population must be non-negative.
+  * 
+  * @param    num_nodes       the number of nodes on this graph, must be >= 0
+  * @param    num_districts   the number of districts on this graph, must
+  *                           be >= 0
+  */
+ Graph(const uint32_t num_nodes,
+       const uint32_t num_districts,
+       const uint32_t state_pop);
 
-  // Default destructor. Also destructs nodes on this graph.
+  /*
+  * Default destructor. Also destructs nodes on this graph.
+  */
   ~Graph();
 
   /////////////////////////////////////////////////////////////////////////////
-  // Graph Mutators
+  // Graph mutators
   /////////////////////////////////////////////////////////////////////////////
 
-  // Adds a node to this graph.
-  //
-  // Arguments:
-  //  - node: the node to add
-  //
-  // Returns:
-  //  - true iff adding node successful
-  //  - false if node cannot be added
+  /*
+  * Adds a node to this graph.
+  * 
+  * @param    node    the node to add
+  * 
+  * @return true iff adding node successful, false otherwise
+  */
   bool AddNode(Node *node);
 
-  // Adds an edge between the two supplied nodes. If either node does not
-  // exist, adds nodes before adding edge.
-  //
-  // Arguments:
-  //  - node1: the neighbor of node2
-  //  - node2: the neighbor of node1
-  //
-  // Returns:
-  //  - true iff adding edge successful
-  //  - false if the edge cannot be added
+  /*
+  * Adds an edge between the two supplied nodes. If either node does not
+  * exist, adds nodes before adding edge.
+  * 
+  * @param    node1    the neighbor of node2
+  * @param    node2    the neighbor of node1
+  * 
+  * @return true iff adding edge successful, false otherwise
+  */
   bool AddEdge(Node *node1, Node *node2);
 
-  void AddStatePop(uint32_t val) { state_pop_ += val; }
+  /*
+  * Adds to the state population.
+  * 
+  * @param    val   the value to add to the state population
+  */
+  void AddStatePop(uint32_t val);
+
+  /*
+  * Adds the given node to the district. Does NOT remove node from its old
+  * district. Updates the population and demographics of the district
+  * accordingly.
+  * 
+  * @param      node        the node to add
+  * @param      district    the district to add the node to
+  * 
+  * @return true iff node does not already belong in district and addition
+  *         successful, false otherwise
+  */
+  bool AddNodeToDistrict(Node *node, int district);
+
+  /*
+  * Removes the given node from the given district. Node must exist in district
+  * before removal. Updates the population and demographics of the district
+  * accordingly. Node will belong to a non-existent district afterwards.
+  * 
+  * @param      node        the node to remove
+  * @param      district    the district to remove node from
+  * 
+  * @return true iff node exists in district and removal successful, false
+  *         otherwise
+  */
+  bool RemoveNodeFromDistrict(Node *node, int district);
+
+  /*
+  * Adds the given node to the given district's set of perim nodes. Node must
+  * exist in the district before addition.
+  * 
+  * @param      node        the perimeter node to add
+  * @param      district    the district to add the perimeter node to
+  * 
+  * @return true iff node exists in district and addition to perim nodes list
+  *         successful, false otherwise
+  */
+  bool AddNodeToDistrictPerim(Node *node, int district);
+
+  /*
+  * Removes the given node from the given district's set of perim nodes. Node
+  * must be on the perimeter of the district before removal.
+  * 
+  * @param      node        the perimeter node to remove
+  * @param      district    the district to remove the perimeter node from
+  * 
+  * @return true iff node is a perimeter node in given district and removal
+  *         successful, false otherwise
+  */
+  bool RemoveNodeFromDistrictPerim(Node *node, int district);
+
 
   /////////////////////////////////////////////////////////////////////////////
   // Queries
   /////////////////////////////////////////////////////////////////////////////
 
-  // Queries whether or not the node exists in the graph.
-  //
-  // Arguments:
-  //  - node: the node to test for existence
-  //
-  // Returns:
-  //  - true iff the node exists on the graph
-  //  - false otherwise
+  /*
+  * Queries whether or not the node exists in the graph.
+  * 
+  * @param    node    the node to test for existence
+  * 
+  * @return true iff the node exists on the graph, false otherwise
+  */
   bool ContainsNode(const Node& node) const;
 
-  // Queries whether or not an edge exists between the two nodes.
-  //
-  // Arguments:
-  //  - node1: the first node to test for an edge relationship
-  //  - node2: the second node to test for an edge relationship
-  //
-  // Returns:
-  //  - true iff the nodes exist and an edge exists between them
-  //  - false otherwise
+  /*
+  * Queries whether or not an edge exists between the two nodes.
+  * 
+  * @param    node1   the first node to test for an edge relationship
+  * @param    node2   the second node to test for an edge relationship
+  * 
+  * @return true iff the nodes exist and an edge exists between them, false
+  *         otherwise
+  */
   bool ContainsEdge(const Node& node1, const Node& node2) const;
 
-  // Queries whether or not the node exists in the district.
-  //
-  // Arguments:
-  //  - node: the node to test for existence
-  //  - district: the district to test whether it contains node
-  //
-  // Returns:
-  //  - true iff the node exists on the graph and is in distric
-  //  - false otherwise
+  /*
+  * Queries whether or not the node exists in the district.
+  * 
+  * @param    node        the node to test for existence
+  * @param    district    the district to test whether it contains node
+  * 
+  * @return true iff the node exists on the graph and is in distric, false
+  *         otherwise
+  */
   bool NodeExistsInDistrict(const Node& node, uint32_t district) const;
+
 
   /////////////////////////////////////////////////////////////////////////////
   // Accessors
   /////////////////////////////////////////////////////////////////////////////
 
-  // Gets the node on this graph by its ID.
-  //
-  // Arguments:
-  //  - id: the id of the node to get
-  //
-  // Returns:
-  //  - a pointer to the node if it exists on this graph
-  //  - nullptr if the node does not exist
+  /*
+  * Gets the node on this graph by its ID.
+  * 
+  * @param    id    the id of the node to get
+  * 
+  * @return a pointer to the node if it exists on this graph; nullptr if the
+  *         node does not exist
+  */
   Node* GetNode(const uint32_t id) const;
 
-  Node** GetNodes() const { return nodes_; }
+  /*
+  * Gets the array of nodes on this graph.
+  * 
+  * @return the array of nodes on this graph; length is the num_nodes_ field
+  */
+  Node** GetNodes() const;
 
-  uint32_t GetNumNodes() const { return num_nodes_; }
+  /*
+  * Gets the number of nodes on this graph.
+  * 
+  * @return the number of nodes on this graph as an unsigned 32-bit int
+  */
+  uint32_t GetNumNodes() const;
 
-  uint32_t GetNumDistricts() const { return num_districts_; }
+  /*
+  * Gets the number of districts on this graph.
+  * 
+  * @return the number of districts on this graph as an unsigned 32-bit int
+  */
+  uint32_t GetNumDistricts() const;
 
-  uint32_t GetStatePop() const { return state_pop_; }
+  /*
+  * Gets the state population of this graph.
+  * 
+  * @return the state population of this graph as an unsigned 32-bit int
+  */
+  uint32_t GetStatePop() const;
 
-  // Gets the set of nodes in the given district.
-  //
-  // Arguments:
-  //  - district: the district to get the nodes from
-  //
-  // Returns:
-  //  - a pointer to the set of nodes in the district
+  /*
+  * Gets the set of nodes in the given district.
+  * 
+  * @param    district      the district to get the nodes from
+  * 
+  * @return a pointer to the set of nodes in the district; nullptr if the
+  *         district does not exist
+  */
   unordered_set<int>* GetNodesInDistrict(const uint32_t district) const;
 
-  // Gets the set of nodes on the given district's perimeter.
-  //
-  // Arguments:
-  //  - district: the district to get the nodes on the perimeter from
-  //
-  // Returns:
-  //  - a pointer to the set of nodes on the district perimeter
+  /*
+  * Gets the set of nodes on the given district's perimeter.
+  * 
+  * @param   district    the district to get the nodes on the perimeter from
+  * 
+  * @return a pointer to the set of nodes on the district perimeter; nullptr
+  *         if the district does not exist
+  */
   unordered_set<int>* GetPerimNodes(const uint32_t district) const;
 
-  // Gets the set of neighbors of the node. Assumes the node is on the
-  // perimeter of the given district.
-  //
-  // Arguments:
-  //  - district: the district that the perim_node resides in
-  //  - node: the node to get the neighbors of
-  //
-  // Returns:
-  //  - a pointer to the set of neighbor nodes of perim_node
+  /*
+  * Gets the set of neighbors of the node. Assumes the node is on the
+  * perimeter of the given district.
+  * 
+  * @param    district    the district that the perim_node resides in
+  * @param    node        the node to get the neighbors of
+  * 
+  * @return a pointer to the set of neighbor nodes of perim_node; nullptr
+  *         if either the district or node does not exist
+  */
   unordered_set<uint32_t>* GetPerimNodeNeighbors(const uint32_t district,
-                                            const uint32_t node) const;
+                                                 const uint32_t node) const;
 
-  // Gets the total population of the given district.
-  //
-  // Arguments:
-  //  - district: the district to get the total population of
-  //
-  // Returns:
-  //  - the total population of the given district
-  uint32_t GetDistrictPop(const uint32_t district) const;
+  /*
+  * Gets the total population of the given district.
+  * 
+  * @param    district    the district to get the total population of
+  * 
+  * @return the total population of the given district; -1 if the district
+  *         does not exist
+  */
+  int32_t GetDistrictPop(const uint32_t district) const;
 
-  // Gets the total minority population of the given district.
-  //
-  // Arguments:
-  //  - district: the district to get the total miniroty population of
-  //
-  // Returns:
-  //  - the total minority population of the given district
-  uint32_t GetMinorityPop(const uint32_t district) const;
-
-  bool RemoveNodeFromDistrict(Node *node, int district);
-
-  bool RemoveNodeFromDistrictPerim(Node *node, int district);
-
-  bool AddNodeToDistrict(Node *node, int district);
-
-  bool AddNodeToDistrictPerim(Node *node, int district);
-
-  /////////////////////////////////////////////////////////////////////////////
-  // Variable Mutators
-  /////////////////////////////////////////////////////////////////////////////
-
-  void SetAlpha(const double val) { alpha_ = val; }
-  void SetBeta(const double val) { beta_ = val; }
-  void SetGamma(const double val) { gamma_ = val; }
-  void SetEta(const double val) { eta_ = val; }
-
-  double GetAlpha() { return alpha_; }
-  double GetBeta() { return beta_; }
-  double GetGamma() { return gamma_; }
-  double GetEta() { return eta_; }
+  /*
+  * Gets the total minority population of the given district.
+  * 
+  * @param    district    the district to get the total miniroty population of
+  * 
+  * @return the total minority population of the given district; -1 if the
+  *         district does not exist
+  */
+  int32_t GetMinorityPop(const uint32_t district) const;
 
  private:
+  // The number of nodes on this graph.
   uint32_t num_nodes_;
+
+  // The number of districts on this graph.
   uint32_t num_districts_;
+
+  // The total state population of this graph.
   uint32_t state_pop_;
-  bool is_empty_;
 
   // An array of all the nodes on this graph. The index of the array is
   // the node ID.
@@ -236,12 +302,6 @@ class Graph {
   // the district ID. The value at that index corresponds to the
   // minority population in that district.
   uint32_t *min_pop_of_district_;
-
-  // Metric parameters.
-  double alpha_;
-  double beta_;
-  double gamma_;
-  double eta_;
 
   // Needed for populating data structures in graph from file.
   friend class Runner;
