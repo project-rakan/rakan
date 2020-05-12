@@ -30,9 +30,6 @@ int main(int argc, char *argv[]) {
 
     request = reinterpret_cast<StartMapJobRequest *>(task.payload);
     runner->StartMapJob(request, NUM_STEPS);
-
-    fclose(file);
-    delete g;
   }
 
   return EXIT_SUCCESS;

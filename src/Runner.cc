@@ -180,6 +180,8 @@ uint16_t Runner::StartMapJob(StartMapJobRequest *request, uint32_t num_steps) {
     return POPULATE_FAILED;
   }
   Walk(num_steps);
+  fclose(file);
+  delete graph_;
 
   return SUCCESS;
 }
