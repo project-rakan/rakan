@@ -337,12 +337,12 @@ double Runner::MetropolisHastings() {
   }
 
   old_score = LogScore();
-  new_score = MakeMove(node, new_district);
+  new_score = Redistrict(node, new_district);
 
   if (new_score > old_score) {
     ratio = decimal_number(generator);
     if (ratio <= (old_score / new_score)) {
-      MakeMove(node, old_district);
+      Redistrict(node, old_district);
       score_ = old_score;
     } else {
       score_ = new_score;
@@ -357,7 +357,7 @@ double Runner::MetropolisHastings() {
   num_steps_++;
 
   if (accepted) {
-    // SubmitToQueue(changes);
+    SubmitToQueue(changes);
     changes_->clear();
   }
 
@@ -380,7 +380,7 @@ void Runner::SubmitToQueue(unordered_map<int, int> *changes) {
   queue_->SubmitRunUpdate(*update);
 }
 
-double Runner::MakeMove(Node *node, int new_district_id) {
+double Runner::Redistrict(Node *node, int new_district) {
   int old_district = node->district_;
 
   graph_->RemoveNodeFromDistrict(node, old_district);
@@ -398,11 +398,11 @@ double Runner::MakeMove(Node *node, int new_district_id) {
   delete graph_->perim_edges_;
   graph_->perim_edges_ = new_perim_edges;
 
-  graph_->AddNodeToDistrict(node, new_district_id);
-  graph_->AddNodeToDistrictPerim(node, new_district_id);
+  graph_->AddNodeToDistrict(node, new_district);
+  graph_->AddNodeToDistrictPerim(node, new_district);
 
   for (auto &neighbor_id : *node->neighbors_) {
-    if (graph_->nodes_[neighbor_id]->district_ != new_district_id) {
+    if (graph_->nodes_[neighbor_id]->district_ != new_district) {
         graph_->perim_edges_->push_back({node->id_, neighbor_id});
     }
   }
