@@ -71,6 +71,10 @@ typedef struct MapJobUpdateStruct {
     double beta;
     double gamma;
     double eta;
+    double compactness;
+    double distribution;
+    double borderRespect;
+    double vra;
 } MapJobUpdate;
 
 typedef struct TaskStruct {
@@ -243,7 +247,11 @@ class Queue {
         jsonPayload << "\"alpha\": " << mapJobUpdate.alpha << ",";
         jsonPayload << "\"beta\": " << mapJobUpdate.beta << ",";
         jsonPayload << "\"gamma\": " << mapJobUpdate.gamma << ",";
-        jsonPayload << "\"eta\": " << mapJobUpdate.eta;
+        jsonPayload << "\"eta\": " << mapJobUpdate.eta << ",";
+        jsonPayload << "\"compactness\": " << mapJobUpdate.compactness << ",";
+        jsonPayload << "\"distribution\": " << mapJobUpdate.distribution << ",";
+        jsonPayload << "\"borderRespect\": " << mapJobUpdate.borderRespect << ",";
+        jsonPayload << "\"vra\": " << mapJobUpdate.vra;
         jsonPayload << "}";
 
         // Setup the call backs to do: connect to TWO queues and push TWO messages
