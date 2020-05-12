@@ -6,7 +6,8 @@
 #include <amqpcpp.h>
 #include <amqpcpp/libevent.h>
 #include <unistd.h>
-
+#include <boost/algorithm/string.hpp>
+#include <bits/stdc++.h> 
 
 #include <string>
 
@@ -70,6 +71,10 @@ typedef struct MapJobUpdateStruct {
     double beta;
     double gamma;
     double eta;
+    double compactness;
+    double distribution;
+    double borderRespect;
+    double vra;
 } MapJobUpdate;
 
 typedef struct TaskStruct {
@@ -107,12 +112,13 @@ class Queue {
 
         auto identifier = identifier_;
 
+        string body;
         // Setup the call backs to do: connect to the queue and get one message
         channel->declareQueue(identifier_, AMQP::passive)
-        .onSuccess([&connection, &channel, &done, &identifier](const std::string &name, uint32_t messagecount, uint32_t consumercount) {
+        .onSuccess([&connection, &channel, &done, &identifier, &body](const std::string &name, uint32_t messagecount, uint32_t consumercount) {
             channel->get(identifier, AMQP::noack)
-            .onReceived([&connection, &done, &identifier](const AMQP::Message &msg, uint64_t tag, bool redelivered) {
-                auto body = std::string(msg.body());
+            .onReceived([&connection, &done, &identifier, &body](const AMQP::Message &msg, uint64_t tag, bool redelivered) {
+                body = std::string(msg.body());
                 body.resize(msg.bodySize());
                 done = true;
                 connection->close();
@@ -130,19 +136,52 @@ class Queue {
 
         tearDownConnection(queueConnection);
 
-        // TODO: parse the payload
-
-        StartMapJobRequest * x = new StartMapJobRequest();
-        strcpy(x->guid, "ia-test-bb02f343-087c-4bb6-b1ed-57d827793491");
-        // x->guid;
-        strcpy(x->state, "IA");
-        x->alpha = 0;
-        x->beta = 0;
-        x->gamma = 0;
-        x->eta = 0;
-
+        // parse the payload
+        StartMapJobRequestStruct * request = new StartMapJobRequestStruct;
+        vector<string> pairs;
+        boost::split(pairs, body, boost::is_any_of(","));
+        for(uint32_t i = 0; i < pairs.size(); i++) {
+            if (pairs[i] == "") {
+            continue;
+            }
+            vector<string> key_val;
+            boost::split(key_val,pairs[i],boost::is_any_of(":"));
+            string result("");
+            for(uint32_t j = 0; j <  key_val[1].length(); j++) {
+            if (isalpha(key_val[1][j]) || key_val[1][j] == '.'
+            || (key_val[1][j] >= 48 && key_val[1][j] <= 57)) {
+            result += tolower(key_val[1][j]);
+            }
+            }
+            string key("");
+            for(uint32_t j = 0; j <  key_val[0].length(); j++) {
+            if (isalpha(key_val[0][j])) {
+            key += tolower(key_val[0][j]);
+            }
+            }
+            if (key == "guid") {
+            for (uint32_t k = 0; k < result.length(); k++) {
+            request->guid[k] = result[k];
+            }
+            } else if (key == "state") {
+            request->state[0] = result[0];
+            request->state[1] = result[1];
+            } else if (key == "alpha") {
+            string::size_type sz;
+            request->alpha = stod(result, &sz);
+            } else if (key == "beta") {
+            string::size_type sz;
+            request->beta = stod(result, &sz);
+            } else if (key == "gamma") {
+            string::size_type sz;
+            request->gamma = stod(result, &sz);
+            } else if (key == "eta") {
+            string::size_type sz;
+            request->eta = stod(result, &sz);
+            }
+        }
         Task task = Task();
-        task.payload = x;
+        task.payload = request;
         task.task_id = START_MAP;
         return task;
     }
@@ -208,7 +247,11 @@ class Queue {
         jsonPayload << "\"alpha\": " << mapJobUpdate.alpha << ",";
         jsonPayload << "\"beta\": " << mapJobUpdate.beta << ",";
         jsonPayload << "\"gamma\": " << mapJobUpdate.gamma << ",";
-        jsonPayload << "\"eta\": " << mapJobUpdate.eta;
+        jsonPayload << "\"eta\": " << mapJobUpdate.eta << ",";
+        jsonPayload << "\"compactness\": " << mapJobUpdate.compactness << ",";
+        jsonPayload << "\"distribution\": " << mapJobUpdate.distribution << ",";
+        jsonPayload << "\"borderRespect\": " << mapJobUpdate.borderRespect << ",";
+        jsonPayload << "\"vra\": " << mapJobUpdate.vra;
         jsonPayload << "}";
 
         // Setup the call backs to do: connect to TWO queues and push TWO messages
