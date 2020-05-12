@@ -173,11 +173,11 @@ uint16_t Runner::PopulateGraphData() {
         }
         graph_->nodes_on_perim_[current_district]->insert(i);
 
-        // map = graph_->perim_nodes_to_neighbors_[current_district];
-        // if (map->find(i) == map->end()) {
-        //   (*map)[i] = new unordered_set<uint32_t>;
-        // }
-        // (*map)[i]->insert(neighbor_id);
+        map = graph_->perim_nodes_to_neighbors_[current_district];
+        if (map->find(i) == map->end()) {
+          (*map)[i] = new unordered_set<uint32_t>;
+        }
+        (*map)[i]->insert(neighbor_id);
       }
     }
   }
@@ -190,19 +190,15 @@ double Runner::ScoreCompactness() {
   uint32_t i, num_foreign_neighbors = 0;
   double current_score = 0, sum = 0;
 
-  // for (auto &pair : *graph_->perim_edges_) {
-  //   perim_nodes_to_neighbors[graph_->nodes_[pair.first]->district_].insert(pair.second);
-  // }
+  for (i = 0; i < graph_->num_districts_; i++) {
+    for (auto &pair : *graph_->perim_nodes_to_neighbors_[i]) {
+      num_foreign_neighbors += pair.second->size();
+    }
+    current_score = pow(num_foreign_neighbors, 2) / graph_->nodes_in_district_[i]->size();
+    sum += current_score;
+  }
 
-  // for (i = 0; i < graph_->num_districts_; i++) {
-  //   for (auto &pair : *graph_->perim_edges) {
-
-  //   }
-  //   current_score = pow(num_foreign_neighbors, 2) / graph_->nodes_in_district_[i]->size();
-  //   sum += current_score;
-  // }
-
-  // std::cout << "Compactness score = " << sum << std::endl;
+  std::cout << "Compactness score = " << sum << std::endl;
 
   return sum;
 }
@@ -218,7 +214,7 @@ double Runner::ScorePopulationDistribution() {
     sum += pow((graph_->pop_of_district_[i] - avg_pop), 1);
   }
 
-  // std::cout << "Population distribution score = " << sum / graph_->num_districts_ << std::endl;
+  std::cout << "Population distribution score = " << sum / graph_->num_districts_ << std::endl;
 
   return sum / graph_->num_districts_;
 }
@@ -239,7 +235,7 @@ double Runner::ScoreVRA() {
     }
   }
 
-  // std::cout << "VRA score = " << sum << std::endl;
+  std::cout << "VRA score = " << sum << std::endl;
 
   return sum;
 }
@@ -338,8 +334,6 @@ double Runner::MetropolisHastings() {
     is_valid = !IsEmptyDistrict(old_district) && !IsDistrictSevered(node);
     is_valid &= (graph_->nodes_[edge.first]->district_ != graph_->nodes_[edge.second]->district_);
     is_valid &= (edge.first != edge.second);
-    // is_valid &= (graph_->nodes_on_perim_[node->district_]->find(node->id_) != 
-                //  graph_->nodes_on_perim_[node->district_]->end());
   }
 
   old_score = LogScore();
@@ -401,17 +395,10 @@ double Runner::MetropolisHastings() {
 }
 
 uint16_t Runner::MakeMove(Node *node, int new_district_id) {
-  cout << "removing node " << std::dec << node->id_ << " from district " << node->district_ << endl;
-
   int old_district = node->district_;
-  // remove the node from its current district
-  // graph_->nodes_in_district_[node->district_]->erase(node->id_);
-  graph_->RemoveNodeFromDistrict(node, old_district);
 
-  // remove the node from the set of perim nodes
+  graph_->RemoveNodeFromDistrict(node, old_district);
   graph_->RemoveNodeFromDistrictPerim(node, old_district);
-  // graph_->nodes_on_perim_[node->district_]->erase(node->id_);
-  // graph_->perim_nodes_to_neighbors_[node->district_]->erase(node->id_);
 
   vector<pair<int, int>>::iterator iter = graph_->perim_edges_->begin();
   vector<pair<int, int>> *new_perim_edges = new vector<pair<int, int>>;
@@ -425,21 +412,9 @@ uint16_t Runner::MakeMove(Node *node, int new_district_id) {
   delete graph_->perim_edges_;
   graph_->perim_edges_ = new_perim_edges;
 
-  // update old district population now that node is removed
-  // graph_->pop_of_district_[node->id_] -= (*node->demographics_)["total"];
-  // graph_->min_pop_of_district_[node->id_] -= ((*node->demographics_)["total"] - (*node->demographics_)["ca"]);
-
-  // add the node to its new district
-  cout << "adding node " << std::dec << node->id_ << " to district " << new_district_id << endl;
-
-  // node->district_ = new_district_id;
   graph_->AddNodeToDistrict(node, new_district_id);
   graph_->AddNodeToDistrictPerim(node, new_district_id);
-  // graph_->nodes_in_district_[node->district_]->insert(node->id_);
-  // graph_->nodes_on_perim_[node->district_]->insert(node->id_);
 
-  // unordered_map<int, unordered_set<uint32_t> *> *map = graph_->perim_nodes_to_neighbors_[node->district_];
-  // (*map)[node->district_] = node->neighbors_;
   for (auto &neighbor_id : *node->neighbors_) {
     // if the neighbor is in a different district, current_node
     // is on the perimeter
@@ -447,10 +422,6 @@ uint16_t Runner::MakeMove(Node *node, int new_district_id) {
         graph_->perim_edges_->push_back({node->id_, neighbor_id});
     }
   }
-
-  // update new district population
-  // graph_->pop_of_district_[node->id_] += (*node->demographics_)["total"];
-  // graph_->min_pop_of_district_[node->id_] += ((*node->demographics_)["total"] - (*node->demographics_)["ca"]);
 
   // return the score of this redistricting
   return SUCCESS;

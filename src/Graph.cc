@@ -33,11 +33,11 @@ Graph::Graph(const uint32_t num_nodes, const uint32_t num_districts, const uint3
     nodes_on_perim_[i] = new unordered_set<int>;
   }
 
-  // perim_nodes_to_neighbors_ =
-  //               new unordered_map<int, unordered_set<uint32_t> *>*[num_districts_];
-  // for (int i = 0; i < num_districts_; i++) {
-  //   perim_nodes_to_neighbors_[i] = new unordered_map<int, unordered_set<uint32_t> *>;
-  // }
+  perim_nodes_to_neighbors_ =
+                new unordered_map<int, unordered_set<uint32_t> *>*[num_districts_];
+  for (int i = 0; i < num_districts_; i++) {
+    perim_nodes_to_neighbors_[i] = new unordered_map<int, unordered_set<uint32_t> *>;
+  }
 
   // Initialize other array fields.
   perim_edges_ = new vector<pair<int, int>>;
@@ -78,15 +78,15 @@ Graph::~Graph() {
   delete[] nodes_on_perim_;
 
   // Delete all map pointers in perim_nodes_to_neighbors_.
-  // for (i = 0; i < num_districts_; i++) {
-  //   // Delete the set pointer.
-  //   // for (auto& kv : *perim_nodes_to_neighbors_[i]) {
-  //   //   delete kv.second;
-  //   // }
-  //   // Delete the map pointer.
-  //   delete perim_nodes_to_neighbors_[i];
-  // }
-  // delete[] perim_nodes_to_neighbors_;
+  for (i = 0; i < num_districts_; i++) {
+    // Delete the set pointer.
+    // for (auto& kv : *perim_nodes_to_neighbors_[i]) {
+    //   delete kv.second;
+    // }
+    // Delete the map pointer.
+    delete perim_nodes_to_neighbors_[i];
+  }
+  delete[] perim_nodes_to_neighbors_;
 }
 
 bool Graph::AddNode(Node *node) {
@@ -142,7 +142,7 @@ unordered_set<int>* Graph::GetPerimNodes(uint32_t district) const {
 
 unordered_set<uint32_t>* Graph::GetPerimNodeNeighbors(const uint32_t district,
                                                  const uint32_t node) const {
-  // return (*perim_nodes_to_neighbors_[district]->find(node)).second;
+  return (*perim_nodes_to_neighbors_[district]->find(node)).second;
 }
 
 uint32_t Graph::GetDistrictPop(const uint32_t district) const {
