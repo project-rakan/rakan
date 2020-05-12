@@ -1,2 +1,0 @@
-/usr/bin/ar qc librakan_lib.a  CMakeFiles/rakan_lib.dir/Graph.cc.o CMakeFiles/rakan_lib.dir/Node.cc.o CMakeFiles/rakan_lib.dir/Reader.cc.o CMakeFiles/rakan_lib.dir/Runner.cc.o CMakeFiles/rakan_lib.dir/rakan.cc.o
-/usr/bin/ranlib librakan_lib.a
