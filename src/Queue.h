@@ -135,7 +135,7 @@ class Queue {
         // parse the payload
         StartMapJobRequestStruct * request = new StartMapJobRequestStruct;
         vector<string> pairs;
-        boost::split(pairs, body, boost::is_any_of(";"));
+        boost::split(pairs, body, boost::is_any_of(","));
         for(uint32_t i = 0; i < pairs.size(); i++) {
             if (pairs[i] == "") {
             continue;
