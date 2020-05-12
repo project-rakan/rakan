@@ -357,7 +357,7 @@ double Runner::MetropolisHastings() {
   num_steps_++;
 
   if (accepted) {
-    SubmitToQueue(changes);
+    SubmitToQueue(changes_);
     changes_->clear();
   }
 

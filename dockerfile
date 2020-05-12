@@ -29,8 +29,13 @@ RUN make install
 # Download Python
 RUN apt-get install python -y
 
-
 WORKDIR "/home/project"
 
-ENTRYPOINT [ "bash" ]
+COPY . .
+
+RUN mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Debug -G "Unix Makefiles" && make all
+
+WORKDIR "/home/project/build/"
+
+ENTRYPOINT [ "src/rakan_run" ]
 
