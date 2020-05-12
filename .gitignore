@@ -1,5 +1,6 @@
 # Prerequisites
 *.d
+*.DS_Store
 
 # Compiled Object files
 *.slo
@@ -26,7 +27,14 @@
 *.a
 *.lib
 
+# Build
+build/*
+
 # Executables
 *.exe
 *.out
 *.app
+
+# Docker files
+docker-compose.yml
+mockProducer
