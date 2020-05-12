@@ -6,7 +6,8 @@
 #include <amqpcpp.h>
 #include <amqpcpp/libevent.h>
 #include <unistd.h>
-
+#include <boost/algorithm/string.hpp>
+#include <bits/stdc++.h> 
 
 #include <string>
 
@@ -16,6 +17,7 @@
 #define JUDGE_MAP 1
 #define BLOCKING_RETRY_DURATION 0.1
 #define XAYAH_QUEUE "xayah"
+#define BLADECALLER_DATABASE "bladecaller"
 
 #ifndef BATTLEDANCE_QUEUE_H_
 #define BATTLEDANCE_QUEUE_H_
@@ -35,7 +37,7 @@ typedef struct StartMapJobRequestStruct {
     double beta;
     double gamma;
     double eta;
-} StartMapJobRequestStruct;
+} StartMapJobRequest;
 
 typedef struct MapScoreRequestStruct {
     char guid[128];
@@ -50,9 +52,17 @@ typedef struct MapScoreRequestStruct {
 typedef struct MapScoreResponseStruct {
     char guid[128];
     double score;
-    double probability;
+    double compactness;
+    double distribution;
+    double borderRespect;
+    double vra;
+    double alpha;
+    double beta;
+    double gamma;
+    double eta;
 } MapScoreResponse;
 
+// Being sent for beta release
 typedef struct MapJobUpdateStruct {
     char guid[128];
     char state[2];
@@ -97,8 +107,8 @@ class Queue {
         AMQP::TcpConnection * connection = queueConnection->connection;
 
         auto identifier = identifier_;
-        std::string body;
 
+        string body;
         // Setup the call backs to do: connect to the queue and get one message
         channel->declareQueue(identifier_, AMQP::passive)
         .onSuccess([&connection, &channel, &done, &identifier, &body](const std::string &name, uint32_t messagecount, uint32_t consumercount) {
@@ -124,37 +134,46 @@ class Queue {
 
         // parse the payload
         StartMapJobRequestStruct * request = new StartMapJobRequestStruct;
-        vector<string> pairs = body.split(";");
-        for(int i = 0; i < pairs.size(); i++) {
-            vector<string> key_val = pairs[i].split(":");
-            int j  = 0;
-            string result;
-            while (j < key_val[1].length) {
-                if (key_val[1][j] !=  ' ') {
-                    result += key_val[1][j];
-                }
-                j++;
+        vector<string> pairs;
+        boost::split(pairs, body, boost::is_any_of(";"));
+        for(uint32_t i = 0; i < pairs.size(); i++) {
+            if (pairs[i] == "") {
+            continue;
             }
-            if (key_val[0].lower() == "guid") {
-                char s[128];
-                strcpy(s, result);
-                request->guid = s;
-            } else if (key_val[0].lower() == "state") {
-                char s[2];
-                strcpy(s, result;
-                request->state = s;
-            } else if (key_val[0].lower() == "alpha") {
-                string::size_type sz;
-                request->alpha = stod(result, &sz);
-            } else if (key_val[0].lower() == "beta") {
-                string::size_type sz;
-                request->beta = stod(result, &sz);
-            } else if (key_val[0].lower() == "gamma") {
-                string::size_type sz;
-                request->gamma = stod(result, &sz);
-            } else if (key_val[0].lower() == "eta") {
-                string::size_type sz;
-                request->eta = stod(result, &sz);
+            vector<string> key_val;
+            boost::split(key_val,pairs[i],boost::is_any_of(":"));
+            string result("");
+            for(uint32_t j = 0; j <  key_val[1].length(); j++) {
+            if (isalpha(key_val[1][j]) || key_val[1][j] == '.'
+            || (key_val[1][j] >= 48 && key_val[1][j] <= 57)) {
+            result += tolower(key_val[1][j]);
+            }
+            }
+            string key("");
+            for(uint32_t j = 0; j <  key_val[0].length(); j++) {
+            if (isalpha(key_val[0][j])) {
+            key += tolower(key_val[0][j]);
+            }
+            }
+            if (key == "guid") {
+            for (uint32_t k = 0; k < result.length(); k++) {
+            request->guid[k] = result[k];
+            }
+            } else if (key == "state") {
+            request->state[0] = result[0];
+            request->state[1] = result[1];
+            } else if (key == "alpha") {
+            string::size_type sz;
+            request->alpha = stod(result, &sz);
+            } else if (key == "beta") {
+            string::size_type sz;
+            request->beta = stod(result, &sz);
+            } else if (key == "gamma") {
+            string::size_type sz;
+            request->gamma = stod(result, &sz);
+            } else if (key == "eta") {
+            string::size_type sz;
+            request->eta = stod(result, &sz);
             }
         }
         Task task = Task();
@@ -175,13 +194,20 @@ class Queue {
         jsonPayload << "{";
         jsonPayload << "\"guid\": \"" << mapScoreResponse.guid << "\",";
         jsonPayload << "\"score\": " << mapScoreResponse.score << ",";
-        jsonPayload << "\"probability\": " << mapScoreResponse.probability << "";
+        jsonPayload << "\"compactness\": " << mapScoreResponse.compactness << ",";
+        jsonPayload << "\"distribution\": " << mapScoreResponse.distribution << ",";
+        jsonPayload << "\"borderRespect\": " << mapScoreResponse.borderRespect << ",";
+        jsonPayload << "\"vra\": " << mapScoreResponse.vra << ",";
+        jsonPayload << "\"alpha\": " << mapScoreResponse.alpha << ",";
+        jsonPayload << "\"beta\": " << mapScoreResponse.beta << ",";
+        jsonPayload << "\"gamma\": " << mapScoreResponse.gamma << ",";
+        jsonPayload << "\"eta\": " << mapScoreResponse.eta;
         jsonPayload << "}";
 
-        // Setup the call backs to do: connect to the queue and get one message
-        channel->declareQueue(XAYAH_QUEUE, AMQP::passive)
+        // Setup the call back to communicate to bladecaller distribution scores, so bladecaller can calculate a probability
+        channel->declareQueue(BLADECALLER_DATABASE, AMQP::passive)
         .onSuccess([&connection, &channel, &jsonPayload](const std::string &name, uint32_t messagecount, uint32_t consumercount) {
-            channel->publish("", XAYAH_QUEUE, jsonPayload.str());
+            channel->publish("", BLADECALLER_DATABASE, jsonPayload.str());
             connection->close();
         });
 
@@ -206,8 +232,12 @@ class Queue {
         jsonPayload << "\"guid\": \"" << mapJobUpdate.guid << "\",";
         jsonPayload << "\"state\": \"" << mapJobUpdate.state << "\",";
         jsonPayload << "\"map\": [";
+        int32_t i = 0;
         for (std::pair<int32_t, int32_t> element : mapJobUpdate.map) {
-            jsonPayload << "[" << element.first << ", " << element.second << "],";
+            jsonPayload << "[" << element.first << ", " << element.second << "]";
+            if (++i != mapJobUpdate.map.size()) {
+                jsonPayload << ",";
+            }
         }
         jsonPayload << "],";
         jsonPayload << "\"alpha\": " << mapJobUpdate.alpha << ",";
@@ -216,12 +246,19 @@ class Queue {
         jsonPayload << "\"eta\": " << mapJobUpdate.eta;
         jsonPayload << "}";
 
-        // Setup the call backs to do: connect to the queue and get one message
-        channel->declareQueue(XAYAH_QUEUE, AMQP::passive)
+        // Setup the call backs to do: connect to TWO queues and push TWO messages
+        // channel->declareQueue(XAYAH_QUEUE, AMQP::passive)
+        // .onSuccess([&connection, &channel, &jsonPayload](const std::string &name, uint32_t messagecount, uint32_t consumercount) {
+
+        std::cout << "SENDING: " << jsonPayload.str() << std::endl;
+        
+        channel->declareQueue(BLADECALLER_DATABASE, AMQP::passive)
         .onSuccess([&connection, &channel, &jsonPayload](const std::string &name, uint32_t messagecount, uint32_t consumercount) {
-            channel->publish("", XAYAH_QUEUE, jsonPayload.str());
+            // channel->publish("", XAYAH_QUEUE, jsonPayload.str());
+            channel->publish("", BLADECALLER_DATABASE, jsonPayload.str());
             connection->close();
         });
+        // });
 
         // fire off the async commands
         event_base_dispatch(evbase);

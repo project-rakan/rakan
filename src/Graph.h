@@ -11,7 +11,9 @@
 #include <vector>           // for std::vector
 
 #include "./Node.h"         // for Node class
+#include "./Queue.h"
 
+using battledance::Queue;
 using std::pair;
 using std::string;
 using std::unordered_set;

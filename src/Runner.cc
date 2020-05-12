@@ -13,12 +13,15 @@
 #include <unordered_set>        // for std::unordered_set
 #include <utility>              // for std::pair
 #include <vector>               // for std::vector
+#include <map>
 
 #include "./ReturnCodes.h"     // for SUCCESS, READ_FAIL, SEEK_FAIL, etc.
 #include "./Graph.h"          // for class Graph
 #include "./Node.h"           // for class Node
 #include "./Reader.h"         // for class Reader, structs
+#include "./Queue.h"
 
+using battledance::MapJobUpdate;
 using std::cerr;
 using std::endl;
 using std::vector;
@@ -87,6 +90,8 @@ uint16_t Runner::SeedDistricts() {
   uint32_t i;
   int32_t prev_random_index, random_index;
   unordered_set<Node *> unused, seed_nodes;
+  map<int, Node *> last_found;
+  vector<uint32_t> random_indexes;
   Node *found_node, *seed_node;
 
   // iterate through the array of nodes and put them into the set
@@ -96,28 +101,35 @@ uint16_t Runner::SeedDistricts() {
 
   // iterate through all the possible districts
   // randomly assign a node to be the seed node of that district
-  prev_random_index = -1;
   for (i = 0; i < graph_->num_districts_; i++) {
     // get a random node index
     random_index = rand() % graph_->num_nodes_;
-    if (random_index != prev_random_index) {
+    if (std::find(random_indexes.begin(), random_indexes.end(), random_index) == random_indexes.end()) {
       seed_node = graph_->nodes_[random_index];
+      seed_node->SetDistrict(i);
       seed_nodes.insert(seed_node);
+      random_indexes.push_back(random_index);
+    } else {
+      i--;
     }
-    prev_random_index = random_index;
   }
 
   for (auto &node : seed_nodes) {
+    // std::cout << "seed node is " << node->id_ << std::endl;
     unused.erase(node);
+    last_found[node->district_] = node;
   }
 
   while (unused.size() > 0) {
     uint32_t check = unused.size();
-    for (auto &seed_node : seed_nodes) {
-      found_node = BFS(graph_, seed_node, &unused);
+    for (int i = 0; i < graph_->num_districts_; i++) {
+      found_node = BFS(graph_, last_found[i], &unused);
       if (found_node != nullptr) {
-        found_node->SetDistrict(seed_node->GetDistrict());
+        found_node->SetDistrict(i);
         unused.erase(found_node);
+        last_found[i] = found_node;
+      } else {
+
       }
     }
     if (unused.size() == check) {
@@ -129,6 +141,7 @@ uint16_t Runner::SeedDistricts() {
 }
 
 uint16_t Runner::PopulateGraphData() {
+  unordered_map<int, unordered_set<int> *> *map;
   Node *current_node, *neighbor_node;
   uint32_t i, current_district;
 
@@ -157,8 +170,12 @@ uint16_t Runner::PopulateGraphData() {
           graph_->perim_edges_->push_back({i, neighbor_id});
         }
         graph_->nodes_on_perim_[current_district]->insert(i);
-        (*graph_->perim_nodes_to_neighbors_[current_district])[i]
-                                                        ->insert(neighbor_id);
+
+        map = graph_->perim_nodes_to_neighbors_[current_district];
+        if (map->find(i) == map->end()) {
+          (*map)[i] = new unordered_set<int>;
+        }
+        (*map)[i]->insert(neighbor_id);
       }
     }
   }
@@ -168,32 +185,35 @@ uint16_t Runner::PopulateGraphData() {
 
 double Runner::ScoreCompactness() {
   uint32_t i, num_foreign_neighbors = 0;
-  double current_score, best_score = INFINITY, worst_score = -INFINITY;
+  double current_score = 0, sum = 0;
 
   for (i = 0; i < graph_->num_districts_; i++) {
     for (auto &pair : *graph_->perim_nodes_to_neighbors_[i]) {
       num_foreign_neighbors += pair.second->size();
     }
-    current_score = num_foreign_neighbors / graph_->nodes_in_district_[i]->size();
-    worst_score = fmax(worst_score, current_score);
-    best_score = fmin(best_score, current_score);
+    current_score = pow(num_foreign_neighbors, 2) / graph_->nodes_in_district_[i]->size();
+    sum += current_score;
   }
 
-  return (worst_score - best_score) / 2;
+  // std::cout << "Compactness score = " << sum << std::endl;
+
+  return sum;
 }
 
 double Runner::ScorePopulationDistribution() {
   uint32_t i, total_pop, avg_pop;
-  double sum;
+  double sum = 0;
   
   total_pop = graph_->state_pop_;
   avg_pop = total_pop / graph_->num_districts_;
 
   for (i = 0; i < graph_->num_districts_; i++) {
-    sum += pow((graph_->pop_of_district_[i] - avg_pop), 2);
+    sum += pow((graph_->pop_of_district_[i] - avg_pop), 1);
   }
 
-  return sum / total_pop;
+  // std::cout << "Population distribution score = " << sum / graph_->num_districts_ << std::endl;
+
+  return sum / graph_->num_districts_;
 }
 
 double Runner::ScoreExistingBorders() {
@@ -202,23 +222,82 @@ double Runner::ScoreExistingBorders() {
 }
 
 double Runner::ScoreVRA() {
-  uint32_t i, min_pop_percentage;
-  double sum;
+  uint32_t i;
+  double sum = 0, min_pop_percentage;
 
   for (i = 0; i < graph_->num_districts_; i++) {
-    min_pop_percentage = graph_->GetMinorityPop(i) / graph_->GetDistrictPop(i);
-    sum += fmin(0, 0.5 - min_pop_percentage);
+    min_pop_percentage = ((double)graph_->GetMinorityPop(i)) / ((double)graph_->GetDistrictPop(i));
+    if ((0.5 - min_pop_percentage) > 0) {
+      sum += min_pop_percentage;
+    }
   }
+
+  std::cout << "VRA score = " << sum << std::endl;
 
   return sum;
 }
 
 double Runner::LogScore() {
   score_ = (graph_->alpha_ * ScoreCompactness()
-        + graph_->beta_ * ScorePopulationDistribution()
-        + graph_->gamma_ * ScoreExistingBorders()
-        + graph_->eta_ * ScoreVRA());
+          + graph_->beta_ * ScorePopulationDistribution()
+          + graph_->gamma_ * ScoreExistingBorders()
+          + graph_->eta_ * ScoreVRA());
   return score_;
+}
+
+bool Runner::IsEmptyDistrict(int old_district) {
+  return graph_->nodes_in_district_[old_district]->size() <= 1;
+}
+
+bool Runner::IsDistrictSevered(Node *proposed_node) {
+  unordered_map<int, vector<Node *>> map;
+  Node *start;
+  int old_district = proposed_node->district_;
+  proposed_node->district_ = graph_->num_districts_ + 1;
+
+  // put all neighbors of the same district together
+  for (auto &neighbor : *proposed_node->neighbors_) {
+    map[graph_->nodes_[neighbor]->district_].push_back(graph_->nodes_[neighbor]);
+  }
+
+  // for all district-neighbor pairs, search for path between them
+  for (auto &pair : map) {
+    for (int i = 0; i < map[pair.first].size() - 1; i++) {
+      if (!DoesPathExist(map[pair.first][i], map[pair.first][i+1])) {
+        proposed_node->district_ = old_district;
+        return true;
+      }
+    }
+  }
+
+  proposed_node->district_ = old_district;
+  return false;
+}
+
+bool Runner::DoesPathExist(Node *start, Node *target) {
+  queue<Node *> q;
+  unordered_set<Node *> processed;
+  Node *current_node;
+  q.push(start);
+  
+  while (!q.empty()) {
+    current_node = q.front();
+    q.pop();
+
+    if (current_node == target) {
+      return true;
+    }
+    processed.insert(current_node);
+
+    for (auto &neighbor : *current_node->neighbors_) {
+      if (graph_->nodes_[neighbor]->district_ == current_node->district_ &&
+          std::find(processed.begin(), processed.end(), graph_->nodes_[neighbor]) == processed.end()) {
+        q.push(graph_->nodes_[neighbor]);
+      }
+    }
+  }
+
+  return false;
 }
 
 double Runner::MetropolisHastings() {
@@ -226,43 +305,83 @@ double Runner::MetropolisHastings() {
   uint32_t random_index, random_number, old_district, new_district;
   std::pair<int, int> edge;
   Node *node;
+  bool is_valid = false;
 
+  // random number generators initialization
   unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
   std::default_random_engine generator(seed);
   std::uniform_real_distribution<double> index(0, graph_->perim_edges_->size());
+  std::uniform_real_distribution<double> number(0.0, graph_->perim_edges_->size());
 
-  random_index = floor(index(generator));
-  edge = (*graph_->perim_edges_)[random_index];
+  while (!is_valid) {
+    random_index = floor(index(generator));
+    edge.first = (*graph_->perim_edges_)[random_index].first;
+    edge.second = (*graph_->perim_edges_)[random_index].second;
 
-  std::uniform_real_distribution<double> number(0.0, 1.0);
-  random_number = floor(number(generator));
-  if (random_number > graph_->perim_edges_->size() / 2) {
-    node = graph_->nodes_[edge.first];
-    new_district = graph_->nodes_[edge.second]->id_;
-  } else {
-    node = graph_->nodes_[edge.second];
-    new_district = graph_->nodes_[edge.first]->id_;
+    random_number = floor(number(generator));
+    if (random_number > graph_->perim_edges_->size() / 2) {
+      node = graph_->nodes_[edge.first];
+      new_district = graph_->nodes_[edge.second]->district_;
+    } else {
+      node = graph_->nodes_[edge.second];
+      new_district = graph_->nodes_[edge.first]->district_;
+    }
+
+    old_district = node->district_;
+    is_valid = !IsEmptyDistrict(old_district) && !IsDistrictSevered(node);
   }
 
-  old_score = score_;
-  old_district = node->district_;
+  old_score = LogScore();
+  // std::cout << "making move on node " << node->id_ << " to district " << new_district << std::endl;
   new_score = MakeMove(node, new_district);
+  // std::cout << "old_score = " << old_score << ", new_score = " << new_score << std::endl;
+
+  bool accepted = false;
 
   if (new_score > old_score) {
+    // Need to check if proposal is to be accepted via stochastic process
+  
     std::uniform_real_distribution<double> decimal_number(0.0, 1.0);
     ratio = decimal_number(generator);
+  
     if (ratio <= (old_score / new_score)) {
+      // Reject move
+      // std::cout << "move rejected" << std::endl;
       MakeMove(node, old_district);
       score_ = old_score;
+    } else {
+      // Accept Move
+      // std::cout << "move accepted" << std::endl;
+      score_ = new_score;
+      accepted = true;
     }
-
-    num_steps_++;
-    if (num_steps_ >= 100) {
-      // TODO: SEND CHANGES TO QUEUE
-    }
+    // }
+  } else {
+    // std::cout << "move accepted" << std::endl;
+    score_ = new_score;
+    accepted = true;
   }
+  
+  (*changes_)[node->id_] = node->district_;
+  num_steps_++;
 
-  score_ = new_score;
+  if (accepted) {
+    // if (num_steps_ >= 100) {
+    MapJobUpdate *update = new MapJobUpdate;
+    strcpy(update->state, "IA");
+    strcpy(update->guid, guid_.c_str());
+    // update->guid = *guid;
+    update->map = *changes_;
+    update->alpha = graph_->alpha_;
+    update->beta = graph_->beta_;
+    update->gamma = graph_->gamma_;
+    update->eta = graph_->eta_;
+    std::cout << "about to send update" << std::endl;
+    queue_->SubmitRunUpdate(*update);
+    std::cout << "sent update to queue" << std::endl;
+    // num_steps_ = 0;
+    changes_->clear();
+  }
 
   return old_score - new_score;
 }
@@ -285,6 +404,9 @@ double Runner::MakeMove(Node *node, int new_district_id) {
   node->district_ = new_district_id;
   graph_->nodes_in_district_[node->district_]->insert(node->id_);
   graph_->nodes_on_perim_[node->district_]->insert(node->id_);
+  if (graph_->perim_nodes_to_neighbors_[node->district_] == nullptr) {
+    std::cout << "nullptr" << std::endl;
+  }
   graph_->perim_nodes_to_neighbors_[node->district_]->insert({node->id_, neighbors});
 
   // update new district population
@@ -295,8 +417,9 @@ double Runner::MakeMove(Node *node, int new_district_id) {
   return LogScore();
 }
 
-double Runner::Walk(int num_steps) {
+double Runner::Walk(int num_steps, string guid) {
   int sum = 0;
+  guid_ = guid;
 
   for (int i = 0; i < num_steps; i++) {
     sum += MetropolisHastings();
@@ -309,18 +432,23 @@ double Runner::Walk(int num_steps) {
 
 static Node* BFS(Graph *graph, Node *start, unordered_set<Node *> *set) {
   Node *current_node;
+  unordered_set<Node *> processed;
   queue<Node *> q;
   q.push(start);
 
   while (!q.empty()) {
     current_node = q.front();
+    q.pop();
 
     if (set->find(current_node) != set->end()) {
       return current_node;
     }
 
+    processed.insert(current_node);
     for (auto neighbor : *current_node->GetNeighbors()) {
-      q.push(graph->GetNode(neighbor));
+      if (std::find(processed.begin(), processed.end(), graph->GetNode(neighbor)) == processed.end()) {
+        q.push(graph->GetNode(neighbor));
+      }
     }
   }
 

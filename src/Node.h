@@ -63,7 +63,7 @@ class Node {
   unordered_map<string, uint32_t>* GetDemographics() { return demographics_; }
 
   uint32_t GetTotalPop() { return (*demographics_)["total"]; }
-  uint32_t GetMinPop() { return (*demographics_)["total"] - (*demographics_)["ca"]; }
+  uint32_t GetMinPop() { return ((*demographics_)["total"] - (*demographics_)["ca"]); }
   
   /////////////////////////////////////////////////////////////////////////////
   // Mutators
@@ -107,7 +107,7 @@ class Node {
 
   // Sets the Caucasian population in this node to be val.
   void SetCAPop(const uint32_t val) {
-    demographics_->insert({"cs", val});
+    demographics_->insert({"ca", val});
   }
 
   // Sets the other population in this node to be val.
