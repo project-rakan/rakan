@@ -7,27 +7,22 @@
 
 #include <algorithm>            // for find()
 #include <chrono>               // for system_clock:now()
-#include <iostream>             // for cerr
 #include <queue>                // for queue
 #include <random>               // for uniform_real_distribution()
 #include <unordered_set>        // for std::unordered_set
 #include <utility>              // for std::pair
 #include <vector>               // for std::vector
-#include <map>
 
-#include "./ReturnCodes.h"     // for SUCCESS, READ_FAIL, SEEK_FAIL, etc.
-#include "./Graph.h"          // for class Graph
-#include "./Node.h"           // for class Node
-#include "./Reader.h"         // for class Reader, structs
-#include "./Queue.h"
+#include "./ReturnCodes.h"      // for SUCCESS, READ_FAIL, SEEK_FAIL, etc.
+#include "./Graph.h"            // for class Graph
+#include "./Node.h"             // for class Node
+#include "./Reader.h"           // for class Reader, structs
+#include "./Queue.h"            // for SubmitRunUpdate()
 
 using battledance::MapJobUpdate;
-using std::cerr;
-using std::endl;
-using std::cout;
-using std::endl;
 using std::vector;
 using std::queue;
+using std::uniform_real_distribution;
 using std::unordered_map;
 using std::unordered_set;
 
@@ -51,7 +46,6 @@ uint16_t Runner::LoadGraph(FILE *file) {
 
   res = reader.ReadHeader(&header);
   if (res != SUCCESS) {
-    cerr << "ReadHeader failed: error code " << res << endl;
     return res;
   }
 
@@ -68,7 +62,6 @@ uint16_t Runner::LoadGraph(FILE *file) {
 
     res = reader.ReadNodeRecord(record_offset, &rec);
     if (res != SUCCESS) {
-      cerr << "ReadNodeRecord failed: error code " << res << endl;
       return res;
     }
 
@@ -76,7 +69,6 @@ uint16_t Runner::LoadGraph(FILE *file) {
                           rec.num_neighbors,
                           node);
     if (res != SUCCESS) {
-      cerr << "ReadNode failed: error code " << res << endl;
       return res;
     }
 
@@ -104,9 +96,10 @@ uint16_t Runner::SeedDistricts() {
   // iterate through all the possible districts
   // randomly assign a node to be the seed node of that district
   for (i = 0; i < graph_->num_districts_; i++) {
-    // get a random node index
     random_index = rand() % graph_->num_nodes_;
-    if (std::find(random_indexes.begin(), random_indexes.end(), random_index) == random_indexes.end()) {
+    if (std::find(random_indexes.begin(),
+                  random_indexes.end(),
+                  random_index) == random_indexes.end()) {
       seed_node = graph_->nodes_[random_index];
       seed_node->SetDistrict(i);
       seed_nodes.insert(seed_node);
@@ -117,7 +110,6 @@ uint16_t Runner::SeedDistricts() {
   }
 
   for (auto &node : seed_nodes) {
-    // std::cout << "seed node is " << node->id_ << std::endl;
     unused.erase(node);
     last_found[node->district_] = node;
   }
@@ -153,11 +145,7 @@ uint16_t Runner::PopulateGraphData() {
     current_district = current_node->district_;
 
     // insert the current node into its appropriate district set
-    graph_->nodes_in_district_[current_district]->insert(current_node->id_);
-
-    // update demographics
-    graph_->pop_of_district_[current_district] += current_node->GetTotalPop();
-    graph_->min_pop_of_district_[current_district] += current_node->GetMinPop();
+    graph_->AddNodeToDistrict(current_node, current_district);
 
     // O(N)
     for (auto &neighbor_id : *current_node->neighbors_) {
@@ -194,13 +182,13 @@ double Runner::ScoreCompactness() {
     for (auto &pair : *graph_->perim_nodes_to_neighbors_[i]) {
       num_foreign_neighbors += pair.second->size();
     }
-    current_score = pow(num_foreign_neighbors, 2) / graph_->nodes_in_district_[i]->size();
+    current_score = pow(num_foreign_neighbors, 2) /
+                    graph_->nodes_in_district_[i]->size();
     sum += current_score;
   }
 
-  std::cout << "Compactness score = " << sum << std::endl;
-
-  return sum;
+  compactness_score_ = sum;
+  return compactness_score_;
 }
 
 double Runner::ScorePopulationDistribution() {
@@ -214,14 +202,15 @@ double Runner::ScorePopulationDistribution() {
     sum += pow((graph_->pop_of_district_[i] - avg_pop), 1);
   }
 
-  std::cout << "Population distribution score = " << sum / graph_->num_districts_ << std::endl;
-
-  return sum / graph_->num_districts_;
+  distribution_score_ = sum / graph_->num_districts_;
+  return distribution_score_;
 }
 
 double Runner::ScoreExistingBorders() {
-  // TODO
-  return 0;
+  // TODO: missing data in index file;
+  //       need existing counties for all precincts
+  border_score_ = 0;
+  return border_score_;
 }
 
 double Runner::ScoreVRA() {
@@ -229,15 +218,15 @@ double Runner::ScoreVRA() {
   double sum = 0, min_pop_percentage;
 
   for (i = 0; i < graph_->num_districts_; i++) {
-    min_pop_percentage = ((double)graph_->GetMinorityPop(i)) / ((double)graph_->GetDistrictPop(i));
+    min_pop_percentage = ((double) graph_->GetMinorityPop(i)) /
+                          ((double)graph_->GetDistrictPop(i));
     if ((0.5 - min_pop_percentage) > 0) {
       sum += min_pop_percentage;
     }
   }
 
-  std::cout << "VRA score = " << sum << std::endl;
-
-  return sum;
+  vra_score_ = sum;
+  return vra_score_;
 }
 
 double Runner::LogScore() {
@@ -260,7 +249,8 @@ bool Runner::IsDistrictSevered(Node *proposed_node) {
 
   // put all neighbors of the same district together
   for (auto &neighbor : *proposed_node->neighbors_) {
-    map[graph_->nodes_[neighbor]->district_].push_back(graph_->nodes_[neighbor]);
+    map[graph_->nodes_[neighbor]->district_].
+                                      push_back(graph_->nodes_[neighbor]);
   }
 
   // for all district-neighbor pairs, search for path between them
@@ -294,7 +284,9 @@ bool Runner::DoesPathExist(Node *start, Node *target) {
 
     for (auto &neighbor : *current_node->neighbors_) {
       if (graph_->nodes_[neighbor]->district_ == current_node->district_ &&
-          std::find(processed.begin(), processed.end(), graph_->nodes_[neighbor]) == processed.end()) {
+          std::find(processed.begin(),
+                    processed.end(),
+                    graph_->nodes_[neighbor]) == processed.end()) {
         q.push(graph_->nodes_[neighbor]);
       }
     }
@@ -308,13 +300,14 @@ double Runner::MetropolisHastings() {
   uint32_t random_index, random_number, old_district, new_district;
   std::pair<int, int> edge;
   Node *node;
-  bool is_valid = false;
+  bool is_valid = false, accepted = false;
 
   // random number generators initialization
   unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
   std::default_random_engine generator(seed);
-  std::uniform_real_distribution<double> index(0, graph_->perim_edges_->size());
-  std::uniform_real_distribution<double> number(0.0, graph_->perim_edges_->size());
+  uniform_real_distribution<double> index(0, graph_->perim_edges_->size());
+  uniform_real_distribution<double> number(0, graph_->perim_edges_->size());
+  uniform_real_distribution<double> decimal_number(0, 1);
 
   while (!is_valid) {
     random_index = floor(index(generator));
@@ -331,41 +324,31 @@ double Runner::MetropolisHastings() {
     }
 
     old_district = node->district_;
+
+    // sanity checks:
+    // 1. the old district cannot be empty after removing this node
+    // 2. the old district cannot be severed after removing this node
+    // 3. the old district cannot be equal to the new district
+    // 4. the two nodes to redistrict cannot be the same node
     is_valid = !IsEmptyDistrict(old_district) && !IsDistrictSevered(node);
-    is_valid &= (graph_->nodes_[edge.first]->district_ != graph_->nodes_[edge.second]->district_);
+    is_valid &= (graph_->nodes_[edge.first]->district_ !=
+                 graph_->nodes_[edge.second]->district_);
     is_valid &= (edge.first != edge.second);
   }
 
   old_score = LogScore();
-  // std::cout << "making move on node " << node->id_ << " to district " << new_district << std::endl;
-  if (MakeMove(node, new_district) != SUCCESS) {
-    return 0;
-  }
-  new_score = LogScore();
-  // std::cout << "old_score = " << old_score << ", new_score = " << new_score << std::endl;
-
-  bool accepted = false;
+  new_score = MakeMove(node, new_district);
 
   if (new_score > old_score) {
-    // Need to check if proposal is to be accepted via stochastic process
-  
-    std::uniform_real_distribution<double> decimal_number(0.0, 1.0);
     ratio = decimal_number(generator);
-  
     if (ratio <= (old_score / new_score)) {
-      // Reject move
-      // std::cout << "move rejected" << std::endl;
       MakeMove(node, old_district);
       score_ = old_score;
     } else {
-      // Accept Move
-      // std::cout << "move accepted" << std::endl;
       score_ = new_score;
       accepted = true;
     }
-    // }
   } else {
-    // std::cout << "move accepted" << std::endl;
     score_ = new_score;
     accepted = true;
   }
@@ -374,27 +357,30 @@ double Runner::MetropolisHastings() {
   num_steps_++;
 
   if (accepted) {
-    // if (num_steps_ >= 100) {
-    MapJobUpdate *update = new MapJobUpdate;
-    strcpy(update->state, "IA");
-    strcpy(update->guid, guid_.c_str());
-    // update->guid = *guid;
-    update->map = *changes_;
-    update->alpha = graph_->alpha_;
-    update->beta = graph_->beta_;
-    update->gamma = graph_->gamma_;
-    update->eta = graph_->eta_;
-    // std::cout << "about to send update" << std::endl;
-    // queue_->SubmitRunUpdate(*update);
-    std::cout << "sent update to queue" << std::endl;
-    // num_steps_ = 0;
+    // SubmitToQueue(changes);
     changes_->clear();
   }
 
   return old_score - new_score;
 }
 
-uint16_t Runner::MakeMove(Node *node, int new_district_id) {
+void Runner::SubmitToQueue(unordered_map<int, int> *changes) {
+  MapJobUpdate *update = new MapJobUpdate;
+  strcpy(update->state, "IA");
+  strcpy(update->guid, guid_.c_str());
+  update->map = *changes_;
+  update->alpha = graph_->alpha_;
+  update->beta = graph_->beta_;
+  update->gamma = graph_->gamma_;
+  update->eta = graph_->eta_;
+  update->compactness = compactness_score_;
+  update->distribution = distribution_score_;
+  update->borderRespect = border_score_;
+  update->vra = vra_score_;
+  queue_->SubmitRunUpdate(*update);
+}
+
+double Runner::MakeMove(Node *node, int new_district_id) {
   int old_district = node->district_;
 
   graph_->RemoveNodeFromDistrict(node, old_district);
@@ -416,15 +402,12 @@ uint16_t Runner::MakeMove(Node *node, int new_district_id) {
   graph_->AddNodeToDistrictPerim(node, new_district_id);
 
   for (auto &neighbor_id : *node->neighbors_) {
-    // if the neighbor is in a different district, current_node
-    // is on the perimeter
     if (graph_->nodes_[neighbor_id]->district_ != new_district_id) {
         graph_->perim_edges_->push_back({node->id_, neighbor_id});
     }
   }
 
-  // return the score of this redistricting
-  return SUCCESS;
+  return LogScore();
 }
 
 double Runner::Walk(int num_steps, string guid) {
@@ -456,7 +439,9 @@ static Node* BFS(Graph *graph, Node *start, unordered_set<Node *> *set) {
 
     processed.insert(current_node);
     for (auto neighbor : *current_node->GetNeighbors()) {
-      if (std::find(processed.begin(), processed.end(), graph->GetNode(neighbor)) == processed.end()) {
+      if (std::find(processed.begin(),
+                    processed.end(),
+                    graph->GetNode(neighbor)) == processed.end()) {
         q.push(graph->GetNode(neighbor));
       }
     }

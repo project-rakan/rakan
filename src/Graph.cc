@@ -153,4 +153,67 @@ uint32_t Graph::GetMinorityPop(const uint32_t district) const {
   return min_pop_of_district_[district];
 }
 
+bool Graph::RemoveNodeFromDistrict(Node *node, int district) {
+  cout << "removing node " << std::dec << node->id_ << " from district " << district;
+  if (nodes_in_district_[district]->find(node->id_) ==
+      nodes_in_district_[district]->end()) {
+    cout << " failed" << endl;
+    return false;
+  }
+  nodes_in_district_[district]->erase(node->id_);
+  pop_of_district_[district] -= node->GetTotalPop();
+  min_pop_of_district_[district] -= node->GetMinPop();
+  cout << " success" << endl;
+  node->district_ = num_districts_ + 1;   // invalid
+  return true;
+}
+
+bool Graph::RemoveNodeFromDistrictPerim(Node *node, int district) {
+  if (nodes_on_perim_[district]->find(node->id_) ==
+      nodes_on_perim_[district]->end()) {
+    return false;
+  }
+  nodes_on_perim_[district]->erase(node->id_);
+
+  unordered_map<int, unordered_set<uint32_t> *> *map;
+  map = perim_nodes_to_neighbors_[district];
+  if (map->find(node->id_) == map->end()) {
+    return false;
+  }
+  map->erase(node->id_);
+  
+  return true;
+}
+
+bool Graph::AddNodeToDistrict(Node *node, int district) {
+  cout << "adding node " << std::dec << node->id_ << " from district " << district;
+  if (nodes_in_district_[district]->find(node->id_) !=
+      nodes_in_district_[district]->end()) {
+    cout << " failed" << endl;
+    return false;
+  }
+  node->district_ = district;
+  nodes_in_district_[district]->insert(node->id_);
+  pop_of_district_[district] += node->GetTotalPop();
+  min_pop_of_district_[district] += node->GetMinPop();
+  cout << " success" << endl;
+  return true;
+}
+
+bool Graph::AddNodeToDistrictPerim(Node *node, int district) {
+  if (nodes_on_perim_[node->district_]->find(node->id_) !=
+      nodes_on_perim_[node->district_]->end()) {
+    return false;
+  }
+  nodes_on_perim_[node->district_]->insert(node->id_);
+
+  unordered_map<int, unordered_set<uint32_t> *> *map;
+  map = perim_nodes_to_neighbors_[district];
+  if (map->find(node->id_) != map->end()) {
+    return false;
+  }
+  map->insert({node->id_, node->neighbors_});
+  return true;
+}
+
 }     // namespace rakan

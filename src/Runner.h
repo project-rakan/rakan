@@ -51,7 +51,7 @@ class Runner {
 
   double MetropolisHastings();
 
-  uint16_t MakeMove(Node *node, int new_district_id);
+  double MakeMove(Node *node, int new_district_id);
 
   double Walk(int num_steps, string guid);
 
@@ -60,6 +60,8 @@ class Runner {
   bool IsDistrictSevered(Node *proposed_node);
 
   bool DoesPathExist(Node *start, Node *target);
+
+  void SubmitToQueue(unordered_map<int, int> *changes);
 
   Graph *GetGraph() { return graph_; }
 
@@ -70,6 +72,10 @@ class Runner {
   unordered_map<int, int> *changes_;
   Graph *graph_;
   double score_;
+  double compactness_score_;
+  double distribution_score_;
+  double border_score_;
+  double vra_score_;
 };        // class Runner
 
 }         // namespace rakan
