@@ -137,6 +137,10 @@ class Queue {
                 done = true;
                 connection->close();
             });
+        })
+        .onError([&connection, &done](const char* message) {
+            done = true;
+            connection->close();
         });
 
         // fire off the async commands
