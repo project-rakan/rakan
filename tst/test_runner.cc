@@ -31,8 +31,8 @@ TEST(Test_Runner, TestVRA) {
   node1.SetAAPop(10); // african american
   node1.SetCAPop(40); // caucasian
 
-  Runner runner;
-  runner.LoadGraph(&g);
+  // Runner runner;
+  // runner.LoadGraph(&g);
 
   // ASSERT_EQ(g.GetNumNodes(), 1);
 }
