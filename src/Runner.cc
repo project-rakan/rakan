@@ -26,17 +26,11 @@ using std::uniform_real_distribution;
 using std::unordered_map;
 using std::unordered_set;
 
-static Node* BFS(Graph *graph, Node *start, unordered_set<Node *> *set);
-
 namespace rakan {
 
-uint16_t Runner::SetDistricts(unordered_map<uint32_t, uint32_t> *map) {
-  for (int i = 0; i < graph_->num_nodes_; i++) {
-    graph_->nodes_[i]->district_ = (*map)[graph_->nodes_[i]->id_];
-  }
-
-  return SUCCESS;
-}
+//////////////////////////////////////////////////////////////////////////////
+// Construction / Initialization
+//////////////////////////////////////////////////////////////////////////////
 
 uint16_t Runner::LoadGraph(FILE *file) {
   Reader reader(file);
@@ -51,12 +45,9 @@ uint16_t Runner::LoadGraph(FILE *file) {
 
   graph_ = new Graph(header.num_nodes, header.num_districts, 0);
 
-  // Calculate the offsets of the first NodeRecord and Node.
-  // Refer to the index file design for actual number of bytes.
   record_offset = kHeaderSize;
   node_offset = kHeaderSize + kNodeRecordSize * header.num_nodes;
 
-  // Read all the nodes and populate the graph with them.
   for (i = 0; i < header.num_nodes; i++) {
     Node *node = new Node;
 
@@ -80,6 +71,14 @@ uint16_t Runner::LoadGraph(FILE *file) {
   return SUCCESS;
 }
 
+uint16_t Runner::SetDistricts(unordered_map<uint32_t, uint32_t> *map) {
+  for (int i = 0; i < graph_->num_nodes_; i++) {
+    graph_->nodes_[i]->district_ = (*map)[graph_->nodes_[i]->id_];
+  }
+
+  return SUCCESS;
+}
+
 uint16_t Runner::SeedDistricts() {
   uint32_t i;
   int32_t prev_random_index, random_index;
@@ -88,13 +87,10 @@ uint16_t Runner::SeedDistricts() {
   map<int, Node *> last_found;
   Node *found_node, *seed_node;
 
-  // iterate through the array of nodes and put them into the set
   for (i = 0; i < graph_->num_nodes_; i++) {
     unused.insert(graph_->nodes_[i]);
   }
 
-  // iterate through all the possible districts
-  // randomly assign a node to be the seed node of that district
   for (i = 0; i < graph_->num_districts_; i++) {
     random_index = rand() % graph_->num_nodes_;
     if (std::find(random_indexes.begin(),
@@ -117,7 +113,7 @@ uint16_t Runner::SeedDistricts() {
   while (unused.size() > 0) {
     uint32_t check = unused.size();
     for (int i = 0; i < graph_->num_districts_; i++) {
-      found_node = BFS(graph_, last_found[i], &unused);
+      found_node = BFS(last_found[i], &unused);
       if (found_node != nullptr) {
         found_node->SetDistrict(i);
         unused.erase(found_node);
@@ -139,19 +135,13 @@ uint16_t Runner::PopulateGraphData() {
   Node *current_node, *neighbor_node;
   uint32_t i, current_district;
 
-  // O(N)
   for (i = 0; i < graph_->num_nodes_; i++) {
     current_node = graph_->nodes_[i];
     current_district = current_node->district_;
-
-    // insert the current node into its appropriate district set
     graph_->AddNodeToDistrict(current_node, current_district);
 
-    // O(N)
     for (auto &neighbor_id : *current_node->neighbors_) {
       neighbor_node = graph_->nodes_[neighbor_id];
-      // if the neighbor is in a different district, current_node
-      // is on the perimeter
       if (neighbor_node->district_ != current_district) {
         if (std::find(graph_->perim_edges_->begin(),
                       graph_->perim_edges_->end(),
@@ -172,6 +162,11 @@ uint16_t Runner::PopulateGraphData() {
 
   return SUCCESS;
 }
+
+
+//////////////////////////////////////////////////////////////////////////////
+// Scoring
+//////////////////////////////////////////////////////////////////////////////
 
 double Runner::ScoreCompactness() {
   unordered_map<int, unordered_set<int>> perim_nodes_to_neighbors;
@@ -207,8 +202,6 @@ double Runner::ScorePopulationDistribution() {
 }
 
 double Runner::ScoreExistingBorders() {
-  // TODO: missing data in index file;
-  //       need existing counties for all precincts
   border_score_ = 0;
   return border_score_;
 }
@@ -237,63 +230,9 @@ double Runner::LogScore() {
   return score_;
 }
 
-bool Runner::IsEmptyDistrict(int old_district) {
-  return graph_->nodes_in_district_[old_district]->size() <= 1;
-}
-
-bool Runner::IsDistrictSevered(Node *proposed_node) {
-  unordered_map<int, vector<Node *>> map;
-  Node *start;
-  int old_district = proposed_node->district_;
-  proposed_node->district_ = graph_->num_districts_ + 1;
-
-  // put all neighbors of the same district together
-  for (auto &neighbor : *proposed_node->neighbors_) {
-    map[graph_->nodes_[neighbor]->district_].
-                                      push_back(graph_->nodes_[neighbor]);
-  }
-
-  // for all district-neighbor pairs, search for path between them
-  for (auto &pair : map) {
-    for (int i = 0; i < map[pair.first].size() - 1; i++) {
-      if (!DoesPathExist(map[pair.first][i], map[pair.first][i+1])) {
-        proposed_node->district_ = old_district;
-        return true;
-      }
-    }
-  }
-
-  proposed_node->district_ = old_district;
-  return false;
-}
-
-bool Runner::DoesPathExist(Node *start, Node *target) {
-  queue<Node *> q;
-  unordered_set<Node *> processed;
-  Node *current_node;
-  q.push(start);
-  
-  while (!q.empty()) {
-    current_node = q.front();
-    q.pop();
-
-    if (current_node == target) {
-      return true;
-    }
-    processed.insert(current_node);
-
-    for (auto &neighbor : *current_node->neighbors_) {
-      if (graph_->nodes_[neighbor]->district_ == current_node->district_ &&
-          std::find(processed.begin(),
-                    processed.end(),
-                    graph_->nodes_[neighbor]) == processed.end()) {
-        q.push(graph_->nodes_[neighbor]);
-      }
-    }
-  }
-
-  return false;
-}
+//////////////////////////////////////////////////////////////////////////////
+// Algorithms
+//////////////////////////////////////////////////////////////////////////////
 
 double Runner::MetropolisHastings() {
   double old_score, new_score, ratio;
@@ -324,12 +263,6 @@ double Runner::MetropolisHastings() {
     }
 
     old_district = node->district_;
-
-    // sanity checks:
-    // 1. the old district cannot be empty after removing this node
-    // 2. the old district cannot be severed after removing this node
-    // 3. the old district cannot be equal to the new district
-    // 4. the two nodes to redistrict cannot be the same node
     is_valid = !IsEmptyDistrict(old_district) && !IsDistrictSevered(node);
     is_valid &= (graph_->nodes_[edge.first]->district_ !=
                  graph_->nodes_[edge.second]->district_);
@@ -362,22 +295,6 @@ double Runner::MetropolisHastings() {
   }
 
   return old_score - new_score;
-}
-
-void Runner::SubmitToQueue(unordered_map<int, int> *changes) {
-  MapJobUpdate *update = new MapJobUpdate;
-  strcpy(update->state, "IA");
-  strcpy(update->guid, guid_.c_str());
-  update->map = *changes_;
-  update->alpha = graph_->alpha_;
-  update->beta = graph_->beta_;
-  update->gamma = graph_->gamma_;
-  update->eta = graph_->eta_;
-  update->compactness = compactness_score_;
-  update->distribution = distribution_score_;
-  update->borderRespect = border_score_;
-  update->vra = vra_score_;
-  queue_->SubmitRunUpdate(*update);
 }
 
 double Runner::Redistrict(Node *node, int new_district) {
@@ -421,9 +338,89 @@ double Runner::Walk(int num_steps, string guid) {
   return sum;
 }
 
-}   // namespace rakan
 
-static Node* BFS(Graph *graph, Node *start, unordered_set<Node *> *set) {
+//////////////////////////////////////////////////////////////////////////////
+// Queries
+//////////////////////////////////////////////////////////////////////////////
+
+bool Runner::IsEmptyDistrict(int old_district) {
+  return graph_->nodes_in_district_[old_district]->size() <= 1;
+}
+
+bool Runner::IsDistrictSevered(Node *proposed_node) {
+  unordered_map<int, vector<Node *>> map;
+  Node *start;
+  int old_district = proposed_node->district_;
+  proposed_node->district_ = graph_->num_districts_ + 1;
+
+  for (auto &neighbor : *proposed_node->neighbors_) {
+    map[graph_->nodes_[neighbor]->district_].
+                                      push_back(graph_->nodes_[neighbor]);
+  }
+
+  for (auto &pair : map) {
+    for (int i = 0; i < map[pair.first].size() - 1; i++) {
+      if (!DoesPathExist(map[pair.first][i], map[pair.first][i+1])) {
+        proposed_node->district_ = old_district;
+        return true;
+      }
+    }
+  }
+
+  proposed_node->district_ = old_district;
+  return false;
+}
+
+bool Runner::DoesPathExist(Node *start, Node *target) {
+  queue<Node *> q;
+  unordered_set<Node *> processed;
+  Node *current_node;
+  q.push(start);
+  
+  while (!q.empty()) {
+    current_node = q.front();
+    q.pop();
+
+    if (current_node == target) {
+      return true;
+    }
+    processed.insert(current_node);
+
+    for (auto &neighbor : *current_node->neighbors_) {
+      if (graph_->nodes_[neighbor]->district_ == current_node->district_ &&
+          std::find(processed.begin(),
+                    processed.end(),
+                    graph_->nodes_[neighbor]) == processed.end()) {
+        q.push(graph_->nodes_[neighbor]);
+      }
+    }
+  }
+
+  return false;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+ // Helpers
+ //////////////////////////////////////////////////////////////////////////////
+
+void Runner::SubmitToQueue(unordered_map<int, int> *changes) {
+  MapJobUpdate *update = new MapJobUpdate;
+  strcpy(update->state, "IA");
+  strcpy(update->guid, guid_.c_str());
+  update->map = *changes_;
+  update->alpha = graph_->alpha_;
+  update->beta = graph_->beta_;
+  update->gamma = graph_->gamma_;
+  update->eta = graph_->eta_;
+  update->compactness = compactness_score_;
+  update->distribution = distribution_score_;
+  update->borderRespect = border_score_;
+  update->vra = vra_score_;
+  queue_->SubmitRunUpdate(*update);
+}
+
+Node *Runner::BFS(Node *start, unordered_set<Node *> *set) {
   Node *current_node;
   unordered_set<Node *> processed;
   queue<Node *> q;
@@ -441,11 +438,13 @@ static Node* BFS(Graph *graph, Node *start, unordered_set<Node *> *set) {
     for (auto neighbor : *current_node->GetNeighbors()) {
       if (std::find(processed.begin(),
                     processed.end(),
-                    graph->GetNode(neighbor)) == processed.end()) {
-        q.push(graph->GetNode(neighbor));
+                    graph_->GetNode(neighbor)) == processed.end()) {
+        q.push(graph_->GetNode(neighbor));
       }
     }
   }
 
   return nullptr;
 }
+
+}   // namespace rakan

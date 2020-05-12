@@ -1,20 +1,18 @@
 #ifndef SRC_RUNNER_H_
 #define SRC_RUNNER_H_
+ 
+#include <inttypes.h>         // for uint32_t, uint16_t, etc.
+#include <stdio.h>            // for FILE *
 
-#include <bits/stdc++.h>      // for std::unordered_set
-#include <inttypes.h>         // for uint32_t
-#include <stdio.h>            // for FILE *, fread, fseek
-#include <string>
+#include <string>             // for std::string
 #include <unordered_map>      // for std::unordered_map
-#include <utility>            // for std::pair
-#include <vector>             // for std::vector
+#include <unordered_set>      // for std::unordered_set
 
 #include "./Graph.h"          // for Graph class
 #include "./Node.h"           // for Node class
-#include "./Queue.h"
+#include "./Queue.h"          // for Queue class
 
 using std::string;
-using std::pair;
 using std::unordered_set;
 using std::unordered_map;
 
@@ -22,20 +20,69 @@ namespace rakan {
 
 class Runner {
  public:
-  Runner(Queue * queue) : num_steps_(0), queue_(queue) {
-    changes_ = new unordered_map<int, int>;
-  }
 
-  // for testing
-  uint16_t LoadGraph(Graph *graph) { graph_ = graph; }
+ //////////////////////////////////////////////////////////////////////////////
+ // Construction / Initialization
+ //////////////////////////////////////////////////////////////////////////////
 
+  /*
+  * Constructs a Runner instance. This Runner will only communicate
+  * with the passed in queue.
+  * 
+  * @param    queue    The queue this instance will communicate with
+  */
+  Runner(Queue *queue)
+      : num_steps_(0),
+        queue_(queue),
+        changes_(new unordered_map<int, int>) {}
+
+  /*
+  * Loads the graph with data parsed from the given file.
+  * 
+  * @param    file    The open FILE * that contains the information
+  *                   to load the graph with
+  * 
+  * @return SUCCESS if all loading successful, the appropriate error
+  *         code otherwise
+  */
   uint16_t LoadGraph(FILE *file);
 
+  /*
+  * Sets the district assignments according to the given map.
+  * Map is interpreted as storing node ID as the key and district ID
+  * as the value.
+  * 
+  * @param    map     The map to set the current graph's districts
+  *                   to be
+  * 
+  * @return SUCCESS if all assignment successful, the appropriate
+  *         error code otherwise
+  */
   uint16_t SetDistricts(unordered_map<uint32_t, uint32_t> *map);
 
+  /*
+  * Generates random seeds on the current graph. Randomly selects
+  * a number of nodes to be the "center" of each district and assigns
+  * other nodes reachable from the seed nodes to the respective
+  * district.
+  * 
+  * @return SUCCESS iff all seeding and assignment successful,
+  *         SEEDING_FAILED otherwise
+  */
   uint16_t SeedDistricts();
 
+  /*
+  * Populates the graph's data structures.
+  * 
+  * @return SUCCESS iff all populating was successful, the appropriate
+  *         error code otherwise
+  */
   uint16_t PopulateGraphData();
+
+
+ //////////////////////////////////////////////////////////////////////////////
+ // Scoring
+ //////////////////////////////////////////////////////////////////////////////
 
   /*
   * Scores the current graph according to the compactness function. 
@@ -79,6 +126,11 @@ class Runner {
   */
   double LogScore();
 
+
+ //////////////////////////////////////////////////////////////////////////////
+ // Algorithms
+ //////////////////////////////////////////////////////////////////////////////
+
   /*
   * Implementation of the Metropolis-Hastings algorithm. Randomly
   * selects a precinct on the border of a district, attempts to
@@ -116,6 +168,10 @@ class Runner {
   */
   double Walk(int num_steps, string guid);
 
+ //////////////////////////////////////////////////////////////////////////////
+ // Queries
+ //////////////////////////////////////////////////////////////////////////////
+
   /*
   * Queries whether or not a district is empty.
   * 
@@ -149,6 +205,11 @@ class Runner {
   */
   bool DoesPathExist(Node *start, Node *target);
 
+
+ //////////////////////////////////////////////////////////////////////////////
+ // Helpers
+ //////////////////////////////////////////////////////////////////////////////
+
   /*
   * Submits the list of changes to the queue.
   *
@@ -156,6 +217,17 @@ class Runner {
   *                    made since the last step
   */
   void SubmitToQueue(unordered_map<int, int> *changes);
+
+  /*
+  * A static helper function that implements BFS on the graph. Searches for
+  * any node that exists in the given set from start.
+  *
+  * @param    start     The node to start the traversal from
+  * @param    set       The set of target nodes
+  *
+  * @return the pointer to the first node found in set; nullptr if not found
+  */
+  Node *BFS(Node *start, unordered_set<Node *> *set);
 
   /*
   * Returns the graph loaded by this Runner.
