@@ -47,31 +47,4 @@ TEST(Test_Graph, TestAddMultiple) {
   ASSERT_EQ(g.GetNode(1), &n1);
 }
 
-// Test adding two nodes with the same id and checking if
-// second is not added.
-TEST(Test_Graph, TestUniqueAdd) {
-  Graph g(2, 1, 0);
-  Node n0(0);
-  Node n0dupe(0);
-  g.AddNode(&n0);
-
-  ASSERT_EQ(g.AddNode(&n0dupe), false);
-}
-
-/*
- * Test changing four demographic scores.
- */
-TEST(Test_Graph, TestScores) {
-  Graph g(2, 1, 0);
-  g.SetAlpha(1.0);
-  g.SetBeta(2.0);
-  g.SetGamma(3.0);
-  g.SetEta(4.0);
-
-  ASSERT_EQ(g.GetAlpha(), 1.0);
-  ASSERT_EQ(g.GetBeta(), 2.0);
-  ASSERT_EQ(g.GetGamma(), 3.0);
-  ASSERT_EQ(g.GetEta(), 4.0);
-}
-
 }   // namespace rakan

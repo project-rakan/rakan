@@ -5,27 +5,23 @@
 
 namespace rakan {
 
+FILE *f = fopen("./iowa.idx", "rb");
+
 TEST(Test_Reader, TestConstructor) {
-  FILE *f1 = fopen("./test_files/small.idx", "r");
-  Reader small_reader(f1);
-  ASSERT_EQ(small_reader.GetFile(), f1);
-
-  FILE *f2 = fopen("./test_files/medium.idx", "r");
-  Reader med_reader(f2);
-  ASSERT_EQ(med_reader.GetFile(), f2);
-
-  FILE *f3 = fopen("./test_files/large.idx", "r");
-  Reader large_reader(f3);
-  ASSERT_EQ(large_reader.GetFile(), f3);
-
-  FILE *f4 = fopen("./test_files/empty.idx", "r");
-  Reader empty_reader(f4);
-  ASSERT_EQ(empty_reader.GetFile(), f4);
+  Reader reader(f);
+  ASSERT_EQ(reader.GetFile(), f);
 }
 
 // Tests reading the header (18 bytes).
 TEST(Test_Reader, TestHeader) {
   Header header;
+  Reader reader(f);
+
+  // expected values according to bladecaller
+  reader.ReadHeader(&header);
+  ASSERT_EQ(header.magic_number, 0xBEEFCAFE);
+  ASSERT_EQ(header.num_nodes, 99);
+  ASSERT_EQ(header.num_districts, 4);
 }
 
 // Tests reading a node record (12 bytes).

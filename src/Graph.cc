@@ -64,9 +64,6 @@ Graph::~Graph() {
   delete[] min_pop_of_district_;
 
   // Delete all node pointers in nodes_.
-  for (i = 0; i < num_nodes_; i++) {
-    delete nodes_[i];
-  }
   delete[] nodes_;
 
   // Delete all set pointers in nodes_in_district_.
