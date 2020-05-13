@@ -29,7 +29,6 @@ int main(int argc, char *argv[]) {
     }
 
     request = reinterpret_cast<StartMapJobRequest *>(task.payload);
-    *request = x;
     runner->StartMapJob(request, NUM_STEPS);
   }
 
