@@ -434,7 +434,7 @@ void Runner::SubmitToQueue(unordered_map<int, int> *changes) {
   MapJobUpdate *update = new MapJobUpdate;
   strcpy(update->state, request_->state);
   strcpy(update->guid, request_->guid);
-  update->map = *changes_;
+  update->map = changes;
   update->alpha = alpha_;
   update->beta = beta_;
   update->gamma = gamma_;
@@ -443,7 +443,7 @@ void Runner::SubmitToQueue(unordered_map<int, int> *changes) {
   update->distribution = distribution_score_;
   update->borderRespect = border_score_;
   update->vra = vra_score_;
-  // queue_->SubmitRunUpdate(*update);
+  queue_->SubmitRunUpdate(*update);
   changes->clear();
 }
 
