@@ -100,7 +100,7 @@ uint16_t Runner::SeedDistricts() {
       seed_node->SetDistrict(i);
       seed_nodes.insert(seed_node);
       random_indexes.push_back(random_index);
-      changes_.insert({seed_node->id_, i});
+      changes_->insert({seed_node->id_, i});
     } else {
       i--;
     }
@@ -119,7 +119,7 @@ uint16_t Runner::SeedDistricts() {
         found_node->SetDistrict(i);
         unused.erase(found_node);
         last_found[i] = found_node;
-        changes_.insert({found_node->id_, i});
+        changes_->insert({found_node->id_, i});
       }
     }
     if (unused.size() == check) {
@@ -127,7 +127,7 @@ uint16_t Runner::SeedDistricts() {
     }
   }
 
-  SubmitToQueue(*changes_);
+  SubmitToQueue(changes_);
 
   return SUCCESS;
 }
@@ -317,7 +317,6 @@ double Runner::MetropolisHastings() {
 
   if (accepted) {
     SubmitToQueue(changes_);
-    changes_->clear();
   }
 
   return old_score - new_score;
@@ -443,6 +442,7 @@ void Runner::SubmitToQueue(unordered_map<int, int> *changes) {
   update->borderRespect = border_score_;
   update->vra = vra_score_;
   queue_->SubmitRunUpdate(*update);
+  changes->clear();
 }
 
 Node *Runner::BFS(Node *start, unordered_set<Node *> *set) {

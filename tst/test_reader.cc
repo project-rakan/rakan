@@ -26,6 +26,12 @@ TEST(Test_Reader, TestHeader) {
 
 // Tests reading a node record (12 bytes).
 TEST(Test_Reader, TestNodeRecord) {
+  NodeRecord rec;
+  Reader reader(f);
+
+  reader.ReadNodeRecord(kHeaderSize, &rec);
+  ASSERT_EQ(rec.num_neighbors, 0);
+  ASSERT_EQ(rec.node_pos, 0);
 }
 
 // Tests reading a basic node (40 bytes):

@@ -1,5 +1,8 @@
 #include "../src/Node.h"
-#include "../src/Graph.h"
+
+#include <inttypes.h>
+
+#include <unordered_set>
 
 #include "gtest/gtest.h"
 
@@ -11,36 +14,38 @@ TEST(Test_Node, TestNodeCreation) {
     ASSERT_EQ(n.GetID(), 12345);
     ASSERT_EQ(n.GetDistrict(), 2);
 
-    unordered_set<uint32_t>* neighbors;
+    unordered_set<uint32_t> *neighbors = new unordered_set<uint32_t>;
     neighbors->insert(1234);
     neighbors->insert(1235);
     neighbors->insert(1236);
     Node m(123456, 3, neighbors);
-    ASSERT_EQ(n.GetID(), 12345);
-    ASSERT_EQ(n.GetDistrict(), 3);
-    ASSERT_EQ(n.GetNeighbors(), neighbors);
-}
-
-// Creates a node with one neighbors
-TEST(Test_Node, TestOneNeighbor) {
-    unordered_set<uint32_t>* neighbors;
-    neighbors->insert(1234);
-    Node m(123456, 3, neighbors);
-    ASSERT_EQ(m.GetID(), 12345);
+    ASSERT_EQ(m.GetID(), 123456);
     ASSERT_EQ(m.GetDistrict(), 3);
     ASSERT_EQ(m.GetNeighbors(), neighbors);
 }
 
+// Creates a node with one neighbors
+TEST(Test_Node, TestOneNeighbor) {
+    unordered_set<uint32_t> *neighbors = new unordered_set<uint32_t>;
+    neighbors->insert(1234);
+    Node m(123456, 3, neighbors);
+    ASSERT_EQ(m.GetID(), 12345);
+    ASSERT_EQ(m.GetDistrict(), 3);
+    ASSERT_EQ(m.GetNeighbors(), &neighbors);
+    ASSERT_EQ(m.GetNeighbors()->size(), neighbors->size());
+}
+
 // Creates a node with many neighbors
 TEST(Test_Node, TestManyNeighbors) {
-    unordered_set<uint32_t>* neighbors;
+    unordered_set<uint32_t> *neighbors = new unordered_set<uint32_t>;
     for (uint32_t i = 0; i < 100; i++) {
         neighbors->insert(i);
     }
     Node m(123456, 3, neighbors);
     ASSERT_EQ(m.GetID(), 12345);
     ASSERT_EQ(m.GetDistrict(), 3);
-    ASSERT_EQ(*(m.GetNeighbors()), *neighbors);
+    ASSERT_EQ(m.GetNeighbors(), neighbors);
+    ASSERT_EQ(m.GetNeighbors()->size(), neighbors->size());
 }
 
 // Creates a node with no neighbors

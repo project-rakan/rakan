@@ -42,7 +42,7 @@ TEST(Test_Graph, TestAddMultiple) {
   g.AddNode(&n0);
   g.AddNode(&n1);
 
-  ASSERT_EQ(g.GetNumNodes(), 1);
+  ASSERT_EQ(g.GetNumNodes(), 2);
   ASSERT_EQ(g.GetNode(0), &n0);
   ASSERT_EQ(g.GetNode(1), &n1);
 }
