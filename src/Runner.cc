@@ -5,6 +5,8 @@
 #include <stdio.h>              // for FILE *, fopen, fseek, fread, etc.
 #include <stdlib.h>             // for rand()
 
+#include <iostream>
+
 #include <algorithm>            // for find()
 #include <chrono>               // for system_clock:now()
 #include <queue>                // for queue
@@ -20,11 +22,11 @@
 #include "./Queue.h"            // for SubmitRunUpdate()
 
 using battledance::MapJobUpdate;
-using std::vector;
 using std::queue;
 using std::uniform_real_distribution;
 using std::unordered_map;
 using std::unordered_set;
+using std::vector;
 
 namespace rakan {
 
@@ -441,7 +443,7 @@ void Runner::SubmitToQueue(unordered_map<int, int> *changes) {
   update->distribution = distribution_score_;
   update->borderRespect = border_score_;
   update->vra = vra_score_;
-  queue_->SubmitRunUpdate(*update);
+  // queue_->SubmitRunUpdate(*update);
   changes->clear();
 }
 

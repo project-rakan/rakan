@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
   while (1) {
     Task task;
     StartMapJobRequest *request;
-    
+
     task = queue.GetNextTask();
     if (task.task_id == NOOP) {
       sleep(1);
@@ -29,6 +29,7 @@ int main(int argc, char *argv[]) {
     }
 
     request = reinterpret_cast<StartMapJobRequest *>(task.payload);
+    *request = x;
     runner->StartMapJob(request, NUM_STEPS);
   }
 

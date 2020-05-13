@@ -5,69 +5,59 @@
 
 namespace rakan {
 
-FILE *f = fopen("./iowa.idx", "rb");
-
-TEST(Test_Reader, TestConstructor) {
-  Reader reader(f);
-  ASSERT_EQ(reader.GetFile(), f);
+TEST(Test_Reader, TestReaderConstructor) {
+  FILE *f = fopen("./iowa.idx", "rb");
+  if (f != nullptr) {
+    Reader reader(f);
+    ASSERT_EQ(reader.GetFile(), f);
+    fclose(f);
+  }
 }
 
 // Tests reading the header (18 bytes).
-TEST(Test_Reader, TestHeader) {
+TEST(Test_Reader, TestReadHeader) {
+  FILE *f = fopen("./iowa.idx", "rb");
   Header header;
   Reader reader(f);
 
   // expected values according to bladecaller
-  reader.ReadHeader(&header);
-  ASSERT_EQ(header.magic_number, 0xBEEFCAFE);
-  ASSERT_EQ(header.num_nodes, 99);
-  ASSERT_EQ(header.num_districts, 4);
+  if (f != nullptr) {
+    fseek(f, 0, SEEK_SET);
+    reader.ReadHeader(&header);
+    ASSERT_EQ(header.magic_number, 0xBEEFCAFE);
+    ASSERT_EQ(header.num_nodes, 99);
+    ASSERT_EQ(header.num_districts, 4);
+    fclose(f);
+  }
 }
 
 // Tests reading a node record (12 bytes).
-TEST(Test_Reader, TestNodeRecord) {
+TEST(Test_Reader, TestReadNodeRecord) {
+  FILE *f = fopen("./iowa.idx", "rb");
   NodeRecord rec;
   Reader reader(f);
 
-  reader.ReadNodeRecord(kHeaderSize, &rec);
-  ASSERT_EQ(rec.num_neighbors, 0);
-  ASSERT_EQ(rec.node_pos, 0);
+  if (f != nullptr) {
+    reader.ReadNodeRecord(kHeaderSize, &rec);
+    ASSERT_EQ(rec.num_neighbors, 0);
+    ASSERT_EQ(rec.node_pos, 0);
+    fclose(f);
+  }
 }
 
 // Tests reading a basic node (40 bytes):
 // - one node id (4 bytes)
-// - one vertex (8 bytes)
 // - one neighbor (4 bytes)
 // - demographics (24 bytes)
-TEST(Test_Reader, TestNodeBasic) {
-}
-
-// Tests reading a "medium" node (52 bytes):
-// - one node id (4 bytes)
-// - two vertices (16 bytes)
-// - two neighbors (8 bytes)
-// - demographics (24 bytes)
-TEST(Test_Reader, TestNodeMedium) {
-}
-
-// Tests reading a "large" node (92 bytes):
-// - one node id (4 bytes)
-// - five vertices (40 bytes)
-// - five neighbors (20 bytes)
-// - demographics (24 bytes)
-TEST(Test_Reader, TestNodeLarge) {
-}
-
-// Tests reading a simple file.
-TEST(Test_Reader, TestFileSimple) {
-}
-
-// Tests reading a moderate file.
-TEST(Test_Reader, TestFileModerate) {
-}
-
-// Tests reading a complex file.
-TEST(Test_Reader, TestFileComplex) {
+//    - 21 total
+//    - 2 AA
+//    - 2 AI
+//    - 2 AS
+//    - 5 CA
+//    - 10 other
+TEST(Test_Reader, TestReadNode) {
+  FILE *f = fopen("./iowa.idx", "rb");
+  fclose(f);
 }
 
 }   // namespace rakan
