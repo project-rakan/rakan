@@ -31,7 +31,7 @@ TEST(Test_Node, TestOneNeighbor) {
     Node m(123456, 3, neighbors);
     ASSERT_EQ(m.GetID(), 12345);
     ASSERT_EQ(m.GetDistrict(), 3);
-    ASSERT_EQ(m.GetNeighbors(), &neighbors);
+    ASSERT_EQ(m.GetNeighbors(), neighbors);
     ASSERT_EQ(m.GetNeighbors()->size(), neighbors->size());
 }
 
