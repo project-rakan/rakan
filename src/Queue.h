@@ -65,8 +65,8 @@ typedef struct MapScoreResponseStruct {
 
 // Being sent for beta release
 typedef struct MapJobUpdateStruct {
-    char guid[128];
-    char state[2];
+    char *guid;
+    char *state;
     unordered_map<int32_t, int32_t> *map;
     double alpha;
     double beta;
@@ -259,8 +259,12 @@ class Queue {
 
         std::stringstream jsonPayload;
         jsonPayload << "{";
-        jsonPayload << "\"guid\": \"" << mapJobUpdate.guid << "\",";
-        jsonPayload << "\"state\": \"" << mapJobUpdate.state << "\",";
+        jsonPayload << "\"guid\": \""; 
+        for (int i = 0; i < 6; i++) {
+            jsonPayload << mapJobUpdate.guid[i];
+        }
+        jsonPayload << "\",";
+        jsonPayload << "\"state\": \"" << mapJobUpdate.state[0] << mapJobUpdate.state[1] << "\",";
         jsonPayload << "\"map\": [";
         int32_t i = 0;
         for (std::pair<int32_t, int32_t> element : *mapJobUpdate.map) {

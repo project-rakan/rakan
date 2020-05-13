@@ -432,8 +432,15 @@ bool Runner::DoesPathExist(Node *start, Node *target) {
 
 void Runner::SubmitToQueue(unordered_map<int, int> *changes) {
   MapJobUpdate *update = new MapJobUpdate;
-  strcpy(update->state, request_->state);
-  strcpy(update->guid, request_->guid);
+  char *state = new char[2];
+  state[0] = request_->state[0];
+  state[1] = request_->state[1];
+  char *guid = new char[6];
+  for (int i = 0; i < 6; i++) {
+    guid[i] = request_->guid[i];
+  }
+  update->state = state;
+  update->guid = guid;
   update->map = changes;
   update->alpha = alpha_;
   update->beta = beta_;
