@@ -35,6 +35,10 @@ build/*
 *.out
 *.app
 
-# Docker files
+# Docker files/Development files
 docker-compose.yml
 mockProducer
+.vscode
+
+# Python files
+*.pyc
