@@ -42,3 +42,6 @@ mockProducer
 
 # Python files
 *.pyc
+
+# Cython files
+rakan/wrapper.cpp
