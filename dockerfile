@@ -12,9 +12,6 @@ RUN apt-get update --fix-missing
 # Download gcc
 RUN apt-get install cmake gcc make g++ gdb -y
 
-# Download boost library
-RUN apt-get install libboost-all-dev -y
-
 # Download Python
 RUN apt-get install python3.7 python3-pip python3.7-dev -y
 
