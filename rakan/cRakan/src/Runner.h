@@ -2,7 +2,6 @@
 #define SRC_RUNNER_H_
  
 #include <inttypes.h>         // for uint32_t, uint16_t, etc.
-#include <stdio.h>            // for FILE *
 
 #include <string>             // for std::string
 #include <unordered_map>      // for std::unordered_map
@@ -11,8 +10,6 @@
 #include "./Graph.h"          // for Graph class
 #include "./Node.h"           // for Node class
 
-using battledance::Queue;
-using battledance::StartMapJobRequest;
 using std::string;
 using std::unordered_set;
 using std::unordered_map;
@@ -26,30 +23,18 @@ class Runner {
  // Construction / Initialization
  //////////////////////////////////////////////////////////////////////////////
   /*
-  * Default constructor. Used ONLY for testing.
+  * Default constructor.
   */
   Runner() {}
 
   /*
-  * Constructs a Runner instance. This Runner will only communicate
-  * with the passed in queue.
+  * Constructs a Runner instance with the given graph.
   * 
-  * @param    queue    The queue this instance will communicate with
+  * @param    g    The graph this Runner will perform on
   */
-  Runner(Queue *queue)
+  Runner(Graph *g)
       : num_steps_(0),
         changes_(new unordered_map<int, int>) {}
-
-  /*
-  * Loads the graph with data parsed from the given file.
-  * 
-  * @param    file    The open FILE * that contains the information
-  *                   to load the graph with
-  * 
-  * @return SUCCESS if all loading successful; the appropriate error
-  *         code otherwise
-  */
-  uint16_t LoadGraph(FILE *file);
 
   /*
   * Sets the district assignments according to the given map.
@@ -82,20 +67,6 @@ class Runner {
   *         error code otherwise
   */
   uint16_t PopulateGraphData();
-
-  /*
-  * Starts the given map job request. Loads the graph with the specified
-  * state in the request, walks on the graph num_steps number of times,
-  * and sends updates to the queue.
-  * 
-  * @param    request       the request to start
-  * @param    num_steps     the number of steps to take per walk
-  * 
-  * @return SUCCESS iff all walk successful; the appropraite error code
-  *         otherwise
-  */
-  uint16_t StartMapJob(StartMapJobRequest *request, uint32_t num_steps);
-
 
  //////////////////////////////////////////////////////////////////////////////
  // Scoring
@@ -222,14 +193,6 @@ class Runner {
  //////////////////////////////////////////////////////////////////////////////
 
   /*
-  * Submits the list of changes to the queue.
-  *
-  * @param   changes   The map of changes this Runner has made since the last
-  *                     step
-  */
-  void SubmitToQueue(unordered_map<int, int> *changes);
-
-  /*
   * A static helper function that implements BFS on the graph. Searches for
   * any node that exists in the given set from start.
   *
@@ -257,9 +220,6 @@ class Runner {
  private:
   // The graph that is loaded and evaluated by this Runner.
   Graph *graph_;
-
-  // The current request in progress.
-  StartMapJobRequest *request_;
 
   // A map of the changes that have been made since the last walk.
   // Maps from a node ID to a district ID and assumes that this change
