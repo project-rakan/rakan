@@ -10,7 +10,6 @@
 
 #include "./Graph.h"          // for Graph class
 #include "./Node.h"           // for Node class
-#include "./Queue.h"          // for Queue class
 
 using battledance::Queue;
 using battledance::StartMapJobRequest;
@@ -39,7 +38,6 @@ class Runner {
   */
   Runner(Queue *queue)
       : num_steps_(0),
-        queue_(queue),
         changes_(new unordered_map<int, int>) {}
 
   /*
@@ -259,10 +257,6 @@ class Runner {
  private:
   // The graph that is loaded and evaluated by this Runner.
   Graph *graph_;
-
-  // The queue this Runner is hooked up to. This runner will solely
-  // communicate with this queue.
-  Queue *queue_;
 
   // The current request in progress.
   StartMapJobRequest *request_;

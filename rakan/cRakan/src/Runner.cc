@@ -19,7 +19,6 @@
 #include "./Graph.h"            // for class Graph
 #include "./Node.h"             // for class Node
 #include "./Reader.h"           // for class Reader, structs
-#include "./Queue.h"            // for SubmitRunUpdate()
 
 using battledance::MapJobUpdate;
 using std::queue;
@@ -450,7 +449,6 @@ void Runner::SubmitToQueue(unordered_map<int, int> *changes) {
   update->distribution = distribution_score_;
   update->borderRespect = border_score_;
   update->vra = vra_score_;
-  queue_->SubmitRunUpdate(*update);
   changes->clear();
 }
 
