@@ -2,10 +2,7 @@
 
 #include <math.h>               // for pow(), log(), fmin()
 #include <inttypes.h>           // for uint32_t, etc.
-#include <stdio.h>              // for FILE *, fopen, fseek, fread, etc.
 #include <stdlib.h>             // for rand()
-
-#include <iostream>
 
 #include <algorithm>            // for find()
 #include <chrono>               // for system_clock:now()
@@ -18,10 +15,7 @@
 #include "./ReturnCodes.h"      // for SUCCESS, READ_FAIL, SEEK_FAIL, etc.
 #include "./Graph.h"            // for class Graph
 #include "./Node.h"             // for class Node
-#include "./Reader.h"           // for class Reader, structs
-#include "./Queue.h"            // for SubmitRunUpdate()
 
-using battledance::MapJobUpdate;
 using std::queue;
 using std::uniform_real_distribution;
 using std::unordered_map;
@@ -33,45 +27,6 @@ namespace rakan {
 //////////////////////////////////////////////////////////////////////////////
 // Construction / Initialization
 //////////////////////////////////////////////////////////////////////////////
-
-uint16_t Runner::LoadGraph(FILE *file) {
-  Reader reader(file);
-  Header header;
-  NodeRecord rec;
-  uint32_t i, res, record_offset, node_offset;
-
-  res = reader.ReadHeader(&header);
-  if (res != SUCCESS) {
-    return res;
-  }
-
-  graph_ = new Graph(header.num_nodes, header.num_districts, 0);
-
-  record_offset = kHeaderSize;
-  node_offset = kHeaderSize + kNodeRecordSize * header.num_nodes;
-
-  for (i = 0; i < header.num_nodes; i++) {
-    Node *node = new Node;
-
-    res = reader.ReadNodeRecord(record_offset, &rec);
-    if (res != SUCCESS) {
-      return res;
-    }
-
-    res = reader.ReadNode(node_offset + rec.node_pos,
-                          rec.num_neighbors,
-                          node);
-    if (res != SUCCESS) {
-      return res;
-    }
-
-    graph_->AddNode(node);
-    graph_->AddStatePop(node->GetTotalPop());
-    record_offset += kNodeRecordSize;
-  }
-
-  return SUCCESS;
-}
 
 uint16_t Runner::SetDistricts(unordered_map<uint32_t, uint32_t> *map) {
   for (int i = 0; i < graph_->num_nodes_; i++) {
@@ -86,7 +41,7 @@ uint16_t Runner::SeedDistricts() {
   int32_t prev_random_index, random_index;
   vector<uint32_t> random_indexes;
   unordered_set<Node *> unused, seed_nodes;
-  map<int, Node *> last_found;
+  unordered_map<int, Node *> last_found;
   Node *found_node, *seed_node;
 
   for (i = 0; i < graph_->num_nodes_; i++) {
@@ -129,8 +84,6 @@ uint16_t Runner::SeedDistricts() {
     }
   }
 
-  SubmitToQueue(changes_);
-
   return SUCCESS;
 }
 
@@ -163,29 +116,6 @@ uint16_t Runner::PopulateGraphData() {
       }
     }
   }
-
-  return SUCCESS;
-}
-
-uint16_t Runner::StartMapJob(StartMapJobRequest *request, uint32_t num_steps) {
-  FILE *file;
-  request_ = request;
-
-  if ((file = fopen("../tst/iowa.idx", "rb")) == nullptr) {
-    return INVALID_FILE;
-  }
-  if (LoadGraph(file) != SUCCESS) {
-    return LOAD_FAILED;
-  }
-  if (SeedDistricts() != SUCCESS) {
-    return SEED_FAILED;
-  }
-  if (PopulateGraphData() != SUCCESS) {
-    return POPULATE_FAILED;
-  }
-  Walk(num_steps);
-  fclose(file);
-  delete graph_;
 
   return SUCCESS;
 }
@@ -317,10 +247,6 @@ double Runner::MetropolisHastings() {
   (*changes_)[node->id_] = node->district_;
   num_steps_++;
 
-  if (accepted) {
-    SubmitToQueue(changes_);
-  }
-
   return old_score - new_score;
 }
 
@@ -429,30 +355,6 @@ bool Runner::DoesPathExist(Node *start, Node *target) {
  //////////////////////////////////////////////////////////////////////////////
  // Helpers
  //////////////////////////////////////////////////////////////////////////////
-
-void Runner::SubmitToQueue(unordered_map<int, int> *changes) {
-  MapJobUpdate *update = new MapJobUpdate;
-  char *state = new char[2];
-  state[0] = request_->state[0];
-  state[1] = request_->state[1];
-  char *guid = new char[6];
-  for (int i = 0; i < 6; i++) {
-    guid[i] = request_->guid[i];
-  }
-  update->state = state;
-  update->guid = guid;
-  update->map = changes;
-  update->alpha = alpha_;
-  update->beta = beta_;
-  update->gamma = gamma_;
-  update->eta = eta_;
-  update->compactness = compactness_score_;
-  update->distribution = distribution_score_;
-  update->borderRespect = border_score_;
-  update->vra = vra_score_;
-  queue_->SubmitRunUpdate(*update);
-  changes->clear();
-}
 
 Node *Runner::BFS(Node *start, unordered_set<Node *> *set) {
   Node *current_node;
