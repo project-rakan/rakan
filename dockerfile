@@ -22,9 +22,5 @@ WORKDIR "/home/project"
 
 COPY . .
 
-RUN mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Debug -G "Unix Makefiles" && make all
-
-WORKDIR "/home/project/build/"
-
-ENTRYPOINT [ "src/rakan_run" ]
-
+RUN touch "a.YOU ARE NOT MOUNTING YOUR DEVELOPMENT DRIVE.YOU ARE IN PRODUCTION MODE"
+RUN touch "z.YOU ARE NOT MOUNTING YOUR DEVELOPMENT DRIVE.YOU ARE IN PRODUCTION MODE"
