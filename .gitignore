@@ -27,9 +27,6 @@
 *.a
 *.lib
 
-# Build
-build/*
-
 # Executables
 *.exe
 *.out
