@@ -18,6 +18,9 @@ RUN apt-get install libboost-all-dev -y
 # Download Python
 RUN apt-get install python3.7 python3-pip python3.7-dev -y
 
+COPY requirements.txt /tmp/requirements.txt
+RUN python3.7 -m pip install -r /tmp/requirements.txt
+
 WORKDIR "/home/project"
 
 COPY . .
