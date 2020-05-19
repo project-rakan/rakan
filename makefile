@@ -12,3 +12,7 @@ clean:
 
 docs: pip
 	mkdocs serve -a 0.0.0.0:8080
+
+test: build
+	cd rakan && cp ./*.so tests/
+	cd rakan && python3.7 tests
