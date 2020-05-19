@@ -3,7 +3,7 @@ from Cython.Build import cythonize
 
 extensions = [
     Extension(
-        "jensen",
+        "rakan",
         ["cRakan/wrapper.pyx"],
         language="c++",
         extra_compile_args=["-std=c++11"],
@@ -12,7 +12,7 @@ extensions = [
 ]
 
 setup(
-    name='Rakan API Toolkit',
+    name='MCMC Engines',
     # ext_modules=cythonize('rakan.pyx', annotate=True, gdb_debug=True),
     ext_modules=cythonize(extensions)
 )
