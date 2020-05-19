@@ -1,0 +1,7 @@
+[Unit]
+Description=gunicorn daemon
+After=network.target
+
+[Service]
+WorkingDirectory=/home/project/distribution
+ExecStart=/usr/local/bin/gunicorn --access-logfile - --workers 4 --bind unix:/home/project/distribution.sock distribution.wsgi:application
