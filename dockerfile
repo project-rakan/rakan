@@ -12,19 +12,15 @@ RUN apt-get update --fix-missing
 # Download gcc
 RUN apt-get install cmake gcc make g++ gdb -y
 
-# Download boost library
-RUN apt-get install libboost-all-dev -y
-
 # Download Python
 RUN apt-get install python3.7 python3-pip python3.7-dev -y
+
+COPY requirements.txt /tmp/requirements.txt
+RUN python3.7 -m pip install -r /tmp/requirements.txt
 
 WORKDIR "/home/project"
 
 COPY . .
 
-RUN mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Debug -G "Unix Makefiles" && make all
-
-WORKDIR "/home/project/build/"
-
-ENTRYPOINT [ "src/rakan_run" ]
-
+RUN touch "a.YOU ARE NOT MOUNTING YOUR DEVELOPMENT DRIVE.YOU ARE IN PRODUCTION MODE"
+RUN touch "z.YOU ARE NOT MOUNTING YOUR DEVELOPMENT DRIVE.YOU ARE IN PRODUCTION MODE"

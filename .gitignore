@@ -27,9 +27,6 @@
 *.a
 *.lib
 
-# Build
-build/*
-
 # Executables
 *.exe
 *.out
@@ -44,4 +41,4 @@ mockProducer
 *.pyc
 
 # Cython files
-rakan/wrapper.cpp
+rakan/cRakan/wrapper.cpp
