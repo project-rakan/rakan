@@ -1,10 +1,15 @@
-on: [push]
+name: CI
+
+on:
+  push:
+    branches:
+      - master
 
 jobs:
   repo-test:
     runs-on: ubuntu-latest
     name: Testing the rakan C++ and Python code
     steps:
-    - name: Test Action
-      id: tests
-      uses: project-rakan/rakan@a1ec859dbd5442a6eb1a56c0a85c91ec29b2c91e
+      - uses: actions/checkout@v2
+        
+      - uses: actions/rakan@a1ec859dbd5442a6eb1a56c0a85c91ec29b2c91e
