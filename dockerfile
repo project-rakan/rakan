@@ -24,15 +24,15 @@ RUN apt-get install postgresql-10 -y
 RUN apt-get install libpq-dev postgis -y
 RUN ln -fs /usr/share/zoneinfo/America/Los_Angles /etc/localtime
 
+# Install additional packages for scripts
+RUN apt-get install wget unzip -y
+
 # Install nginx + Gunicorn
 RUN apt-get install nginx -y
 RUN wget https://raw.githubusercontent.com/nginx/nginx/master/conf/uwsgi_params -O /etc/nginx/uwsgi_params
 COPY ./configs/nginx.conf /etc/nginx/sites-enabled/nginx.conf
 COPY ./configs/gunicorn.service /etc/systemd/system/gunicorn.service
 RUN rm /etc/nginx/sites-enabled/default
-
-# Install additional packages for scripts
-RUN apt-get install wget unzip -y
 
 COPY requirements.txt /tmp/requirements.txt
 RUN python3.7 -m pip install -r /tmp/requirements.txt
