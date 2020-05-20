@@ -22,7 +22,8 @@ service nginx start
 
 # run the gunicorn if it hasn't already
 cd bladecaller
-gunicorn --bind 127.0.0.1:8000 --workers 3 bladecaller.wsgi &> /home/project/logs/gunicorn.log &
+echo "Running Server..."
+gunicorn --bind 127.0.0.1:8000 --workers 3 bladecaller.wsgi &> /home/project/logs/gunicorn.log
 cd ..
 
 # start a shell if it's dev mode
