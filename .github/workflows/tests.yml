@@ -1,0 +1,10 @@
+on: [push]
+
+jobs:
+  repo-test:
+    runs-on: ubuntu-latest
+    name: Testing the rakan C++ and Python code
+    steps:
+    - name: Test Action
+      id: tests
+      uses: rakan/action
