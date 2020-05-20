@@ -15,7 +15,7 @@ class testAPIExist(unittest.TestCase):
     
     def test_push(self):
         item = self.runnerClass()
-        self.assertTrue(True)
+        self.assertTrue(False) # Testing CI to see what happens if a test fails
 
 """
     def setUp(self):
