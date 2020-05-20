@@ -15,4 +15,4 @@ docs: pip
 
 test: build
 	cd rakan && cp ./*.so tests/
-	cd rakan && python3.7 tests
+	cd rakan/tests && python3.7 -m unittest
