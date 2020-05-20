@@ -31,7 +31,6 @@ RUN apt-get install wget unzip -y
 RUN apt-get install nginx -y
 RUN wget https://raw.githubusercontent.com/nginx/nginx/master/conf/uwsgi_params -O /etc/nginx/uwsgi_params
 COPY ./configs/nginx.conf /etc/nginx/sites-enabled/nginx.conf
-COPY ./configs/gunicorn.service /etc/systemd/system/gunicorn.service
 RUN rm /etc/nginx/sites-enabled/default
 
 COPY requirements.txt /tmp/requirements.txt
@@ -43,3 +42,8 @@ COPY . .
 
 RUN touch "a.YOU ARE NOT MOUNTING YOUR DEVELOPMENT DRIVE.YOU ARE IN PRODUCTION MODE"
 RUN touch "z.YOU ARE NOT MOUNTING YOUR DEVELOPMENT DRIVE.YOU ARE IN PRODUCTION MODE"
+
+RUN chmod +x ./configs/docker-entrypoint.sh
+
+ENTRYPOINT [ "./configs/docker-entrypoint.sh" ]
+
