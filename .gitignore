@@ -42,3 +42,12 @@ mockProducer
 
 # Cython files
 rakan/cRakan/wrapper.cpp
+
+# Secrets/Configuration files
+.env
+.secrets*
+.bashrc
+
+# Temporary Database Files
+db.sqlite3
+db.sqlite3-journal
