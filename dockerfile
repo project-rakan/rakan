@@ -45,5 +45,5 @@ RUN touch "z.YOU ARE NOT MOUNTING YOUR DEVELOPMENT DRIVE.YOU ARE IN PRODUCTION M
 
 RUN chmod +x ./configs/docker-entrypoint.sh
 
-ENTRYPOINT [ "./configs/docker-entrypoint.sh" ]
+CMD [ "./configs/docker-entrypoint.sh" ]
 
