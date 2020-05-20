@@ -35,7 +35,8 @@ class Edge {
        const uint32_t dist_one,
        const uint32_t dist_two);
        
-  // Takes in the two nodes to be stored for usage later. 
+  // Takes in the two nodes to be stored for usage later. Sets cross_ to false
+  // by default.
   Edge(const uint32_t one, const uint32_t two);
 
   // Destructor.
@@ -58,9 +59,9 @@ class Edge {
   // Returns whether or not the two nodes are in separate districts.
   bool Crosses() const { return cross_; }
 
-  uint32_t GetNodeOne() const { return node_one_; }
+  const uint32_t GetNodeOne() const { return node_one_; }
 
-  uint32_t GetNodeTwo() const { return node_two_; }
+  const uint32_t GetNodeTwo() const { return node_two_; }
   
   /////////////////////////////////////////////////////////////////////////////
   // Mutators
@@ -71,16 +72,17 @@ class Edge {
   // Arguments:
   //  - one: first node id to be assigned to edge.
   //  - two: second node id to be assigned to edge.
+  //  - cross: Whether the two nodes are in the same district.
   //
   // Returns:
   //  - true iff the relationship is new
   //  - false otherwise
-  bool ChangeConnection(uint32_t one, uint32_t two, bool district);
+  bool ChangeConnection(uint32_t one, uint32_t two, bool cross);
 
  private:
   bool cross_;
-  uint32_t node_one;
-  uint32_t node_two;
+  uint32_t node_one_;
+  uint32_t node_two_;
 
   // Needed for populating data structures in graph from file.
   friend class Runner;
