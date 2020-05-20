@@ -1,10 +1,6 @@
 # action.yml
 name: 'Rakan Test'
 description: 'Run test on the Rakan repo'
-inputs:
-outputs:
-    exit_code:
-        description: The exit_code of the test suite
 runs:
   using: 'docker'
   image: 'dockerfile'
