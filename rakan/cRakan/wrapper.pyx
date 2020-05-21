@@ -43,7 +43,7 @@ cdef class Engine:
     def seed(self):
         print('mock seed')
 
-    def walk(int stepsToTake, double alpha, double beta, double gamma, double eta):
+    def walk(self, int stepsToTake, double alpha, double beta, double gamma, double eta):
         print('mock walk')
 
 # dereference(self._runner)
