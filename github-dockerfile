@@ -43,7 +43,6 @@ COPY . .
 RUN touch "a.YOU ARE NOT MOUNTING YOUR DEVELOPMENT DRIVE.YOU ARE IN PRODUCTION MODE"
 RUN touch "z.YOU ARE NOT MOUNTING YOUR DEVELOPMENT DRIVE.YOU ARE IN PRODUCTION MODE"
 
-RUN chmod +x ./configs/docker-entrypoint.sh
+RUN chmod +x ./configs/testing-entrypoint.sh
 
-CMD [ "./configs/docker-entrypoint.sh" ]
-
+ENTRYPOINT [ "./configs/testing-entrypoint.sh" ]

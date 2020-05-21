@@ -12,5 +12,5 @@ clean:
 
 test: build cmake
 	cd rakan && cp ./*.so tests/
-	cd rakan && python3.7 tests
+	cd rakan && python3.7 -m unittest
 	cd rakan/cRakan/build && ./tst/rakan_tst 

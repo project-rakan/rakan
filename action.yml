@@ -1,0 +1,6 @@
+# action.yml
+name: 'Rakan Test'
+description: 'Run test on the Rakan repo'
+runs:
+  using: 'docker'
+  image: 'github-dockerfile'
