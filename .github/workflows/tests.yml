@@ -1,0 +1,12 @@
+name: CI
+
+on: [push]
+
+jobs:
+  repo-test:
+    runs-on: ubuntu-latest
+    name: Testing the rakan C++ and Python code
+    steps:
+      - uses: actions/checkout@v2
+        
+      - uses: ./
