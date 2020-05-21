@@ -10,11 +10,6 @@ class testAPIExist(unittest.TestCase):
         self.assertTrue(hasattr(self.runnerClass, "addNode"))
         self.assertTrue(hasattr(self.runnerClass, "addEdge"))
         self.assertTrue(hasattr(self.runnerClass, "setDistricts"))
-        self.assertTrue(hasattr(self.runnerClass, "populate"))
-    
-    def test_push(self):
-        item = self.runnerClass()
-        self.assertTrue(True) # Testing CI to see what happens if a test fails
 
 """
     def setUp(self):
