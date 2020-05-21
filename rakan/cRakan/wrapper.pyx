@@ -7,8 +7,9 @@ from libcpp.string cimport string as cstring
 from wrapper cimport Runner as cRunner
 from wrapper cimport Graph as cGraph
 
-cdef class Runner:
+cdef class Engine:
     cdef cRunner* _runner
+    cdef cGraph* _graph
 
     def __cinit__(self):
         self._runner = new cRunner()
@@ -40,21 +41,4 @@ cdef class Runner:
 
     def walk(int stepsToTake, double alpha, double beta, double gamma, double eta):
         print('walk')
-
-
-cdef class Graph:
-    cdef cGraph* _graph
-
-    def __cinit__(self):
-        self._graph = new cGraph()
-
-    def __dealloc__(self):
-        del self._graph
-
-    def getNumNodes(self):
-        return dereference(self._graph).GetNumNodes()
-
-    def addNode(self, node):
-        pass
-
 # dereference(self._runner)

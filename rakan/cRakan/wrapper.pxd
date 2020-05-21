@@ -29,7 +29,6 @@ cdef extern from "src/Runner.h" namespace "rakan":
         cbool IsEmptyDistrict(int &district) except +;
         cbool IsDistrictSevered(Node &proposed_node) except +;
         cbool DoesPathExist(Node &start, Node &target) except +;
-        Node *BFS(Node &start, cunordered_set[Node *] &set) except +;
         Graph *GetGraph() except +;
         void SetGraph(Graph &graph) except +;
 

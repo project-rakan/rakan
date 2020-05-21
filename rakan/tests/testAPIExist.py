@@ -2,9 +2,8 @@ import unittest
 
 class testAPIExist(unittest.TestCase):
     def setUp(self):
-        from rakan import Runner, Graph
-        self.runnerClass = Runner
-        self.graphClass = Graph
+        from rakan import Engine
+        self.runnerClass = Engine
 
     def test_documented_api(self):
         "Test that this class has the documented API"
@@ -15,7 +14,7 @@ class testAPIExist(unittest.TestCase):
     
     def test_push(self):
         item = self.runnerClass()
-        self.assertTrue(False) # Testing CI to see what happens if a test fails
+        self.assertTrue(True) # Testing CI to see what happens if a test fails
 
 """
     def setUp(self):
