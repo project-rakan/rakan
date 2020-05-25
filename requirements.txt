@@ -1,5 +1,6 @@
 asgiref==3.2.7
 asn1crypto==0.24.0
+cffi==1.14.0
 click==7.1.2
 cryptography==2.3
 Cython==0.29.18
@@ -21,6 +22,8 @@ mkdocs==1.1.2
 mkdocs-material==5.2.0
 mkdocs-material-extensions==1.0
 nltk==3.5
+psycopg2==2.8.5
+pycparser==2.20
 pycrypto==2.6.1
 Pygments==2.6.1
 pygobject==3.26.1
