@@ -20,23 +20,32 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '8-+ofui#=t)$glecc@%)1zd)7n8^38&x8^((r*guz1f7k12gr('
+SECRET_KEY = os.getenv('DJANGO_SECRET', 'blj9_2iel2esgjtpn-p=_^k&33w1ym#5f@p40843kv5&x8^((r*guz1f7k12gr(')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG_MODE', False)
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+]
 
 # Application definition
 
 INSTALLED_APPS = [
+    # Django builtins
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+] + [
+    # Django plugins
+    'rest_framework',
+] + [
+    # My apps
+    'api',
 ]
 
 MIDDLEWARE = [
@@ -75,10 +84,15 @@ WSGI_APPLICATION = 'bladecaller.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': os.getenv('DATABASE_TABLE', 'temptable'),
+        'USER': os.getenv('DATABASE_USER', 'guest'),
+        'PASSWORD': os.getenv('DATABASE_PASS', 'guest'),
+        'HOST': 'localhost',
+        'PORT': '',
     }
 }
+
 
 
 # Password validation
@@ -119,3 +133,11 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = '/var/www/html/static/'
+
+# Django Restframework
+# https://www.django-rest-framework.org/
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 50
+}
