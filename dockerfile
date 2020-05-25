@@ -33,8 +33,15 @@ RUN wget https://raw.githubusercontent.com/nginx/nginx/master/conf/uwsgi_params 
 COPY ./configs/nginx.conf /etc/nginx/sites-enabled/nginx.conf
 RUN rm /etc/nginx/sites-enabled/default
 
+# Install python related components
 COPY requirements.txt /tmp/requirements.txt
 RUN python3.7 -m pip install -r /tmp/requirements.txt
+
+# Download maps from bladecaller
+ADD .gitignore /var/www/html/stateinfo/.gitignore
+COPY configs/downloadMaps.sh /tmp/downloadMaps.sh
+RUN chmod +x /tmp/downloadMaps.sh
+RUN /tmp/downloadMaps.sh
 
 WORKDIR "/home/project"
 
