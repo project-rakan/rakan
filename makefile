@@ -20,5 +20,6 @@ migrations:
 	cd bladecaller && python3.7 manage.py migrate
 
 bladecaller-dev:
+	cd bladecaller && python3.7 manage.py loaddata seed.json
 	cd bladecaller && python3.7 manage.py collectstatic --no-input
 	cd bladecaller && python3.7 manage.py runserver
