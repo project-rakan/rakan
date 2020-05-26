@@ -13,20 +13,24 @@ cdef class Engine:
     cpdef int districts
     cpdef int precincts
 
-    def __cinit__(self, int districts, int precincts):
+    def __cinit__(self, jsonLocation):
         print('mock init')
         self._runner = new cRunner()
-        self.districts = districts
-        self.precincts = precincts
+        "Create an new engine with the initialization data in the jsonLocation"
+        with open(jsonLocation) as json_file:
+            data = json.load(json_file)
+
+        self.districts = data['numNodes']
+        self.precincts = data['numDistricts']
 
     def __dealloc__(self):
         del self._runner
 
-    def addNode(self, int id, int county, int minorityPopulation, int majorityPoplation):
+    def _addNode(self, int id, int county, int minorityPopulation, int majorityPoplation):
         print('mock addNode')
         print(id, county, minorityPopulation, majorityPoplation)
 
-    def addEdge(self, int id1, int id2):
+    def _addEdge(self, int id1, int id2):
         print('mock addEdge')
 
     def setDistricts(self, cvector[int] districts):
@@ -45,5 +49,6 @@ cdef class Engine:
 
     def walk(self, int stepsToTake, double alpha, double beta, double gamma, double eta):
         print('mock walk')
+
 
 # dereference(self._runner)
