@@ -29,6 +29,7 @@ class State(models.Model):
         return os.path.join(MAP_ROOT, f"{self.state}.districts.json")
 
 class GeneratedMap(models.Model):
+    added = models.DateTimeField(auto_now_add=True)
     state = models.ForeignKey(State, on_delete=models.CASCADE)
 
     mapContents = ArrayField(
@@ -43,6 +44,7 @@ class GeneratedMap(models.Model):
 
 
 class Job(models.Model):
+    added = models.DateTimeField(auto_now_add=True)
     jobId = models.CharField(max_length=256, unique=True)
     state = models.ForeignKey(State, on_delete=models.CASCADE)
 
