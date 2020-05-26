@@ -22,6 +22,9 @@ sys.path.append(os.getenv('RAKAN_LOCATION', '/home/project/'))
 # Set minimum required entries for creating probabilities
 MIN_MAPS_FOR_PROBABILITY = 5000
 
+# Set default step size when steps isn't specified by frontend
+DEFAULT_WALK_SIZE = 200
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
