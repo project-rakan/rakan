@@ -19,6 +19,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Include Rakan location
 sys.path.append(os.getenv('RAKAN_LOCATION', '/home/project/'))
 
+# Set minimum required entries for creating probabilities
+MIN_MAPS_FOR_PROBABILITY = 5000
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
