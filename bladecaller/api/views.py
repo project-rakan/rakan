@@ -107,12 +107,19 @@ def scoreMap(request):
     # Calculate the probability iff there exists enough entries in the db
     mapCount = len(models.GeneratedMap.objects.all())
     if mapCount >= MIN_MAPS_FOR_PROBABILITY:
+        # Handle the random walk case:
+        denom = sum([abs(alpha), abs(beta), abs(gamma), abs(eta)])
+        if sum([abs(alpha), abs(beta), abs(gamma), abs(eta)]) == 0:
+            denom = 1.
+        elif sum([alpha, beta, gamma, eta]) == 0:
+            denom = alpha = beta = gamma = eta = 1.
+
         probability = (
             models.GeneratedMap.objects.filter(compactness__lte=scores['compactness']) * alpha + 
             models.GeneratedMap.objects.filter(population__lte=scores['population']) * beta + 
             models.GeneratedMap.objects.filter(borderRespect__lte=scores['political']) * gamma + 
             models.GeneratedMap.objects.filter(vra__lte=scores['vra']) * eta
-        )
+        ) / denom
     else:
         probability = float('nan')
 
