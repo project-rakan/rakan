@@ -2,8 +2,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
 
-from bladecaller.settings import MAP_ROOT, MIN_MAPS_FOR_PROBABILITY
-from rakan.engines import Engines
+from bladecaller.settings import MIN_MAPS_FOR_PROBABILITY
+from rakan import Engine
 
 from api import models
 
@@ -103,14 +103,9 @@ def scoreMap(request):
 
     # Connect to single threaded engine (blocking & ids don't matter)
 
-    engine = Engines(maxThreads=1)
-    engine.newThread(0)
-
-    engine.loadMap(0, MAP_ROOT + state + '.json')
-    engine.setDistricts(0, districting)
+    engine = engine(stateModel.stateJsonLocation)
+    engine.setDistricts(districting)
     scores = engine.getScores()
-
-    engine.terminateThread(0)
 
     # Calculate the weighted score using the weights + scores
     weightedScore = (
@@ -153,3 +148,43 @@ def scoreMap(request):
     return response
 
 
+@api_view(['POST'])
+def startMapJob(request):
+     # Check fields are there
+    for field in ['id', 'state', 'alpha', 'beta', 'gamma', 'eta']:
+        if field not in request.data:
+            return Response({'msg': 'Missing a field', 'missing_field': field}, status=status.HTTP_400_BAD_REQUEST)
+
+    jobId = request.data['id']
+    state = request.data['state']
+
+    # Check jobId is not in use
+    if models.objects.filter(jobId=jobId):
+        return Response({'msg': 'jobId in use, please use a new one', 'id': jobId}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Check state is there
+    if len(models.State.objects.filter(state=state)) == 0:
+        return Response({'msg': 'Unable to find state', 'id': jobId, 'state': state}, status=status.HTTP_400_BAD_REQUEST)
+
+    stateModel = models.State.objects.get(state=state)
+
+    alpha = request.data['alpha']
+    beta = request.data['beta']
+    gamma = request.data['gamma']
+    eta = request.data['eta']
+
+    # Assert the weights are floats
+    for name, weight in [('alpha', alpha), ('beta', beta), ('gamma', gamma), ('eta', eta)]:
+        if not isinstance(weight, (float, int)):
+            return Response({'msg': f'Invalid weight: {name}', 'id': jobId, 'recieved': str(type(weight)), 'expected': 'float or int'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Start the job
+    models.Job.objects.create(
+        jobId=jobId,
+        state=stateModel,
+        # steps=request.data['steps']
+        alpha=alpha,
+        beta=beta,
+        gamma=gamma,
+        eta=eta,
+    )
