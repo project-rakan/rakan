@@ -48,6 +48,8 @@ class Job(models.Model):
     jobId = models.CharField(max_length=256, unique=True)
     state = models.ForeignKey(State, on_delete=models.CASCADE)
 
+    finished = models.BooleanField(default=False)
+
     generatedMaps = models.ManyToManyField(GeneratedMap, blank=True)
 
     steps = models.IntegerField(default=200)
@@ -84,7 +86,10 @@ def queue_new_job(sender, **kwargs):
             )
             job.generatedMaps.add(mapModel)
     
-    process = Process(target=task, args=(job,))
-    process.start()
-    process.join()
+    if kwargs['created']:
+        process = Process(target=task, args=(job,))
+        process.start()
+        process.join()
+        job.finished = True
+        job.save()
 
