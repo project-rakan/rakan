@@ -12,11 +12,20 @@ class State(models.Model):
     def __str__(self):
         return self.state
 
+    @property
+    def stateJsonLocation(self):
+        return os.path.join(MAP_ROOT, f"{self.state}.json")
+
+    @property
+    def stateDistrictJsonLocation(self):
+        return os.path.join(MAP_ROOT, f"{self.state}.districts.json")
+
 class GeneratedMap(models.Model):
     state = models.ForeignKey(State, on_delete=models.CASCADE)
 
     mapContents = ArrayField(
         models.IntegerField(),
+        unique=True
     )
 
     compactness = models.FloatField()
@@ -27,12 +36,9 @@ class GeneratedMap(models.Model):
 
 class Job(models.Model):
     jobId = models.CharField(max_length=256, unique=True)
+    state = models.ForeignKey(State, on_delete=models.CASCADE)
 
-    status = models.CharField(max_length=128, choices=(
-        ('queued', 'queued'),
-        ('running', 'running'),
-        ('finished', 'finished')
-    ))
+    generatedMaps = models.ManyToManyField(GeneratedMap, blank=True)
 
     steps = models.IntegerField(default=200)
 
