@@ -26,6 +26,7 @@ def createGuid(request):
     uuid = uuid4()
     return Response({"guid": f"{state}-{jobType}-{str(uuid)}"})
 
+
 @api_view(['POST'])
 def getDistricting(request):
     # Check fields are there
@@ -36,13 +37,21 @@ def getDistricting(request):
     mapId = request.data['mapId']
     state = request.data['state']
 
+    # Check state is there
+    if len(models.State.objects.filter(state=state)) == 0:
+        return Response({'msg': 'Unable to find state', 'mapId': mapId, 'state': state}, status=status.HTTP_400_BAD_REQUEST)
+
+    stateModel = models.State.objects.get(state=state)
+
     # Check mapID is there
-    if len(models.GeneratedMap.objects.filter(id=mapId, state=state)) == 0:
-        return Response({'msg': 'Unable to find mapId', mapId: mapId, state: state}, status=status.HTTP_400_BAD_REQUEST)
+    if len(models.GeneratedMap.objects.filter(id=mapId, state=stateModel)) == 0:
+        return Response({'msg': 'Unable to find mapId', 'mapId': mapId, 'state': state}, status=status.HTTP_400_BAD_REQUEST)
+
+    mapFound = models.GeneratedMap.objects.get(id=mapId, state=stateModel).mapContents
 
     # Return the map
     return Response({
         'state': request.data['state'],
-        'map': [[precinct_id, district_id] for precinct_id, district_id in enumerate(models.GeneratedMap.objects.get(id=mapId, state=state).mapContents)]
+        'map': [[precinct_id, district_id] for precinct_id, district_id in enumerate(mapFound)]
     })
-    
+
