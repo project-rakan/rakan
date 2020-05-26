@@ -2,23 +2,12 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
 
-from bladecaller.settings import MIN_MAPS_FOR_PROBABILITY
+from bladecaller.settings import MIN_MAPS_FOR_PROBABILITY, DEFAULT_WALK_SIZE
 from rakan import Engine
 
 from api import models
-
 from uuid import uuid4
-
 from math import isnan
-
-# Create your views here.
-
-# API to handle:
-
-"""
-Rakan
-# StartMapJob (Request/Update)
-"""
 
 @api_view(['POST'])
 def createGuid(request):
@@ -157,6 +146,7 @@ def startMapJob(request):
 
     jobId = request.data['id']
     state = request.data['state']
+    steps = request.data.get('steps')
 
     # Check jobId is not in use
     if models.objects.filter(jobId=jobId):
@@ -165,6 +155,10 @@ def startMapJob(request):
     # Check state is there
     if len(models.State.objects.filter(state=state)) == 0:
         return Response({'msg': 'Unable to find state', 'id': jobId, 'state': state}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Check if steps is there, and set a default if it's invalid
+    if not isinstance(steps, int):
+        steps = DEFAULT_WALK_SIZE
 
     stateModel = models.State.objects.get(state=state)
 
@@ -179,12 +173,25 @@ def startMapJob(request):
             return Response({'msg': f'Invalid weight: {name}', 'id': jobId, 'recieved': str(type(weight)), 'expected': 'float or int'}, status=status.HTTP_400_BAD_REQUEST)
 
     # Start the job
-    models.Job.objects.create(
+    job = models.Job.objects.create(
         jobId=jobId,
         state=stateModel,
-        # steps=request.data['steps']
+        steps=steps,
         alpha=alpha,
         beta=beta,
         gamma=gamma,
         eta=eta,
     )
+
+    # Return status code
+    return Response({
+        'id': jobId,
+        'state': state,
+        'steps': steps,
+        'msg': 'Queued up the task',
+        'alpha': alpha,
+        'beta': beta,
+        'gamma': gamma,
+        'eta': eta,
+    }, status=status.HTTP_201_CREATED)
+
