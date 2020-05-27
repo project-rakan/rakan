@@ -25,12 +25,12 @@ class Graph {
   // Constructors and destructors
   /////////////////////////////////////////////////////////////////////////////
 
-  /*
+  /**
   * Default constructor. Used ONLY for testing.
   */
   Graph() = default;
 
-  /*
+  /**
   * Supplies the number of nodes and districts on this graph. Number of nodes,
   * districts, and state population must be non-negative.
   * 
@@ -43,7 +43,7 @@ class Graph {
        const uint32_t num_districts,
        const uint32_t state_pop);
 
-  /*
+  /**
   * Default destructor. Also destructs nodes on this graph.
   */
   ~Graph();
@@ -53,32 +53,23 @@ class Graph {
   /////////////////////////////////////////////////////////////////////////////
 
   /**
-  * Adds a node to this graph.
-  * 
-<<<<<<< HEAD
-  * @param    node      the node to add to this graph
-  * 
-  * @return true iff adding node successful, false otherwise
-  */
+   * Adds a node to this graph.
+   * 
+   * @param     node      the node to be added
+   * 
+   * @return true iff adding node successful; false otherwise
+   */
   bool AddNode(Node *node);
 
   /**
   * Constructs a new node and adds the node to this graph.
   * 
-  * @param    id              the id of the node
-  * @param    county          the county the node resides in
-  * @param    district        the district the node resides in
-  * @param    total_pop       the total population of the node
-  * @param    majority_pop    the majority population of the node
-  * @param    minority_pop    the minority population of the node
-=======
   * @param    id
   * @param    county
   * @param    majority_pop
   * @param    minority_pop
->>>>>>> ae9b611a0d6e2b2ba6f91bec42949825aeadc171
   * 
-  * @return true iff adding node successful, false otherwise
+  * @return true iff adding node successful; false otherwise
   */
   bool AddNode(const uint32_t id,
                const uint32_t county,
@@ -129,7 +120,7 @@ class Graph {
   */
   bool RemoveNodeFromDistrict(uint32_t node, int district);
 
-  /*
+  /**
   * Adds the given node to the given district's set of perim nodes. Node must
   * exist in the district before addition.
   * 
@@ -158,13 +149,8 @@ class Graph {
   // Queries
   /////////////////////////////////////////////////////////////////////////////
 
-<<<<<<< HEAD
   /**
-  * TO BE REMOVED. Queries whether or not the node exists in the graph.
-=======
-  /*
   * Queries whether or not the node exists in the graph.
->>>>>>> ae9b611a0d6e2b2ba6f91bec42949825aeadc171
   * 
   * @param    node    the node to test for existence
   * 

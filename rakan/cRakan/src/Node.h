@@ -24,8 +24,6 @@ class Node {
   * 
   * @param    id              the id to identify this node as
   * @param    county          the county this node resides in
-  * @param    destrict        the district this node resides in
-  * @param    total_pop       the total population this node contains
   * @param    majority_pop    the population that is of the majority race
   * @param    minority_pop    the population that is of the minority races
   */
