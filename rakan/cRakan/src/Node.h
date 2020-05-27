@@ -19,7 +19,12 @@ class Node {
   /////////////////////////////////////////////////////////////////////////////
 
   // Default constructor.
-  Node();
+  Node(const uint32_t id,
+       const uint32_t county,
+       const uint32_t district,
+       const uint32_t total_pop,
+       const uint32_t majority_pop,
+       const uint32_t minority_pop);
 
   // Destructor.
   ~Node();
@@ -65,7 +70,7 @@ class Node {
   // Returns:
   //  - true iff the relationship is new
   //  - false otherwise
-  bool AddNeighbor(const Node& other);
+  bool AddNeighbor(const uint32_t neighbor);
 
   void SetCounty(const uint32_t county) { county_ = county; }
 

@@ -37,6 +37,7 @@ class Graph {
   * @param    num_nodes       the number of nodes on this graph, must be >= 0
   * @param    num_districts   the number of districts on this graph, must
   *                           be >= 0
+  * @param    state_pop       the population on this graph
   */
  Graph(const uint32_t num_nodes,
        const uint32_t num_districts,
@@ -54,7 +55,12 @@ class Graph {
   /*
   * Adds a node to this graph.
   * 
-  * @param    node    the node to add
+  * @param    id
+  * @param    county
+  * @param    district
+  * @param    total_pop
+  * @param    majority_pop
+  * @param    minority_pop
   * 
   * @return true iff adding node successful, false otherwise
   */
@@ -62,8 +68,8 @@ class Graph {
                const uint32_t county,
                const uint32_t district,
                const uint32_t total_pop,
-               const uint32_t minority_pop,
-               const uint32_t majority_pop);
+               const uint32_t majority_pop,
+               const uint32_t minority_pop);
 
   /*
   * Adds an edge between the two supplied nodes. If either node does not
@@ -139,7 +145,7 @@ class Graph {
   /////////////////////////////////////////////////////////////////////////////
 
   /*
-  * Queries whether or not the node exists in the graph.
+  * TO BE REMOVED. Queries whether or not the node exists in the graph.
   * 
   * @param    node    the node to test for existence
   * 
@@ -302,6 +308,11 @@ class Graph {
   // ID. The value at that index corresponds to the population in
   // that district.
   uint32_t *pop_of_district_;
+
+  // An array of majority populations. The index of the array is
+  // the district ID. The value at that index corresponds to the
+  // majority population in that district.
+  uint32_t *maj_pop_of_district_;
 
   // An array of minority populations. The index of the array is
   // the district ID. The value at that index corresponds to the
