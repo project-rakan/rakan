@@ -8,7 +8,6 @@
 
 namespace rakan {
 
-<<<<<<< Updated upstream
 // Creates a node with no neighbors
 // TEST(Test_Node, TestNodeCreation) {
 //     Node n(12345, 2);
@@ -24,28 +23,6 @@ namespace rakan {
 //     ASSERT_EQ(m.GetDistrict(), 3);
 //     ASSERT_EQ(m.GetNeighbors(), neighbors);
 // }
-=======
-// Creates a node with no neighbors and
-// adds a few neighbors
-TEST(Test_Node, TestNodeCreation) {
-    Node n(12345, 2, 3, 4);
-    ASSERT_EQ(n.GetID(), 12345);
-    ASSERT_EQ(n.GetCounty(), 2);
-    ASSERT_EQ(n.GetTotalPop(), 7);
-    ASSERT_EQ(n.GetMajorityPop(), 3);
-    ASSERT_EQ(n.GetMinorityPop(), 4);
-
-
-    n.AddNeighbor(1234);
-    n.AddNeighbor(1235);
-    n.AddNeighbor(1236);
-    unordered_set<uint32_t>* neighbors = n.GetNeighbors();
-    ASSERT_EQ(neighbors->size(), 3);
-    ASSERT_EQ(neighbors->find(1234) != neighbors->end(), true);
-    ASSERT_EQ(neighbors->find(1235) != neighbors->end(), true);
-    ASSERT_EQ(neighbors->find(1236) != neighbors->end(), true);
-}
->>>>>>> Stashed changes
 
 // // Creates a node with one neighbors
 // TEST(Test_Node, TestOneNeighbor) {
