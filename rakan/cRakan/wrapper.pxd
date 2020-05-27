@@ -24,13 +24,8 @@ cdef extern from "src/Runner.h" namespace "rakan":
         double ScoreVRA() except +;
         double LogScore() except +;
         double MetropolisHastings() except +;
-        double Redistrict(Node &node, int &new_district) except +;
-        double Walk(int &num_steps) except +;
-        cbool IsEmptyDistrict(int &district) except +;
-        cbool IsDistrictSevered(Node &proposed_node) except +;
-        cbool DoesPathExist(Node &start, Node &target) except +;
-        Graph *GetGraph() except +;
-        void SetGraph(Graph &graph) except +;
+        double Redistrict(Node &node, int new_district) except +;
+        double Walk(int num_steps) except +;
 
 cdef extern from "src/Graph.cc" namespace "rakan":
     pass

@@ -7,6 +7,8 @@ from libcpp.vector cimport vector as cvector
 from wrapper cimport Runner as cRunner
 from wrapper cimport Graph as cGraph
 
+import json
+
 cdef class Engine:
     cdef cRunner* _runner
     cdef cGraph* _graph
