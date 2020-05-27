@@ -11,4 +11,5 @@ export RABBIT_VHOST="celery"
 export RABBIT_PORT="5672"
 export RABBIT_LOCATION="localhost"
 
-export RAKAN_LOCATION="/home/project/"
+export RAKAN_LOCATION="/home/project"
+export RAKAN_STATEFILES="/var/www/html/stateinfo"
