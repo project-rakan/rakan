@@ -15,9 +15,9 @@ clean:
 	rm -rf bladecaller/bladecaller/__pycache__ rakan/__pycache__ rakan/tests/__pycache__
 
 test: build cmake
-	cd bladecaller && coverage run --source='.' manage.py test && coverage html
 	cd rakan && cp ./*.so tests/
 	cd rakan/tests && python3.7 -m unittest
+	cd bladecaller && coverage run --source='.' manage.py test && coverage html
 	cd rakan/cRakan/build && ./tst/rakan_tst 
 
 migrations: build
