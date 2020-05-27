@@ -7,9 +7,13 @@ class testAPIExist(unittest.TestCase):
 
     def test_documented_api(self):
         "Test that this class has the documented API"
-        self.assertTrue(hasattr(self.runnerClass, "addNode"))
-        self.assertTrue(hasattr(self.runnerClass, "addEdge"))
+        self.assertTrue(hasattr(self.runnerClass, "_addNode"))
+        self.assertTrue(hasattr(self.runnerClass, "_addEdge"))
         self.assertTrue(hasattr(self.runnerClass, "setDistricts"))
+        self.assertTrue(hasattr(self.runnerClass, "getMaps"))
+        self.assertTrue(hasattr(self.runnerClass, "getScores"))
+        self.assertTrue(hasattr(self.runnerClass, "seed"))
+        self.assertTrue(hasattr(self.runnerClass, "walk"))
 
 """
     def setUp(self):
