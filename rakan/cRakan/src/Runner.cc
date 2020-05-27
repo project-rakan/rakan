@@ -28,12 +28,32 @@ namespace rakan {
 // Construction / Initialization
 //////////////////////////////////////////////////////////////////////////////
 
-uint16_t Runner::SetDistricts(unordered_map<uint32_t, uint32_t> *map) {
-  for (int i = 0; i < graph_->num_nodes_; i++) {
-    graph_->nodes_[i]->district_ = (*map)[graph_->nodes_[i]->id_];
-  }
+Runner::Runner() {
+  graph_ = new Graph();
+  changes_ = new unordered_map<int, int>;
+  // each subsequent sub-vector will be initialized in the walk method.
+  walk_changes_ = new vector<vector <uint32_t> *>;
+}
 
-  return SUCCESS;
+Runner::Runner(uint32_t num_precincts, uint32_t num_districts) {
+  graph_ = new Graph(num_precincts, num_districts, 0);
+  changes_ = new unordered_map<int, int>;
+  // each subsequent sub-vector will be initialized in the walk method.
+  walk_changes_ = new vector<vector <uint32_t> *>;
+}
+
+void Runner::set_districts(vector<uint32_t>& districts) {
+  for (int i = 0; i < districts.size(); i++) {
+    graph_->nodes_[i]->district_ = districts[i];
+  }
+}
+
+vector<vector<uint32_t>&>& Runner::getMaps() {
+  vector<vector<uint32_t> &>* outer_vector = new vector<vector<uint32_t> &>;
+  for (int i = 0; i < walk_changes_->size(); i++) {
+    vector<uint32_t> inner_vector = *((*walk_changes_)[i]);
+    outer_vector->push_back(inner_vector);
+  }
 }
 
 uint16_t Runner::SeedDistricts() {
@@ -87,7 +107,7 @@ uint16_t Runner::SeedDistricts() {
   return SUCCESS;
 }
 
-uint16_t Runner::PopulateGraphData() {
+void Runner::populate() {
   unordered_map<int, unordered_set<uint32_t> *> *map;
   Node *current_node, *neighbor_node;
   uint32_t i, current_district;
@@ -95,7 +115,7 @@ uint16_t Runner::PopulateGraphData() {
   for (i = 0; i < graph_->num_nodes_; i++) {
     current_node = graph_->nodes_[i];
     current_district = current_node->district_;
-    graph_->AddNodeToDistrict(current_node, current_district);
+    graph_->AddNodeToDistrict(current_node->id_, current_district);
 
     for (auto &neighbor_id : *current_node->neighbors_) {
       neighbor_node = graph_->nodes_[neighbor_id];
@@ -116,8 +136,6 @@ uint16_t Runner::PopulateGraphData() {
       }
     }
   }
-
-  return SUCCESS;
 }
 
 

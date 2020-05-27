@@ -6,6 +6,7 @@
 #include <string>             // for std::string
 #include <unordered_map>      // for std::unordered_map
 #include <unordered_set>      // for std::unordered_set
+#include <map>                // for std::map
 
 #include "./Graph.h"          // for Graph class
 #include "./Node.h"           // for Node class
@@ -13,6 +14,7 @@
 using std::string;
 using std::unordered_set;
 using std::unordered_map;
+using std::map;
 
 namespace rakan {
 
@@ -25,22 +27,30 @@ class Runner {
   /*
   * Default constructor.
   */
-  Runner() {}
+  Runner();
 
-  void Add();
+  Runner(uint32_t num_precincts, uint32_t num_districts);
 
+  void add(uint32_t node_id, uint32_t county, uint32_t minority, uint32_t majority);
+
+  void add_edge(uint32_t node_one, uint32_t node_two);
+
+  // Returns a vector of vectors of uint32_t, where each vector
+  // represents the changes made to the graph in each step of 
+  // the walk.
+  vector<vector<uint32_t>&>& getMaps();
   /*
-  * Sets the district assignments according to the given map.
-  * Map is interpreted as storing node ID as the key and district ID
-  * as the value.
+  * Sets the district assignments according to the given vector.
+  * Vector is interpreted as the node_id corresponding to the index
+  * of the district number inside of the vector.
   * 
-  * @param    map     The map to set the current graph's districts
-  *                   to be
+  * @param    districts     a vector of uint32_t where each index of
+  *                         the vector corresponds to the node id.
   * 
   * @return SUCCESS if all assignment successful; the appropriate
   *         error code otherwise
   */
-  uint16_t SetDistricts(unordered_map<uint32_t, uint32_t> &map);
+  void set_districts(vector<uint32_t>& districts);
 
   /*
   * Generates random seeds on the current graph. Randomly selects
@@ -48,18 +58,22 @@ class Runner {
   * other nodes reachable from the seed nodes to the respective
   * district.
   * 
-  * @return SUCCESS iff all seeding and assignment successful;
-  *         SEEDING_FAILED otherwise
   */
-  uint16_t SeedDistricts();
+  void SeedDistricts();
 
   /*
   * Populates the graph's data structures.
   * 
-  * @return SUCCESS iff all populating was successful; the appropriate
-  *         error code otherwise
   */
-  uint16_t PopulateGraphData();
+  void populate();
+
+  /*
+  * returns a vector of maps representing the scoring for each of the
+  * maps generated so far in the walk.
+  */
+  vector<map<string, double>>& getScores();
+
+
 
  //////////////////////////////////////////////////////////////////////////////
  // Scoring
@@ -141,7 +155,9 @@ class Runner {
   * 
   * @return a sum of all the scores accumulated during the walk
   */
-  double Walk(int num_steps);
+  double Walk(uint32_t num_steps, double alpha, double beta, double gamma, double eta);
+
+
 
  //////////////////////////////////////////////////////////////////////////////
  // Queries
@@ -208,6 +224,10 @@ class Runner {
 
   // The number of steps to take per walk.
   int num_steps_;
+
+  // A vector containing multiple vectors of uint32_t where each vector
+  // represents the state of the map after a single step in the walk.
+  vector<vector <uint32_t> *>* walk_changes_;
 
   // Variables to keep track of the scores of the current map.
   double score_;
