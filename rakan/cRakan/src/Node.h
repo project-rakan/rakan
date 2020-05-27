@@ -50,26 +50,18 @@ class Node {
 
   uint32_t GetID() { return id_; }
 
-  unordered_set<uint32_t>* GetNeighbors() { return neighbors_; }
-
   uint32_t GetTotalPop() { return total_pop_; }
   uint32_t GetMajorityPop() { return majority_pop_; }
   uint32_t GetMinorityPop() { return minority_pop_; }
+
+
+  unordered_set<uint32_t>* GetNeighbors() { return neighbors_; }
   
   /////////////////////////////////////////////////////////////////////////////
   // Mutators
   /////////////////////////////////////////////////////////////////////////////
 
-  // Adds other node as a neighbor to this node. Also adds
-  // this node as a neighbor to the other node. The relationship
-  // is bi-directional.
-  //
-  // Arguments:
-  //  - other: the neighbor to this node
-  //
-  // Returns:
-  //  - true iff the relationship is new
-  //  - false otherwise
+  // Adds other node as a neighbor to this node.
   bool AddNeighbor(const uint32_t neighbor);
 
   void SetCounty(const uint32_t county) { county_ = county; }
@@ -101,9 +93,9 @@ class Node {
 
   uint32_t total_pop_;
 
-  uint32_t minority_pop_;
-
   uint32_t majority_pop_;
+
+  uint32_t minority_pop_;
 
   // The set of neighbors this node has.
   unordered_set<uint32_t> *neighbors_;
