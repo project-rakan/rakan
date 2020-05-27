@@ -26,3 +26,15 @@ cdef extern from "src/Runner.h" namespace "rakan":
         double Walk(uint32_t num_steps, double alpha, double beta, double gamma, double eta) except +;
         cvector[cvector[uint32_t]] getMaps() except +;
         cvector[cmap[cstring, double]] getScores() except +;
+
+cdef extern from "src/Graph.h" namespace "rakan":
+    pass
+
+cdef extern from "src/Graph.cc" namespace "rakan":
+    pass
+
+cdef extern from "src/Node.h" namespace "rakan":
+    pass
+
+cdef extern from "src/Node.cc" namespace "rakan":
+    pass
