@@ -55,6 +55,7 @@ class Graph {
   /**
   * Adds a node to this graph.
   * 
+<<<<<<< HEAD
   * @param    node      the node to add to this graph
   * 
   * @return true iff adding node successful, false otherwise
@@ -70,13 +71,17 @@ class Graph {
   * @param    total_pop       the total population of the node
   * @param    majority_pop    the majority population of the node
   * @param    minority_pop    the minority population of the node
+=======
+  * @param    id
+  * @param    county
+  * @param    majority_pop
+  * @param    minority_pop
+>>>>>>> ae9b611a0d6e2b2ba6f91bec42949825aeadc171
   * 
   * @return true iff adding node successful, false otherwise
   */
   bool AddNode(const uint32_t id,
                const uint32_t county,
-               const uint32_t district,
-               const uint32_t total_pop,
                const uint32_t majority_pop,
                const uint32_t minority_pop);
 
@@ -153,14 +158,19 @@ class Graph {
   // Queries
   /////////////////////////////////////////////////////////////////////////////
 
+<<<<<<< HEAD
   /**
   * TO BE REMOVED. Queries whether or not the node exists in the graph.
+=======
+  /*
+  * Queries whether or not the node exists in the graph.
+>>>>>>> ae9b611a0d6e2b2ba6f91bec42949825aeadc171
   * 
   * @param    node    the node to test for existence
   * 
   * @return true iff the node exists on the graph, false otherwise
   */
-  bool ContainsNode(const uint32_t node) const;
+  bool ContainsNode(const Node *node) const;
 
   /**
   * Queries whether or not an edge exists between the two nodes.

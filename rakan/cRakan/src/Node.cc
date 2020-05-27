@@ -11,13 +11,21 @@ using std::unordered_map;
 
 namespace rakan {
 
+<<<<<<< HEAD
 Node::Node(const uint32_t id,
            const uint32_t county,
            const uint32_t district,
            const uint32_t total_pop,
            const uint32_t majority_pop,
            const uint32_t minority_pop) {
+=======
+Node:: Node(const uint32_t id,
+            const uint32_t county,
+            const uint32_t majority_pop,
+            const uint32_t minority_pop) {
+>>>>>>> ae9b611a0d6e2b2ba6f91bec42949825aeadc171
   neighbors_ = new unordered_set<uint32_t>;
+  total_pop_ = majority_pop + minority_pop;
 }
 
 bool Node::operator==(const Node& other) const {
