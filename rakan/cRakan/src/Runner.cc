@@ -1,5 +1,9 @@
 #include "./Runner.h"
 
+///////////////////////////////////////////////////////////////
+#include <iostream>     // FOR DEBUGGING, REMOVE FOR PRODUCTION
+///////////////////////////////////////////////////////////////
+
 #include <math.h>               // for pow(), log(), fmin()
 #include <inttypes.h>           // for uint32_t, etc.
 #include <stdlib.h>             // for rand()
@@ -86,12 +90,13 @@ bool Runner::seed() {
   uint32_t i;
   int32_t prev_random_index, random_index;
   vector<uint32_t> random_indexes;
-  unordered_set<Node *> unused, seed_nodes;
+  unordered_set<uint32_t> unused;
+  unordered_set<Node *> seed_nodes;
   unordered_map<int, Node *> last_found;
   Node *found_node, *seed_node;
 
   for (i = 0; i < graph_->num_nodes_; i++) {
-    unused.insert(graph_->nodes_[i]);
+    unused.insert(i);
   }
 
   for (i = 0; i < graph_->num_districts_; i++) {
@@ -100,6 +105,7 @@ bool Runner::seed() {
                   random_indexes.end(),
                   random_index) == random_indexes.end()) {
       seed_node = graph_->nodes_[random_index];
+      unused.erase(random_index);
       seed_node->SetDistrict(i);
       seed_nodes.insert(seed_node);
       random_indexes.push_back(random_index);
@@ -110,7 +116,6 @@ bool Runner::seed() {
   }
 
   for (auto &node : seed_nodes) {
-    unused.erase(node);
     last_found[node->district_] = node;
   }
 
@@ -120,7 +125,7 @@ bool Runner::seed() {
       found_node = BFS(last_found[i], &unused);
       if (found_node != nullptr) {
         found_node->SetDistrict(i);
-        unused.erase(found_node);
+        unused.erase(found_node->GetID());
         last_found[i] = found_node;
         changes_->insert({found_node->id_, i});
       }
@@ -422,7 +427,7 @@ vector<map<string, double>> Runner::getScores() {
  // Helpers
  //////////////////////////////////////////////////////////////////////////////
 
-Node *Runner::BFS(Node *start, unordered_set<Node *> *set) {
+Node *Runner::BFS(Node *start, unordered_set<uint32_t> *set) {
   Node *current_node;
   unordered_set<Node *> processed;
   queue<Node *> q;
@@ -432,7 +437,7 @@ Node *Runner::BFS(Node *start, unordered_set<Node *> *set) {
     current_node = q.front();
     q.pop();
 
-    if (set->find(current_node) != set->end()) {
+    if (set->find(current_node->id_) != set->end()) {
       return current_node;
     }
 
