@@ -234,6 +234,13 @@ class Runner {
   bool DoesPathExist(Node *start, Node *target);
 
   /**
+   * Gets the graph this instance runs on.
+   * 
+   * @return a pointer to the internal graph
+   */
+  Graph *GetGraph() { return graph_; }
+
+  /**
    * Gets the list of changes of the graph on every step of the walk. The
    * changes are represented as a vector of uint32_t, where each index of the
    * vector represents the precinct ID, and the value at the index represents
@@ -262,12 +269,12 @@ class Runner {
   * A helper function that implements BFS on the graph. Searches for any node
   * that exists in the given set from start.
   *
-  * @param    start     The node to start the traversal from
-  * @param    set       The set of target nodes
+  * @param    start     the node to start the traversal from
+  * @param    set       the set of target nodes
   *
   * @return the pointer to the first node found in set; nullptr if not found
   */
-  Node *BFS(Node *start, unordered_set<Node *> *set);
+  Node *BFS(Node *start, unordered_set<uint32_t> *set);
 
 
  private:
