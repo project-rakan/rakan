@@ -27,14 +27,7 @@ class Runner {
   */
   Runner() {}
 
-  /*
-  * Constructs a Runner instance with the given graph.
-  * 
-  * @param    g    The graph this Runner will perform on
-  */
-  Runner(Graph *g)
-      : num_steps_(0),
-        changes_(new unordered_map<int, int>) {}
+  void Add();
 
   /*
   * Sets the district assignments according to the given map.
@@ -47,7 +40,7 @@ class Runner {
   * @return SUCCESS if all assignment successful; the appropriate
   *         error code otherwise
   */
-  uint16_t SetDistricts(unordered_map<uint32_t, uint32_t> *map);
+  uint16_t SetDistricts(unordered_map<uint32_t, uint32_t> &map);
 
   /*
   * Generates random seeds on the current graph. Randomly selects
@@ -203,19 +196,6 @@ class Runner {
   */
   Node *BFS(Node *start, unordered_set<Node *> *set);
 
-  /*
-  * Returns the graph loaded by this Runner.
-  * 
-  * @return the pointer pointing to this graph
-  */
-  Graph *GetGraph() { return graph_; }
-
-  /*
-  * Sets the internal graph to be the given graph.
-  * 
-  * @param    graph   The graph to set the internal graph to
-  */
-  void SetGraph(Graph *graph) { graph_ = graph; }
 
  private:
   // The graph that is loaded and evaluated by this Runner.
