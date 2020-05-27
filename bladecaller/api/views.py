@@ -156,7 +156,7 @@ def startMapJob(request):
     steps = request.data.get('steps')
 
     # Check jobId is not in use
-    if models.objects.filter(jobId=jobId):
+    if models.Job.objects.filter(jobId=jobId):
         return Response({'msg': 'jobId in use, please use a new one', 'id': jobId}, status=status.HTTP_400_BAD_REQUEST)
 
     # Check state is there
