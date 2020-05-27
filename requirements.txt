@@ -5,6 +5,7 @@ billiard==3.6.3.0
 celery==4.4.2
 cffi==1.14.0
 click==7.1.2
+coverage==5.1
 cryptography==2.3
 Cython==0.29.18
 Django==3.0.6
