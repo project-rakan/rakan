@@ -13,6 +13,9 @@ su - postgres -c "psql -c \"CREATE USER $DATABASE_USER with encrypted password '
 su - postgres -c "psql -c \"GRANT ALL PRIVILEGES ON DATABASE $DATABASE_TABLE TO $DATABASE_USER;\""
 su - postgres -c "psql -c \"ALTER USER $DATABASE_USER WITH SUPERUSER;\""
 
+# Start a build for the celery worker
+make build
+
 # Create migrations and whatnot
 cd bladecaller
 python3.7 manage.py makemigrations
@@ -26,9 +29,6 @@ service nginx start
 # Configure rabbit
 rabbitmqctl add_user $RABBIT_USER $RABBIT_PASS
 rabbitmqctl add_vhost $RABBIT_VHOST
-
-# Start a build for the celery worker
-make build
 
 # Launch celery
 cd bladecaller
