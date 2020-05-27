@@ -24,60 +24,88 @@ class Runner {
  //////////////////////////////////////////////////////////////////////////////
  // Construction / Initialization
  //////////////////////////////////////////////////////////////////////////////
-  /*
-  * Default constructor.
+
+  /**
+  * Default constructor. Used ONLY for testing.
   */
   Runner();
 
+  /**
+   * Constructs a Runner instance that will run on a graph with num_precincts
+   * number of precincts and num_districts number of districts.
+   * 
+   * @param       num_precincts   the number of precincts on the running graph
+   * @param       num_districts   the number of districts on the running graph
+   */
   Runner(uint32_t num_precincts, uint32_t num_districts);
 
-  void add_node(uint32_t node_id, uint32_t county, uint32_t minority, uint32_t majority);
+  /**
+   * Destructor.
+   */
+  ~Runner();
 
+  /**
+   * Adds a new node to the graph this Runner instance runs on.
+   * 
+   * @param   node_id               the node id of the node to add
+   * @param   county                the county the to be added node resides in
+   * @param   majority_population   the majority population in the node
+   * @param   minority_population   the minority population in the node
+   */
+  void add_node(uint32_t node_id,
+                uint32_t county,
+                uint32_t majority_population,
+                uint32_t minority_population);
+
+  /**
+   * Adds an edge from node_one to node_two and from node_two to node_one
+   * on the graph this Runner runs on.
+   * 
+   * @param       node_one      the node to add an edge from node_two to
+   * @param       node_two      the node to add an edge from node_one to
+   */
   void add_edge(uint32_t node_one, uint32_t node_two);
 
-  // Returns a vector of vectors of uint32_t, where each vector
-  // represents the changes made to the graph in each step of 
-  // the walk.
-  vector<vector<uint32_t>&>& getMaps();
-  /*
-  * Sets the district assignments according to the given vector.
-  * Vector is interpreted as the node_id corresponding to the index
-  * of the district number inside of the vector.
+  /**
+  * Sets the district assignments according to the given vector. Vector is
+  * interpreted as the node_id corresponding to the index of the district
+  * number inside of the vector.
   * 
-  * @param    districts     a vector of uint32_t where each index of
-  *                         the vector corresponds to the node id.
-  * 
+  * @param    districts     a vector of uint32_t where each index of the vector
+  *                         corresponds to the node id
   */
   void set_districts(vector<uint32_t>& districts);
 
-  /*
-  * Generates random seeds on the current graph. Randomly selects
-  * a number of nodes to be the "center" of each district and assigns
-  * other nodes reachable from the seed nodes to the respective
-  * district.
+  /**
+  * Generates random seeds on the current graph. Randomly selects a number of
+  * nodes to be the "center" of each district and assigns other nodes reachable
+  * from the seed nodes to the respective district.
   * 
+  * @return true iff seeding is successful (i.e, all precincts are reachable),
+  *         fase otherwise
   */
   bool seed();
 
-  /*
-  * Populates the graph's data structures.
+  /**
+  * Populates the graph's data structures. Prerequisites to this method depend
+  * on the job.
   * 
+  * If job is to generate a random seeding, walk on the randomly seeded graph,
+  * and return the score of the graph, `add_node()`, `add_edge`, and `seed()`
+  * must be called beforehand.
+  * 
+  * If job is to return the score of the graph without random seeding, then
+  * `add_node()`, `add_edge()`, and `set_districts()` must be called
+  * beforehand.
   */
   void populate();
-
-  /*
-  * @returns a vector of maps representing the scoring for each of the
-  * maps generated so far in the walk.
-  */
-  vector<map<string, double> &>& getScores();
-
 
 
  //////////////////////////////////////////////////////////////////////////////
  // Scoring
  //////////////////////////////////////////////////////////////////////////////
 
-  /*
+  /**
   * Scores the current graph according to the compactness function. 
   * Score is related to but unaffected by the parameter alpha.
   * 
@@ -85,7 +113,7 @@ class Runner {
   */
   double ScoreCompactness();
 
-  /*
+  /**
   * Scores the current graph according to the population distribution
   * function. Score is related to but unaffected by the parameter beta.
   * 
@@ -102,7 +130,7 @@ class Runner {
   */
   double ScoreExistingBorders();
 
-  /*
+  /**
   * Scores the current graph according to the Voter Rights Act
   * function. Score is related to but unaffected by the parameter
   * eta.
@@ -111,7 +139,7 @@ class Runner {
   */
   double ScoreVRA();
 
-  /*
+  /**
   * Logs the score of the current graph. Takes the metrics given
   * into account (e.g. alpha, beta, gamma, eta).
   * 
@@ -124,7 +152,7 @@ class Runner {
  // Algorithms
  //////////////////////////////////////////////////////////////////////////////
 
-  /*
+  /**
   * Implementation of the Metropolis-Hastings algorithm. Randomly
   * selects a precinct on the border of a district, attempts to
   * reassign that node to a neighbor district, and evaluates the
@@ -134,74 +162,100 @@ class Runner {
   */
   double MetropolisHastings();
 
-  /*
+  /**
   * Makes a redistrcting move on the given node. Removes
   * the node from its old district and into the given district.
   * 
-  * @param    node          The node to make the move on
-  * @param    new_district  The new district ID to move node into
+  * @param    node          the node to make the move on
+  * @param    new_district  the new district ID to move node into
   * 
   * @return the score of this redistricting
   */
   double Redistrict(Node *node, int new_district);
 
-  /*
+  /**
   * Walks along the graph this Runner has loaded. Implements the
   * Metropolis-Hastings algorithm on the graph a given number of times.
   * 
-  * @param    num_steps     The number of steps to take in this walk
+  * @param    num_steps     the number of steps to take in this walk
+  * @param    alpha         the weight to assign to the compactness score
+  * @param    beta          the weight to assign to the population distribution
+  *                         score
+  * @param    gamma         the weight to assign to the existing border
+  *                         respectfulness score
+  * @param    eta           the weight to assign to the VRA score
   * 
   * @return a sum of all the scores accumulated during the walk
   */
-  double Walk(uint32_t num_steps, double alpha, double beta, double gamma, double eta);
-
+  double Walk(uint32_t num_steps,
+              double alpha, double beta, double gamma, double eta);
 
 
  //////////////////////////////////////////////////////////////////////////////
  // Queries
  //////////////////////////////////////////////////////////////////////////////
 
-  /*
+  /**
   * Queries whether or not a district is empty.
   * 
-  * @param  district   The district to query
+  * @param  district   the district to query
   * 
   * @return true iff the district is empty
   */
   bool IsEmptyDistrict(int district);
 
-  /*
+  /**
   * Queries whether or not the district that the proposed node is in will be
   * severed once the proposed node is removed.
   * 
-  * @param    proposed_node   The node that will be hypothetically removed
+  * @param    proposed_node   the node that will be hypothetically removed
   *                           from its district
   * 
   * @return true iff the district will be severed
   */
   bool IsDistrictSevered(Node *proposed_node);
 
-  /*
+  /**
   * Queries whether or not a path exists between the start node and the target
   * node. Path is only valid if all nodes traversed in the path are in the
   * same district.
   *
-  * @param   start   The node to start the search at
-  * @param   target  The node to look for
+  * @param        start        the node to start the search at
+  * @param        target       the node to look for
   *
   * @return true iff a path exists between start and target and nodes traversed
   * belong in the same district
   */
   bool DoesPathExist(Node *start, Node *target);
 
+  /**
+   * Gets the list of changes of the graph on every step of the walk. The
+   * changes are represented as a vector of uint32_t, where each index of the
+   * vector represents the precinct ID, and the value at the index represents
+   * the new district ID of that precinct.
+   * 
+   * @return a vector of vector of uint32_t, representing changes at every step
+   */
+  vector<vector<uint32_t>&>& getMaps();
+
+  /**
+  * Gets the list of scores for every step of the walk. The scores consist of
+  * the total score, the compactness score, the population distribution score,
+  * the existing-border respectfulness score, and the VRA score. These are
+  * stored in a map from score name to score value.
+  * 
+  * @returns a vector of maps representing the scoring for each of the
+  *          maps generated so far in the walk.
+  */
+  vector<map<string, double> &>& getScores();
 
  //////////////////////////////////////////////////////////////////////////////
  // Helpers
  //////////////////////////////////////////////////////////////////////////////
 
-  /*
-  * A static helper function that implements BFS on the graph. Searches for
-  * any node that exists in the given set from start.
+  /**
+  * A helper function that implements BFS on the graph. Searches for any node
+  * that exists in the given set from start.
   *
   * @param    start     The node to start the traversal from
   * @param    set       The set of target nodes
@@ -225,12 +279,12 @@ class Runner {
 
   // A vector containing multiple vectors of uint32_t where each vector
   // represents the state of the map after a single step in the walk.
-  vector<vector <uint32_t> *>* walk_changes_;
+  vector<vector <uint32_t> *> *walk_changes_;
 
   // A map containing all of the scores for each of the maps generated
   // in the walk, where each index here in the outer vector corresponds
   // to the map in the same index in walk_changes_
-  vector<map <string, double> *> * scores_;
+  vector<map <string, double> *> *scores_;
 
   // Variables to keep track of the scores of the current map.
   double score_;

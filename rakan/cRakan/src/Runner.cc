@@ -29,7 +29,7 @@ namespace rakan {
 //////////////////////////////////////////////////////////////////////////////
 
 Runner::Runner() {
-  graph_ = new Graph();
+  graph_ = new Graph;
   changes_ = new unordered_map<int, int>;
   // each subsequent sub-vector will be initialized in the walk method.
   walk_changes_ = new vector<vector <uint32_t> *>;
@@ -44,14 +44,27 @@ Runner::Runner(uint32_t num_precincts, uint32_t num_districts) {
   scores_ = new vector<map <string, double> *>;
 }
 
+Runner::~Runner() {
+  if (graph_ != nullptr) {
+    delete graph_;
+  }
+  delete changes_;
+  // TODO: delete inner vectors if heap allocated
+  delete walk_changes_;
+  delete scores_;
+}
+
 void Runner::set_districts(vector<uint32_t>& districts) {
   for (int i = 0; i < districts.size(); i++) {
     graph_->nodes_[i]->district_ = districts[i];
   }
 }
 
-void Runner::add_node(uint32_t node_id, uint32_t county, uint32_t minority, uint32_t majority) {
-  graph_->AddNode(node_id, county, minority, majority);
+void Runner::add_node(uint32_t node_id,
+                      uint32_t county,
+                      uint32_t majority_population,
+                      uint32_t minority_population) {
+  graph_->AddNode(node_id, county, majority_population, minority_population);
 }
 
 void Runner::add_edge(uint32_t node_one, uint32_t node_two) {
