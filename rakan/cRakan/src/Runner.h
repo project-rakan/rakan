@@ -86,6 +86,7 @@ class Runner {
   * nodes to be the "center" of each district and assigns other nodes reachable
   * from the seed nodes to the respective district.
   * 
+<<<<<<< Updated upstream
   * @return true iff seeding is successful (i.e, all precincts are reachable);
   *         false otherwise
   */
@@ -105,6 +106,24 @@ class Runner {
   */
   void populate();
 
+=======
+  * @return true if the graph was seeded successfully, false if not.
+  */
+  bool seed();
+
+  /*
+  * Populates the graph's data structures.
+  */
+  void populate();
+
+  /*
+  * @return a vector of maps representing the scoring for each of the
+  * maps generated so far in the walk.
+  */
+  vector<map<string, double> &>& getScores();
+
+
+>>>>>>> Stashed changes
 
  //////////////////////////////////////////////////////////////////////////////
  // Scoring
