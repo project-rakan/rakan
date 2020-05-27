@@ -37,6 +37,7 @@ class Graph {
   * @param    num_nodes       the number of nodes on this graph, must be >= 0
   * @param    num_districts   the number of districts on this graph, must
   *                           be >= 0
+  * @param    state_pop       the population on this graph
   */
  Graph(const uint32_t num_nodes,
        const uint32_t num_districts,
@@ -54,22 +55,28 @@ class Graph {
   /*
   * Adds a node to this graph.
   * 
-  * @param    node    the node to add
+  * @param    id
+  * @param    county
+  * @param    majority_pop
+  * @param    minority_pop
   * 
   * @return true iff adding node successful, false otherwise
   */
-  bool AddNode(Node *node);
+  bool AddNode(const uint32_t id,
+               const uint32_t county,
+               const uint32_t majority_pop,
+               const uint32_t minority_pop);
 
   /*
   * Adds an edge between the two supplied nodes. If either node does not
-  * exist, adds nodes before adding edge.
+  * exist, adds nodes before adding edge. Assumes both nodes are on the graph.
   * 
   * @param    node1    the neighbor of node2
   * @param    node2    the neighbor of node1
   * 
   * @return true iff adding edge successful, false otherwise
   */
-  bool AddEdge(Node *node1, Node *node2);
+  bool AddEdge(uint32_t node1, uint32_t node2);
 
   /*
   * Adds to the state population.
@@ -89,7 +96,7 @@ class Graph {
   * @return true iff node does not already belong in district and addition
   *         successful, false otherwise
   */
-  bool AddNodeToDistrict(Node *node, int district);
+  bool AddNodeToDistrict(uint32_t node, int district);
 
   /*
   * Removes the given node from the given district. Node must exist in district
@@ -102,7 +109,7 @@ class Graph {
   * @return true iff node exists in district and removal successful, false
   *         otherwise
   */
-  bool RemoveNodeFromDistrict(Node *node, int district);
+  bool RemoveNodeFromDistrict(uint32_t node, int district);
 
   /*
   * Adds the given node to the given district's set of perim nodes. Node must
@@ -114,7 +121,7 @@ class Graph {
   * @return true iff node exists in district and addition to perim nodes list
   *         successful, false otherwise
   */
-  bool AddNodeToDistrictPerim(Node *node, int district);
+  bool AddNodeToDistrictPerim(uint32_t node, int district);
 
   /*
   * Removes the given node from the given district's set of perim nodes. Node
@@ -126,7 +133,7 @@ class Graph {
   * @return true iff node is a perimeter node in given district and removal
   *         successful, false otherwise
   */
-  bool RemoveNodeFromDistrictPerim(Node *node, int district);
+  bool RemoveNodeFromDistrictPerim(uint32_t node, int district);
 
 
   /////////////////////////////////////////////////////////////////////////////
@@ -140,7 +147,7 @@ class Graph {
   * 
   * @return true iff the node exists on the graph, false otherwise
   */
-  bool ContainsNode(const Node& node) const;
+  bool ContainsNode(const Node *node) const;
 
   /*
   * Queries whether or not an edge exists between the two nodes.
@@ -151,7 +158,7 @@ class Graph {
   * @return true iff the nodes exist and an edge exists between them, false
   *         otherwise
   */
-  bool ContainsEdge(const Node& node1, const Node& node2) const;
+  bool ContainsEdge(const uint32_t node1, const uint32_t node2) const;
 
   /*
   * Queries whether or not the node exists in the district.
@@ -162,7 +169,7 @@ class Graph {
   * @return true iff the node exists on the graph and is in distric, false
   *         otherwise
   */
-  bool NodeExistsInDistrict(const Node& node, uint32_t district) const;
+  bool NodeExistsInDistrict(const uint32_t node, uint32_t district) const;
 
 
   /////////////////////////////////////////////////////////////////////////////
@@ -297,6 +304,11 @@ class Graph {
   // ID. The value at that index corresponds to the population in
   // that district.
   uint32_t *pop_of_district_;
+
+  // An array of majority populations. The index of the array is
+  // the district ID. The value at that index corresponds to the
+  // majority population in that district.
+  uint32_t *maj_pop_of_district_;
 
   // An array of minority populations. The index of the array is
   // the district ID. The value at that index corresponds to the

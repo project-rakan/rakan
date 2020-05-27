@@ -11,38 +11,25 @@ using std::unordered_map;
 
 namespace rakan {
 
-Node::Node() {
+Node:: Node(const uint32_t id,
+            const uint32_t county,
+            const uint32_t majority_pop,
+            const uint32_t minority_pop) {
   neighbors_ = new unordered_set<uint32_t>;
-  demographics_ = new unordered_map<string, uint32_t>;
-}
-
-Node::Node(const uint32_t id) : id_(id) {
-  neighbors_ = new unordered_set<uint32_t>;
-  demographics_ = new unordered_map<string, uint32_t>;
-}
-
-Node::Node(const uint32_t id, const uint32_t district)
-    : id_(id), district_(district) {
-  neighbors_ = new unordered_set<uint32_t>;
-  demographics_ = new unordered_map<string, uint32_t>;
-}
-
-Node::Node(const uint32_t id,
-           const uint32_t district,
-          unordered_set<uint32_t> *neighbors)
-    : id_(id), district_(district), neighbors_(neighbors) {
-  demographics_ = new unordered_map<string, uint32_t>;
+  total_pop_ = majority_pop + minority_pop;
 }
 
 bool Node::operator==(const Node& other) const {
   return (this->id_ == other.id_ &&
+          this->county_ == other.county_ &&
           this->district_ == other.district_ &&
-          this->neighbors_ == other.neighbors_ &&
-          this->demographics_ == other.demographics_);
+          this->total_pop_ == other.total_pop_ &&
+          this->majority_pop_ == other.majority_pop_ &&
+          this->minority_pop_ == other.minority_pop_;
 }
 
-bool Node::AddNeighbor(const Node& other) {
-  this->neighbors_->insert(other.id_).second;
+bool Node::AddNeighbor(const uint32_t other) {
+  this->neighbors_->insert(other);
   return true;
 }
 
