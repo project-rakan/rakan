@@ -27,8 +27,13 @@ service nginx start
 rabbitmqctl add_user $RABBIT_USER $RABBIT_PASS
 rabbitmqctl add_vhost $RABBIT_VHOST
 
+# Start a build for the celery worker
+make build
+
 # Launch celery
+cd bladecaller
 ( celery -A bladecaller worker > $RAKAN_LOCATION/logs/celery.log ) &
+cd ..
 
 # start a shell if it's dev mode
 if [ $DEBUG_MODE = true ]; then
