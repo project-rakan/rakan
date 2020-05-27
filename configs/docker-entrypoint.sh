@@ -27,6 +27,9 @@ service nginx start
 rabbitmqctl add_user $RABBIT_USER $RABBIT_PASS
 rabbitmqctl add_vhost $RABBIT_VHOST
 
+# Launch celery
+( celery -A bladecaller worker > $RAKAN_LOCATION/logs/celery.log ) &
+
 # start a shell if it's dev mode
 if [ $DEBUG_MODE = true ]; then
     cp $RAKAN_LOCATION/bladecaller/api/tests/*.json $RAKAN_STATEFILES
@@ -35,7 +38,7 @@ else
     # run the gunicorn if it hasn't already
     cd bladecaller
     echo "Running Server..."
-    gunicorn --bind 127.0.0.1:8000 --workers 3 bladecaller.wsgi &> /home/project/logs/gunicorn.log
+    ( gunicorn --bind 127.0.0.1:8000 --workers 3 bladecaller.wsgi > $RAKAN_LOCATION/logs/gunicorn.log ) &
     cd ..
     exec $@
 fi
