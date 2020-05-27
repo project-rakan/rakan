@@ -14,6 +14,7 @@ class testAPIExist(unittest.TestCase):
         self.assertTrue(hasattr(self.runnerClass, "getScores"))
         self.assertTrue(hasattr(self.runnerClass, "seed"))
         self.assertTrue(hasattr(self.runnerClass, "walk"))
+        self.assertTrue(hasattr(self.runnerClass, "districts"))
 
 """
     def setUp(self):
