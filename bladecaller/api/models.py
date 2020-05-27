@@ -69,7 +69,7 @@ def queue_new_job(sender, **kwargs):
     # start an engine in a different process
 
     def task(job):
-        engine = engine(job.state.stateJsonLocation)
+        engine = Engine(job.state.stateJsonLocation)
         engine.walk(job.steps, job.alpha, job.beta, job.gamma, job.eta)
 
         maps = engine.getMaps()
@@ -81,7 +81,7 @@ def queue_new_job(sender, **kwargs):
                 mapContents=map_,
                 compactness=score_['compactness'],
                 vra=score_['vra'],
-                population=score_['population'],
+                distribution=score_['population'],
                 borderRespect=score_['political'],
             )
             job.generatedMaps.add(mapModel)

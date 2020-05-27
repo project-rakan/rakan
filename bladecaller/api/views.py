@@ -116,7 +116,7 @@ def scoreMap(request):
 
         probability = (
             models.GeneratedMap.objects.filter(compactness__lte=scores['compactness']) * alpha + 
-            models.GeneratedMap.objects.filter(population__lte=scores['population']) * beta + 
+            models.GeneratedMap.objects.filter(distribution__lte=scores['population']) * beta + 
             models.GeneratedMap.objects.filter(borderRespect__lte=scores['political']) * gamma + 
             models.GeneratedMap.objects.filter(vra__lte=scores['vra']) * eta
         ) / denom
@@ -136,7 +136,7 @@ def scoreMap(request):
         state=stateModel,
         mapContents=districting,
         compactness=scores['compactness'],
-        population=scores['population'],
+        distribution=scores['population'],
         borderRespect=scores['borderRespect'],
         vra=scores['vra'],
     )
@@ -235,7 +235,7 @@ def updateMapJob(request):
     # Calculate our scores
     weightedScore = (
         mapFound.compactness * job.alpha +
-        mapFound.population * job.beta +
+        mapFound.distribution * job.beta +
         mapFound.borderRespect * job.gamma +
         mapFound.vra * job.eta
     )
@@ -253,7 +253,7 @@ def updateMapJob(request):
 
         probability = (
             models.GeneratedMap.objects.filter(compactness__lte=mapFound.compactness) * alpha + 
-            models.GeneratedMap.objects.filter(population__lte=mapFound.population) * beta + 
+            models.GeneratedMap.objects.filter(distribution__lte=mapFound.distribution) * beta + 
             models.GeneratedMap.objects.filter(borderRespect__lte=mapFound.borderRespect) * gamma + 
             models.GeneratedMap.objects.filter(vra__lte=mapFound.vra) * eta
         ) / denom
