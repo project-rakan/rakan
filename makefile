@@ -9,6 +9,10 @@ cmake: rakan/cRakan
 
 clean:
 	cd rakan && rm -rf *.so  cRakan/wrapper.cpp tests/*.so build
+	cd bladecaller && rm -rf htmlcov .coverage
+	cd logs && rm -rf *.log
+	rm -rf bladecaller/api/__pycache__ bladecaller/api/tests/__pycache__ bladecaller/api/migrations/__pycache__
+	rm -rf bladecaller/bladecaller/__pycache__ rakan/__pycache__ rakan/tests/__pycache__
 
 test: build cmake
 	cd bladecaller && coverage run --source='.' manage.py test && coverage html
