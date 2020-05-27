@@ -3,9 +3,6 @@ from django.contrib.postgres.fields import ArrayField
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from multiprocessing import Process
-from rakan import Engine
-
 import os
 from bladecaller.settings import MAP_ROOT
 
@@ -65,31 +62,11 @@ class Job(models.Model):
 
 @receiver(post_save, sender=Job)
 def queue_new_job(sender, **kwargs):
+    from api import tasks # imported here to prevent circular imports
+
     job = kwargs.get('instance')
     # start an engine in a different process
 
-    def task(job):
-        engine = Engine(job.state.stateJsonLocation)
-        engine.walk(job.steps, job.alpha, job.beta, job.gamma, job.eta)
-
-        maps = engine.getMaps()
-        scores = engine.getScores()
-
-        for map_, score_ in zip(maps, scores):
-            mapModel = GeneratedMap.objects.create(
-                state=job.state,
-                mapContents=map_,
-                compactness=score_['compactness'],
-                vra=score_['vra'],
-                distribution=score_['population'],
-                borderRespect=score_['political'],
-            )
-            job.generatedMaps.add(mapModel)
-    
     if kwargs['created']:
-        process = Process(target=task, args=(job,))
-        process.start()
-        process.join()
-        job.finished = True
-        job.save()
-
+        tasks.performMetropolisHastingsWalk.delay(job.id)
+        
