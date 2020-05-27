@@ -45,8 +45,48 @@ class EngineTests(APITestCase):
         self.assertTrue('missing' in response.data['msg'].lower())
         self.assertEqual(response.data['missing_field'], 'alpha')
 
-    # def test_post_startMap_duplicate_job(self):
-    #     self.assertEqual(False, True)
+    def test_post_startMap_duplicate_job(self):
+        from api.models import Job
+        guid = '0'
+        job = Job.objects.create(jobId=guid, state=self.ex_state, steps=1, alpha=0.0, beta=0.0, gamma=0.0, eta=0.0)
+
+        response = self.client.post('/startjob', {
+            'id': guid,
+            'state': 'EX',
+            'alpha': 0,
+            'beta': 0,
+            'gamma': 0,
+            'eta': 0
+        }, format='json')
+        self.assertEqual(response.status_code, 400)
+
+    def test_post_startMap_illegal_state_job(self):
+        from api.models import Job
+        guid = '0'
+
+        response = self.client.post('/startjob', {
+            'id': guid,
+            'state': 'NOT A STATE :o',
+            'alpha': 0,
+            'beta': 0,
+            'gamma': 0,
+            'eta': 0
+        }, format='json')
+        self.assertEqual(response.status_code, 400)
+    
+    def test_post_startMap_illegal_weight(self):
+        from api.models import Job
+        guid = '0'
+
+        response = self.client.post('/startjob', {
+            'id': guid,
+            'state': 'NOT A STATE :o',
+            'alpha': 'a',
+            'beta': 0,
+            'gamma': 0,
+            'eta': 0
+        }, format='json')
+        self.assertEqual(response.status_code, 400)
 
     def test_post_startMap_fires_signal(self):
         guid = '0'
