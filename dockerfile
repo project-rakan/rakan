@@ -27,6 +27,9 @@ RUN ln -fs /usr/share/zoneinfo/America/Los_Angles /etc/localtime
 # Install additional packages for scripts
 RUN apt-get install wget unzip -y
 
+# Install rabbitmq for celery
+RUN apt-get install rabbitmq-server -y
+
 # Install nginx + Gunicorn
 RUN apt-get install nginx -y
 RUN wget https://raw.githubusercontent.com/nginx/nginx/master/conf/uwsgi_params -O /etc/nginx/uwsgi_params
@@ -36,9 +39,6 @@ RUN rm /etc/nginx/sites-enabled/default
 # Install python related components
 COPY requirements.txt /tmp/requirements.txt
 RUN python3.7 -m pip install -r /tmp/requirements.txt
-
-# Install rabbitmq for celery
-RUN apt-get install rabbitmq-server -y
 
 # Download maps from bladecaller
 ADD .gitignore /var/www/html/stateinfo/.gitignore
