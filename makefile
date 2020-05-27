@@ -11,7 +11,7 @@ clean:
 	cd rakan && rm -rf *.so  cRakan/wrapper.cpp tests/*.so build
 
 test: build cmake
-	cd bladecaller && python3.7 manage.py test
+	cd bladecaller && coverage run --source='.' manage.py test && coverage html
 	cd rakan && cp ./*.so tests/
 	cd rakan/tests && python3.7 -m unittest
 	cd rakan/cRakan/build && ./tst/rakan_tst 
@@ -21,6 +21,7 @@ migrations:
 	cd bladecaller && python3.7 manage.py migrate
 
 bladecaller-dev:
+	cd bladecaller && python3.7 manage.py test
 	cd bladecaller && python3.7 manage.py loaddata seed.json
 	cd bladecaller && python3.7 manage.py collectstatic --no-input
 	cd bladecaller && python3.7 manage.py runserver
