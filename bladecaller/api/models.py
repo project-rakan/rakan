@@ -67,6 +67,6 @@ def queue_new_job(sender, **kwargs):
     job = kwargs.get('instance')
     # start an engine in a different process
 
-    if kwargs['created']:
+    if kwargs['created'] and not job.finished:
         tasks.performMetropolisHastingsWalk.delay(job.id)
         
