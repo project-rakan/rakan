@@ -94,6 +94,15 @@ Graph::~Graph() {
 // Graph mutators
 ///////////////////////////////////////////////////////////////////////////////
 
+bool Graph::AddNode(Node *node) {
+  if (node->id_ > num_nodes_) {
+    return false;
+  }
+
+  nodes_[node->id_] = node;
+  return true;
+}
+
 bool Graph::AddNode(const uint32_t id,
                     const uint32_t county,
                     const uint32_t district,
