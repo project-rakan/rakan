@@ -47,8 +47,6 @@ class Runner {
   * @param    districts     a vector of uint32_t where each index of
   *                         the vector corresponds to the node id.
   * 
-  * @return SUCCESS if all assignment successful; the appropriate
-  *         error code otherwise
   */
   void set_districts(vector<uint32_t>& districts);
 
@@ -59,7 +57,7 @@ class Runner {
   * district.
   * 
   */
-  void SeedDistricts();
+  bool seed();
 
   /*
   * Populates the graph's data structures.
@@ -68,10 +66,10 @@ class Runner {
   void populate();
 
   /*
-  * returns a vector of maps representing the scoring for each of the
+  * @returns a vector of maps representing the scoring for each of the
   * maps generated so far in the walk.
   */
-  vector<map<string, double>>& getScores();
+  vector<map<string, double> &>& getScores();
 
 
 
@@ -228,6 +226,11 @@ class Runner {
   // A vector containing multiple vectors of uint32_t where each vector
   // represents the state of the map after a single step in the walk.
   vector<vector <uint32_t> *>* walk_changes_;
+
+  // A map containing all of the scores for each of the maps generated
+  // in the walk, where each index here in the outer vector corresponds
+  // to the map in the same index in walk_changes_
+  vector<map <string, double> *> * scores_;
 
   // Variables to keep track of the scores of the current map.
   double score_;

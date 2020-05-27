@@ -33,6 +33,7 @@ Runner::Runner() {
   changes_ = new unordered_map<int, int>;
   // each subsequent sub-vector will be initialized in the walk method.
   walk_changes_ = new vector<vector <uint32_t> *>;
+  scores_ = new vector<map <string, double> *>;
 }
 
 Runner::Runner(uint32_t num_precincts, uint32_t num_districts) {
@@ -40,6 +41,7 @@ Runner::Runner(uint32_t num_precincts, uint32_t num_districts) {
   changes_ = new unordered_map<int, int>;
   // each subsequent sub-vector will be initialized in the walk method.
   walk_changes_ = new vector<vector <uint32_t> *>;
+  scores_ = new vector<map <string, double> *>;
 }
 
 void Runner::set_districts(vector<uint32_t>& districts) {
@@ -54,9 +56,19 @@ vector<vector<uint32_t>&>& Runner::getMaps() {
     vector<uint32_t> inner_vector = *((*walk_changes_)[i]);
     outer_vector->push_back(inner_vector);
   }
+  return *outer_vector;
 }
 
-uint16_t Runner::SeedDistricts() {
+vector<map<string, double> &>& Runner::getScores() {
+  vector<map<string, double> &>* outer_vector = new vector<map<string, double> &>;
+  for (int i = 0; i < scores_->size(); i++) {
+    map<string, double> inner_map = *((*scores_)[i]);
+    outer_vector->push_back(inner_map);
+  }
+  return *outer_vector;
+}
+
+bool Runner::seed() {
   uint32_t i;
   int32_t prev_random_index, random_index;
   vector<uint32_t> random_indexes;
@@ -100,11 +112,11 @@ uint16_t Runner::SeedDistricts() {
       }
     }
     if (unused.size() == check) {
-      return SEED_FAILED;
+      return false;
     }
   }
 
-  return SUCCESS;
+  return true;
 }
 
 void Runner::populate() {
@@ -271,8 +283,8 @@ double Runner::MetropolisHastings() {
 double Runner::Redistrict(Node *node, int new_district) {
   int old_district = node->district_;
 
-  graph_->RemoveNodeFromDistrict(node, old_district);
-  graph_->RemoveNodeFromDistrictPerim(node, old_district);
+  graph_->RemoveNodeFromDistrict(node->id_, old_district);
+  graph_->RemoveNodeFromDistrictPerim(node->id_, old_district);
 
   vector<pair<int, int>>::iterator iter = graph_->perim_edges_->begin();
   vector<pair<int, int>> *new_perim_edges = new vector<pair<int, int>>;
@@ -286,8 +298,8 @@ double Runner::Redistrict(Node *node, int new_district) {
   delete graph_->perim_edges_;
   graph_->perim_edges_ = new_perim_edges;
 
-  graph_->AddNodeToDistrict(node, new_district);
-  graph_->AddNodeToDistrictPerim(node, new_district);
+  graph_->AddNodeToDistrict(node->id_, new_district);
+  graph_->AddNodeToDistrictPerim(node->id_, new_district);
 
   for (auto &neighbor_id : *node->neighbors_) {
     if (graph_->nodes_[neighbor_id]->district_ != new_district) {
@@ -298,10 +310,14 @@ double Runner::Redistrict(Node *node, int new_district) {
   return LogScore();
 }
 
-double Runner::Walk(int num_steps) {
-  int sum = 0;
+double Runner::Walk(uint32_t num_steps, double alpha, double beta, double gamma, double eta) {
+  uint32_t sum = 0;
+  alpha_ = alpha;
+  beta_ = beta;
+  gamma_ = gamma;
+  eta_ = eta;
 
-  for (int i = 0; i < num_steps; i++) {
+  for (uint32_t i = 0; i < num_steps; i++) {
     sum += MetropolisHastings();
   }
 
