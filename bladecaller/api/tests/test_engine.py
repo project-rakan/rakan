@@ -107,11 +107,3 @@ class EngineTests(APITestCase):
         job = Job.objects.create(jobId=guid, state=self.ex_state, steps=1, alpha=0.0, beta=0.0, gamma=0.0, eta=0.0)
         performMetropolisHastingsWalk(guid)
         self.assertEqual(len(GeneratedMap.objects.all()), 1)
-
-    def test_post_startMap_worker_role(self):
-        from api.models import Job, GeneratedMap, State
-        from api.tasks import performMetropolisHastingsWalk
-        guid = '0'
-        job = Job.objects.create(jobId=guid, state=self.ex_state, steps=1, alpha=0.0, beta=0.0, gamma=0.0, eta=0.0)
-        performMetropolisHastingsWalk(guid)
-        self.assertEqual(len(GeneratedMap.objects.all()), 1)
