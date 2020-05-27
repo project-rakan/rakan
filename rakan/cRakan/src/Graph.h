@@ -25,12 +25,12 @@ class Graph {
   // Constructors and destructors
   /////////////////////////////////////////////////////////////////////////////
 
-  /*
+  /**
   * Default constructor. Used ONLY for testing.
   */
   Graph() = default;
 
-  /*
+  /**
   * Supplies the number of nodes and districts on this graph. Number of nodes,
   * districts, and state population must be non-negative.
   * 
@@ -43,7 +43,7 @@ class Graph {
        const uint32_t num_districts,
        const uint32_t state_pop);
 
-  /*
+  /**
   * Default destructor. Also destructs nodes on this graph.
   */
   ~Graph();
@@ -52,22 +52,31 @@ class Graph {
   // Graph mutators
   /////////////////////////////////////////////////////////////////////////////
 
-  /*
-  * Adds a node to this graph.
+  /**
+   * Adds a node to this graph.
+   * 
+   * @param     node      the node to be added
+   * 
+   * @return true iff adding node successful; false otherwise
+   */
+  bool AddNode(Node *node);
+
+  /**
+  * Constructs a new node and adds the node to this graph.
   * 
   * @param    id
   * @param    county
   * @param    majority_pop
   * @param    minority_pop
   * 
-  * @return true iff adding node successful, false otherwise
+  * @return true iff adding node successful; false otherwise
   */
   bool AddNode(const uint32_t id,
                const uint32_t county,
                const uint32_t majority_pop,
                const uint32_t minority_pop);
 
-  /*
+  /**
   * Adds an edge between the two supplied nodes. If either node does not
   * exist, adds nodes before adding edge. Assumes both nodes are on the graph.
   * 
@@ -78,14 +87,14 @@ class Graph {
   */
   bool AddEdge(uint32_t node1, uint32_t node2);
 
-  /*
+  /**
   * Adds to the state population.
   * 
   * @param    val   the value to add to the state population
   */
   void AddStatePop(uint32_t val);
 
-  /*
+  /**
   * Adds the given node to the district. Does NOT remove node from its old
   * district. Updates the population and demographics of the district
   * accordingly.
@@ -98,7 +107,7 @@ class Graph {
   */
   bool AddNodeToDistrict(uint32_t node, int district);
 
-  /*
+  /**
   * Removes the given node from the given district. Node must exist in district
   * before removal. Updates the population and demographics of the district
   * accordingly. Node will belong to a non-existent district afterwards.
@@ -111,7 +120,7 @@ class Graph {
   */
   bool RemoveNodeFromDistrict(uint32_t node, int district);
 
-  /*
+  /**
   * Adds the given node to the given district's set of perim nodes. Node must
   * exist in the district before addition.
   * 
@@ -123,7 +132,7 @@ class Graph {
   */
   bool AddNodeToDistrictPerim(uint32_t node, int district);
 
-  /*
+  /**
   * Removes the given node from the given district's set of perim nodes. Node
   * must be on the perimeter of the district before removal.
   * 
@@ -140,7 +149,7 @@ class Graph {
   // Queries
   /////////////////////////////////////////////////////////////////////////////
 
-  /*
+  /**
   * Queries whether or not the node exists in the graph.
   * 
   * @param    node    the node to test for existence
@@ -149,7 +158,7 @@ class Graph {
   */
   bool ContainsNode(const Node *node) const;
 
-  /*
+  /**
   * Queries whether or not an edge exists between the two nodes.
   * 
   * @param    node1   the first node to test for an edge relationship
@@ -160,7 +169,7 @@ class Graph {
   */
   bool ContainsEdge(const uint32_t node1, const uint32_t node2) const;
 
-  /*
+  /**
   * Queries whether or not the node exists in the district.
   * 
   * @param    node        the node to test for existence
@@ -176,7 +185,7 @@ class Graph {
   // Accessors
   /////////////////////////////////////////////////////////////////////////////
 
-  /*
+  /**
   * Gets the node on this graph by its ID.
   * 
   * @param    id    the id of the node to get
@@ -186,21 +195,21 @@ class Graph {
   */
   Node* GetNode(const uint32_t id) const;
 
-  /*
+  /**
   * Gets the array of nodes on this graph.
   * 
   * @return the array of nodes on this graph; length is the num_nodes_ field
   */
   Node** GetNodes() const;
 
-  /*
+  /**
   * Gets the number of nodes on this graph.
   * 
   * @return the number of nodes on this graph as an unsigned 32-bit int
   */
   uint32_t GetNumNodes() const;
 
-  /*
+  /**
   * Gets the number of districts on this graph.
   * 
   * @return the number of districts on this graph as an unsigned 32-bit int
@@ -214,7 +223,7 @@ class Graph {
   */
   uint32_t GetStatePop() const;
 
-  /*
+  /**
   * Gets the set of nodes in the given district.
   * 
   * @param    district      the district to get the nodes from
@@ -224,7 +233,7 @@ class Graph {
   */
   unordered_set<int>* GetNodesInDistrict(const uint32_t district) const;
 
-  /*
+  /**
   * Gets the set of nodes on the given district's perimeter.
   * 
   * @param   district    the district to get the nodes on the perimeter from
@@ -234,7 +243,7 @@ class Graph {
   */
   unordered_set<int>* GetPerimNodes(const uint32_t district) const;
 
-  /*
+  /**
   * Gets the set of neighbors of the node. Assumes the node is on the
   * perimeter of the given district.
   * 
@@ -247,7 +256,7 @@ class Graph {
   unordered_set<uint32_t>* GetPerimNodeNeighbors(const uint32_t district,
                                                  const uint32_t node) const;
 
-  /*
+  /**
   * Gets the total population of the given district.
   * 
   * @param    district    the district to get the total population of
@@ -257,7 +266,7 @@ class Graph {
   */
   int32_t GetDistrictPop(const uint32_t district) const;
 
-  /*
+  /**
   * Gets the total minority population of the given district.
   * 
   * @param    district    the district to get the total miniroty population of
