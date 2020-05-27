@@ -11,6 +11,7 @@ clean:
 	cd rakan && rm -rf *.so  cRakan/wrapper.cpp tests/*.so build
 
 test: build cmake
+	cd bladecaller && python3.7 manage.py test
 	cd rakan && cp ./*.so tests/
 	cd rakan/tests && python3.7 -m unittest
 	cd rakan/cRakan/build && ./tst/rakan_tst 
