@@ -4,6 +4,9 @@
 # launch postgres using values in . .secrets.sh
 service postgresql start
 
+# launch rabbitmq
+rabbitmq-server -detached
+
 # insert credentials into the database if it hasn't already
 su - postgres -c "createdb $DATABASE_TABLE"
 su - postgres -c "psql -c \"CREATE USER $DATABASE_USER with encrypted password '$DATABASE_PASS'\""
@@ -20,8 +23,13 @@ cd ..
 # run nginx if it isn't running already
 service nginx start
 
+# Configure rabbit
+rabbitmqctl add_user $RABBIT_USER $RABBIT_PASS
+rabbitmqctl add_vhost $RABBIT_VHOST
+
 # start a shell if it's dev mode
 if [ $DEBUG_MODE = true ]; then
+    cp $RAKAN_LOCATION/bladecaller/api/tests/*.json $RAKAN_STATEFILES
     /bin/bash
 else
     # run the gunicorn if it hasn't already
