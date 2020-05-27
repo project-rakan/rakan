@@ -43,8 +43,7 @@ else
     # run the gunicorn if it hasn't already
     cd bladecaller
     echo "Running Server..."
-    ( gunicorn --bind 127.0.0.1:8000 --workers 3 bladecaller.wsgi > $RAKAN_LOCATION/logs/gunicorn.log ) &
+    gunicorn --bind 127.0.0.1:8000 --workers 3 bladecaller.wsgi > $RAKAN_LOCATION/logs/gunicorn.log
     cd ..
-    exec $@
 fi
 
