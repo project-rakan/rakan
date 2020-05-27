@@ -4,7 +4,7 @@ from rakan import Engine
 
 @shared_task
 def performMetropolisHastingsWalk(jobId: int):
-    job = Job.objects.get(jobId=jobId)
+    job = Job.objects.get(id=jobId)
     engine = Engine(job.state.stateJsonLocation)
     engine.walk(job.steps, job.alpha, job.beta, job.gamma, job.eta)
 
