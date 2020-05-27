@@ -20,4 +20,5 @@ from api import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('createGuid', views.createGuid),
+    path('startjob', views.startMapJob)
 ]
