@@ -1,333 +1,310 @@
-#ifndef SRC_GRAPH_H_
-#define SRC_GRAPH_H_
+#ifndef SRC_RUNNER_H_
+#define SRC_RUNNER_H_
+ 
+#include <inttypes.h>         // for uint32_t, uint16_t, etc.
 
-#include <inttypes.h>       // for uint32_t
-#include <stdio.h>          // for FILE *
+#include <string>             // for std::string
+#include <unordered_map>      // for std::unordered_map
+#include <unordered_set>      // for std::unordered_set
+#include <map>                // for std::map
 
-#include <unordered_set>    // for std::unordered_set
-#include <unordered_map>    // for std::unordered_map
-#include <utility>          // for std::pair
-#include <vector>           // for std::vector
+#include "./Graph.h"          // for Graph class
+#include "./Node.h"           // for Node class
 
-#include "./Node.h"         // for Node class
-
-using std::pair;
+using std::string;
 using std::unordered_set;
 using std::unordered_map;
-using std::vector;
+using std::map;
 
 namespace rakan {
 
-class Graph {
+class Runner {
  public:
 
-  /////////////////////////////////////////////////////////////////////////////
-  // Constructors and destructors
-  /////////////////////////////////////////////////////////////////////////////
+ //////////////////////////////////////////////////////////////////////////////
+ // Construction / Initialization
+ //////////////////////////////////////////////////////////////////////////////
 
   /**
   * Default constructor. Used ONLY for testing.
   */
-  Graph() = default;
+  Runner();
 
   /**
-  * Supplies the number of nodes and districts on this graph. Number of nodes,
-  * districts, and state population must be non-negative.
-  * 
-  * @param    num_nodes       the number of nodes on this graph, must be >= 0
-  * @param    num_districts   the number of districts on this graph, must
-  *                           be >= 0
-  * @param    state_pop       the population on this graph
-  */
- Graph(const uint32_t num_nodes,
-       const uint32_t num_districts,
-       const uint32_t state_pop);
-
-  /**
-  * Default destructor. Also destructs nodes on this graph.
-  */
-  ~Graph();
-
-  /////////////////////////////////////////////////////////////////////////////
-  // Graph mutators
-  /////////////////////////////////////////////////////////////////////////////
-
-  /**
-   * Adds a node to this graph.
+   * Constructs a Runner instance that will run on a graph with num_precincts
+   * number of precincts and num_districts number of districts.
    * 
-   * @param     node      the node to be added
-   * 
-   * @return true iff adding node successful; false otherwise
+   * @param       num_precincts   the number of precincts on the running graph
+   * @param       num_districts   the number of districts on the running graph
    */
-  bool AddNode(Node *node);
+  Runner(uint32_t num_precincts, uint32_t num_districts);
 
   /**
-  * Constructs a new node and adds the node to this graph.
-  * 
-  * @param    id
-  * @param    county
-  * @param    majority_pop
-  * @param    minority_pop
-  * 
-  * @return true iff adding node successful; false otherwise
-  */
-  bool AddNode(const uint32_t id,
-               const uint32_t county,
-               const uint32_t majority_pop,
-               const uint32_t minority_pop);
+   * Destructor.
+   */
+  ~Runner();
 
   /**
-  * Adds an edge between the two supplied nodes. If either node does not
-  * exist, adds nodes before adding edge. Assumes both nodes are on the graph.
-  * 
-  * @param    node1    the neighbor of node2
-  * @param    node2    the neighbor of node1
-  * 
-  * @return true iff adding edge successful, false otherwise
-  */
-  bool AddEdge(uint32_t node1, uint32_t node2);
+   * Adds a new node to the graph this Runner instance runs on.
+   * 
+   * @param   node_id               the node id of the node to add
+   * @param   county                the county the to be added node resides in
+   * @param   majority_population   the majority population in the node
+   * @param   minority_population   the minority population in the node
+   */
+  void add_node(uint32_t node_id,
+                uint32_t county,
+                uint32_t majority_population,
+                uint32_t minority_population);
 
   /**
-  * Adds to the state population.
-  * 
-  * @param    val   the value to add to the state population
-  */
-  void AddStatePop(uint32_t val);
+   * Adds an edge from node_one to node_two and from node_two to node_one
+   * on the graph this Runner runs on. Two nodes must be on the graph.
+   * 
+   * @param       node_one      the node to add an edge from node_two to
+   * @param       node_two      the node to add an edge from node_one to
+   * 
+   * @return true iff node_one and node_two are on the graph; false otherwise
+   */
+  bool add_edge(uint32_t node_one, uint32_t node_two);
 
   /**
-  * Adds the given node to the district. Does NOT remove node from its old
-  * district. Updates the population and demographics of the district
-  * accordingly.
+  * Sets the district assignments according to the given vector. Vector is
+  * interpreted as the node_id corresponding to the index of the district
+  * number inside of the vector. Input vector must align with the number of
+  * districts on the Runner graph.
   * 
-  * @param      node        the node to add
-  * @param      district    the district to add the node to
+  * @param    districts     a vector of uint32_t where each index of the vector
+  *                         corresponds to the node id
   * 
-  * @return true iff node does not already belong in district and addition
-  *         successful, false otherwise
+  * @return true iff the input vector is valid
   */
-  bool AddNodeToDistrict(uint32_t node, int district);
+  bool set_districts(vector<uint32_t>& districts);
 
   /**
-  * Removes the given node from the given district. Node must exist in district
-  * before removal. Updates the population and demographics of the district
-  * accordingly. Node will belong to a non-existent district afterwards.
+  * Generates random seeds on the current graph. Randomly selects a number of
+  * nodes to be the "center" of each district and assigns other nodes reachable
+  * from the seed nodes to the respective district.
   * 
-  * @param      node        the node to remove
-  * @param      district    the district to remove node from
-  * 
-  * @return true iff node exists in district and removal successful, false
-  *         otherwise
+  * @return true iff seeding is successful (i.e, all precincts are reachable);
+  *         false otherwise
   */
-  bool RemoveNodeFromDistrict(uint32_t node, int district);
+  bool seed();
 
   /**
-  * Adds the given node to the given district's set of perim nodes. Node must
-  * exist in the district before addition.
+  * Populates the graph's data structures. Prerequisites to this method depend
+  * on the job.
   * 
-  * @param      node        the perimeter node to add
-  * @param      district    the district to add the perimeter node to
+  * If job is to generate a random seeding, walk on the randomly seeded graph,
+  * and return the score of the graph, `add_node()`, `add_edge`, and `seed()`
+  * must be called beforehand.
   * 
-  * @return true iff node exists in district and addition to perim nodes list
-  *         successful, false otherwise
+  * If job is to return the score of the graph without random seeding, then
+  * `add_node()`, `add_edge()`, and `set_districts()` must be called
+  * beforehand.
   */
-  bool AddNodeToDistrictPerim(uint32_t node, int district);
+  void populate();
+
+
+ //////////////////////////////////////////////////////////////////////////////
+ // Scoring
+ //////////////////////////////////////////////////////////////////////////////
 
   /**
-  * Removes the given node from the given district's set of perim nodes. Node
-  * must be on the perimeter of the district before removal.
+  * Scores the current graph according to the compactness function. 
+  * Score is related to but unaffected by the parameter alpha.
   * 
-  * @param      node        the perimeter node to remove
-  * @param      district    the district to remove the perimeter node from
-  * 
-  * @return true iff node is a perimeter node in given district and removal
-  *         successful, false otherwise
+  * @return the compactness score of the current graph
   */
-  bool RemoveNodeFromDistrictPerim(uint32_t node, int district);
-
-
-  /////////////////////////////////////////////////////////////////////////////
-  // Queries
-  /////////////////////////////////////////////////////////////////////////////
+  double ScoreCompactness();
 
   /**
-  * Queries whether or not the node exists in the graph.
+  * Scores the current graph according to the population distribution
+  * function. Score is related to but unaffected by the parameter beta.
   * 
-  * @param    node    the node to test for existence
-  * 
-  * @return true iff the node exists on the graph, false otherwise
+  * @return the population distribution score of the current graph
   */
-  bool ContainsNode(const Node *node) const;
-
-  /**
-  * Queries whether or not an edge exists between the two nodes.
-  * 
-  * @param    node1   the first node to test for an edge relationship
-  * @param    node2   the second node to test for an edge relationship
-  * 
-  * @return true iff the nodes exist and an edge exists between them, false
-  *         otherwise
-  */
-  bool ContainsEdge(const uint32_t node1, const uint32_t node2) const;
-
-  /**
-  * Queries whether or not the node exists in the district.
-  * 
-  * @param    node        the node to test for existence
-  * @param    district    the district to test whether it contains node
-  * 
-  * @return true iff the node exists on the graph and is in distric, false
-  *         otherwise
-  */
-  bool NodeExistsInDistrict(const uint32_t node, uint32_t district) const;
-
-
-  /////////////////////////////////////////////////////////////////////////////
-  // Accessors
-  /////////////////////////////////////////////////////////////////////////////
-
-  /**
-  * Gets the node on this graph by its ID.
-  * 
-  * @param    id    the id of the node to get
-  * 
-  * @return a pointer to the node if it exists on this graph; nullptr if the
-  *         node does not exist
-  */
-  Node* GetNode(const uint32_t id) const;
-
-  /**
-  * Gets the array of nodes on this graph.
-  * 
-  * @return the array of nodes on this graph; length is the num_nodes_ field
-  */
-  Node** GetNodes() const;
-
-  /**
-  * Gets the number of nodes on this graph.
-  * 
-  * @return the number of nodes on this graph as an unsigned 32-bit int
-  */
-  uint32_t GetNumNodes() const;
-
-  /**
-  * Gets the number of districts on this graph.
-  * 
-  * @return the number of districts on this graph as an unsigned 32-bit int
-  */
-  uint32_t GetNumDistricts() const;
+  double ScorePopulationDistribution();
 
   /*
-  * Gets the state population of this graph.
+  * Scores the current graph according to how closely it resembles
+  * existing borders. Score is related to but unaffected by the
+  * parameter gamma.
   * 
-  * @return the state population of this graph as an unsigned 32-bit int
+  * @return the existing-border score of the current graph
   */
-  uint32_t GetStatePop() const;
+  double ScoreExistingBorders();
 
   /**
-  * Gets the set of nodes in the given district.
+  * Scores the current graph according to the Voter Rights Act
+  * function. Score is related to but unaffected by the parameter
+  * eta.
   * 
-  * @param    district      the district to get the nodes from
-  * 
-  * @return a pointer to the set of nodes in the district; nullptr if the
-  *         district does not exist
+  * @return the VRA score of the current graph
   */
-  unordered_set<int>* GetNodesInDistrict(const uint32_t district) const;
+  double ScoreVRA();
 
   /**
-  * Gets the set of nodes on the given district's perimeter.
+  * Logs the score of the current graph. Takes the metrics given
+  * into account (e.g. alpha, beta, gamma, eta).
   * 
-  * @param   district    the district to get the nodes on the perimeter from
-  * 
-  * @return a pointer to the set of nodes on the district perimeter; nullptr
-  *         if the district does not exist
+  * @return the score of the current graph
   */
-  unordered_set<int>* GetPerimNodes(const uint32_t district) const;
+  double LogScore();
+
+
+ //////////////////////////////////////////////////////////////////////////////
+ // Algorithms
+ //////////////////////////////////////////////////////////////////////////////
 
   /**
-  * Gets the set of neighbors of the node. Assumes the node is on the
-  * perimeter of the given district.
+  * Implementation of the Metropolis-Hastings algorithm. Randomly
+  * selects a precinct on the border of a district, attempts to
+  * reassign that node to a neighbor district, and evaluates the
+  * score of that redistricting.
   * 
-  * @param    district    the district that the perim_node resides in
-  * @param    node        the node to get the neighbors of
-  * 
-  * @return a pointer to the set of neighbor nodes of perim_node; nullptr
-  *         if either the district or node does not exist
+  * @return the score of the random redistricting
   */
-  unordered_set<uint32_t>* GetPerimNodeNeighbors(const uint32_t district,
-                                                 const uint32_t node) const;
+  double MetropolisHastings();
 
   /**
-  * Gets the total population of the given district.
+  * Makes a redistrcting move on the given node. Removes
+  * the node from its old district and into the given district.
   * 
-  * @param    district    the district to get the total population of
+  * @param    node          the node to make the move on
+  * @param    new_district  the new district ID to move node into
   * 
-  * @return the total population of the given district; -1 if the district
-  *         does not exist
+  * @return the score of this redistricting
   */
-  int32_t GetDistrictPop(const uint32_t district) const;
+  double Redistrict(Node *node, int new_district);
 
   /**
-  * Gets the total minority population of the given district.
+  * Walks along the graph this Runner has loaded. Implements the
+  * Metropolis-Hastings algorithm on the graph a given number of times.
   * 
-  * @param    district    the district to get the total miniroty population of
+  * @param    num_steps     the number of steps to take in this walk
+  * @param    alpha         the weight to assign to the compactness score
+  * @param    beta          the weight to assign to the population distribution
+  *                         score
+  * @param    gamma         the weight to assign to the existing border
+  *                         respectfulness score
+  * @param    eta           the weight to assign to the VRA score
   * 
-  * @return the total minority population of the given district; -1 if the
-  *         district does not exist
+  * @return a sum of all the scores accumulated during the walk
   */
-  int32_t GetMinorityPop(const uint32_t district) const;
+  double Walk(uint32_t num_steps,
+              double alpha, double beta, double gamma, double eta);
+
+
+ //////////////////////////////////////////////////////////////////////////////
+ // Queries
+ //////////////////////////////////////////////////////////////////////////////
+
+  /**
+  * Queries whether or not a district is empty.
+  * 
+  * @param  district   the district to query
+  * 
+  * @return true iff the district is empty
+  */
+  bool IsEmptyDistrict(int district);
+
+  /**
+  * Queries whether or not the district that the proposed node is in will be
+  * severed once the proposed node is removed.
+  * 
+  * @param    proposed_node   the node that will be hypothetically removed
+  *                           from its district
+  * 
+  * @return true iff the district will be severed
+  */
+  bool IsDistrictSevered(Node *proposed_node);
+
+  /**
+  * Queries whether or not a path exists between the start node and the target
+  * node. Path is only valid if all nodes traversed in the path are in the
+  * same district.
+  *
+  * @param        start        the node to start the search at
+  * @param        target       the node to look for
+  *
+  * @return true iff a path exists between start and target and nodes traversed
+  * belong in the same district
+  */
+  bool DoesPathExist(Node *start, Node *target);
+
+  /**
+   * Gets the list of changes of the graph on every step of the walk. The
+   * changes are represented as a vector of uint32_t, where each index of the
+   * vector represents the precinct ID, and the value at the index represents
+   * the new district ID of that precinct.
+   * 
+   * @return a vector of vector of uint32_t, representing changes at every step
+   */
+  vector<vector<uint32_t>> getMaps();
+
+  /**
+  * Gets the list of scores for every step of the walk. The scores consist of
+  * the total score, the compactness score, the population distribution score,
+  * the existing-border respectfulness score, and the VRA score. These are
+  * stored in a map from score name to score value.
+  * 
+  * @returns a vector of maps representing the scoring for each of the
+  *          maps generated so far in the walk.
+  */
+  vector<map<string, double>> getScores();
+
+ //////////////////////////////////////////////////////////////////////////////
+ // Helpers
+ //////////////////////////////////////////////////////////////////////////////
+
+  /**
+  * A helper function that implements BFS on the graph. Searches for any node
+  * that exists in the given set from start.
+  *
+  * @param    start     The node to start the traversal from
+  * @param    set       The set of target nodes
+  *
+  * @return the pointer to the first node found in set; nullptr if not found
+  */
+  Node *BFS(Node *start, unordered_set<Node *> *set);
+
 
  private:
-  // The number of nodes on this graph.
-  uint32_t num_nodes_;
+  // The graph that is loaded and evaluated by this Runner.
+  Graph *graph_;
 
-  // The number of districts on this graph.
-  uint32_t num_districts_;
+  // A map of the changes that have been made since the last walk.
+  // Maps from a node ID to a district ID and assumes that this change
+  // is new.
+  unordered_map<int, int> *changes_;
 
-  // The total state population of this graph.
-  uint32_t state_pop_;
+  // The number of steps to take per walk.
+  int num_steps_;
 
-  // An array of all the nodes on this graph. The index of the array is
-  // the node ID.
-  Node **nodes_;
+  // A vector containing multiple vectors of uint32_t where each vector
+  // represents the state of the map after a single step in the walk.
+  vector<vector <uint32_t> *> *walk_changes_;
 
-  // An array of pointers to sets. The index of the array
-  // is the district ID, and the pointer at the index points
-  // to a set of nodes in that district.
-  unordered_set<int> **nodes_in_district_;
+  // A map containing all of the scores for each of the maps generated
+  // in the walk, where each index here in the outer vector corresponds
+  // to the map in the same index in walk_changes_
+  vector<map <string, double> *> *scores_;
 
-  // An array of pointers to sets. The index of the array
-  // is the district ID, and the pointer at the index points
-  // to a set of nodes on the perimeter of that district.
-  unordered_set<int> **nodes_on_perim_;
+  // Variables to keep track of the scores of the current map.
+  double score_;
+  double compactness_score_;
+  double distribution_score_;
+  double border_score_;
+  double vra_score_;
 
-  vector<pair<int, int>> *perim_edges_;
-
-  // An array of maps. The index of the map is the district
-  // ID. Each district map stores node IDs as keys, and each
-  // node must be on the perimeter of the district. Corresponding
-  // to each key contains a set of node IDs that are neighbors
-  // to the perimeter node.
-  unordered_map<int, unordered_set<uint32_t> *> **perim_nodes_to_neighbors_;
-
-  // An array of populations. The index of the array is the district
-  // ID. The value at that index corresponds to the population in
-  // that district.
-  uint32_t *pop_of_district_;
-
-  // An array of majority populations. The index of the array is
-  // the district ID. The value at that index corresponds to the
-  // majority population in that district.
-  uint32_t *maj_pop_of_district_;
-
-  // An array of minority populations. The index of the array is
-  // the district ID. The value at that index corresponds to the
-  // minority population in that district.
-  uint32_t *min_pop_of_district_;
-
-  // Needed for populating data structures in graph from file.
-  friend class Runner;
-};        // class Graph
+  // Weights of scoring metrics.
+  double alpha_;
+  double beta_;
+  double gamma_;
+  double eta_;
+};        // class Runner
 
 }         // namespace rakan
 
-#endif    // SRC_GRAPH_H_
+#endif    // SRC_RUNNER_H_
