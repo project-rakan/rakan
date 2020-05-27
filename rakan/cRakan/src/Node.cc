@@ -13,11 +13,10 @@ namespace rakan {
 
 Node:: Node(const uint32_t id,
             const uint32_t county,
-            const uint32_t district,
-            const uint32_t total_pop,
             const uint32_t majority_pop,
             const uint32_t minority_pop) {
   neighbors_ = new unordered_set<uint32_t>;
+  total_pop_ = majority_pop + minority_pop;
 }
 
 bool Node::operator==(const Node& other) const {

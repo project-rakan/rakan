@@ -96,16 +96,13 @@ Graph::~Graph() {
 
 bool Graph::AddNode(const uint32_t id,
                     const uint32_t county,
-                    const uint32_t district,
-                    const uint32_t total_pop,
                     const uint32_t majority_pop,
                     const uint32_t minority_pop) {
   if (id > num_nodes_) {
     return false;
   }
 
-  nodes_[id] = new Node(id, county, district,
-                        total_pop, majority_pop, minority_pop);
+  nodes_[id] = new Node(id, county, majority_pop, minority_pop);
   return true;
 }
 

@@ -50,6 +50,14 @@ void Runner::set_districts(vector<uint32_t>& districts) {
   }
 }
 
+void Runner::add_node(uint32_t node_id, uint32_t county, uint32_t minority, uint32_t majority) {
+  graph_->AddNode(node_id, county, minority, majority);
+}
+
+void Runner::add_edge(uint32_t node_one, uint32_t node_two) {
+  graph_->AddEdge(node_one, node_two);
+}
+
 vector<vector<uint32_t>&>& Runner::getMaps() {
   vector<vector<uint32_t> &>* outer_vector = new vector<vector<uint32_t> &>;
   for (int i = 0; i < walk_changes_->size(); i++) {

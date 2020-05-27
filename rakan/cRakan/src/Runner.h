@@ -31,7 +31,7 @@ class Runner {
 
   Runner(uint32_t num_precincts, uint32_t num_districts);
 
-  void add(uint32_t node_id, uint32_t county, uint32_t minority, uint32_t majority);
+  void add_node(uint32_t node_id, uint32_t county, uint32_t minority, uint32_t majority);
 
   void add_edge(uint32_t node_one, uint32_t node_two);
 
