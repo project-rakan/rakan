@@ -15,6 +15,7 @@ class testAPIExist(unittest.TestCase):
         self.assertTrue(hasattr(self.runnerClass, "seed"))
         self.assertTrue(hasattr(self.runnerClass, "walk"))
         self.assertTrue(hasattr(self.runnerClass, "districts"))
+        self.assertTrue(hasattr(self.runnerClass, "visualize"))
 
 """
     def setUp(self):
