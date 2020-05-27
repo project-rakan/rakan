@@ -21,7 +21,6 @@ Node::Node(const uint32_t id,
   
   neighbors_ = new unordered_set<uint32_t>;
   total_pop_ = majority_pop + minority_pop;
-  total_pop_ = minority_pop + majority_pop;
 }
 
 Node::~Node() {
