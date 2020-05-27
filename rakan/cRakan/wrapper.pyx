@@ -3,6 +3,7 @@
 from cython.operator import dereference, preincrement, address
 
 from libcpp.vector cimport vector as cvector
+from libcpp.string cimport string as cstring
 
 from wrapper cimport Runner as cRunner
 
@@ -12,11 +13,14 @@ cdef class Engine:
     cdef cRunner* _runner
     cpdef int _districts
     cpdef int _precincts
+    cpdef cstring _filepath;
 
     def __cinit__(self, jsonLocation):
+        "Create an new engine with the initialization data in the jsonLocation"
+
         print('mock init')
         # self._runner = new cRunner()
-        "Create an new engine with the initialization data in the jsonLocation"
+        
         with open(jsonLocation) as json_file:
             data = json.load(json_file)
 
@@ -53,5 +57,10 @@ cdef class Engine:
     @property
     def districts(self):
         return self._districts[:]
+
+    def visualize(self, output = "output.jpg"):
+        "Creates an image with the file name output"
+        raise Exception("Not implemented")
+
 
 # dereference(self._runner)
