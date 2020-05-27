@@ -20,11 +20,11 @@ test: build cmake
 	cd rakan/tests && python3.7 -m unittest
 	cd rakan/cRakan/build && ./tst/rakan_tst 
 
-migrations:
+migrations: build
 	cd bladecaller && python3.7 manage.py makemigrations
 	cd bladecaller && python3.7 manage.py migrate
 
-bladecaller-dev:
+bladecaller-dev: build
 	cd bladecaller && python3.7 manage.py test
 	cd bladecaller && python3.7 manage.py loaddata seed.json
 	cd bladecaller && python3.7 manage.py collectstatic --no-input
