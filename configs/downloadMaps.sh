@@ -1,3 +1,7 @@
+# Example
+touch /var/www/html/stateinfo/EX.districts.json
+touch /var/www/html/stateinfo/EX.json
+
 # Iowa
 
 wget https://github.com/project-rakan/bladecaller/blob/master/output/iowa/iowa.districts.json?raw=true -O /var/www/html/stateinfo/IA.districts.json
