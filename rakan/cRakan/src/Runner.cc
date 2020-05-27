@@ -1,5 +1,9 @@
 #include "./Runner.h"
 
+///////////////////////////////////////////////////////////////
+#include <iostream>     // FOR DEBUGGING, REMOVE FOR PRODUCTION
+///////////////////////////////////////////////////////////////
+
 #include <math.h>               // for pow(), log(), fmin()
 #include <inttypes.h>           // for uint32_t, etc.
 #include <stdlib.h>             // for rand()
@@ -438,6 +442,7 @@ Node *Runner::BFS(Node *start, unordered_set<Node *> *set) {
 
     processed.insert(current_node);
     for (auto neighbor : *current_node->GetNeighbors()) {
+      std::cout << "neighbor = " << neighbor << std::endl;
       if (std::find(processed.begin(),
                     processed.end(),
                     graph_->GetNode(neighbor)) == processed.end()) {
