@@ -59,30 +59,35 @@ class Runner {
 
   /**
    * Adds an edge from node_one to node_two and from node_two to node_one
-   * on the graph this Runner runs on.
+   * on the graph this Runner runs on. Two nodes must be on the graph.
    * 
    * @param       node_one      the node to add an edge from node_two to
    * @param       node_two      the node to add an edge from node_one to
+   * 
+   * @return true iff node_one and node_two are on the graph; false otherwise
    */
-  void add_edge(uint32_t node_one, uint32_t node_two);
+  bool add_edge(uint32_t node_one, uint32_t node_two);
 
   /**
   * Sets the district assignments according to the given vector. Vector is
   * interpreted as the node_id corresponding to the index of the district
-  * number inside of the vector.
+  * number inside of the vector. Input vector must align with the number of
+  * districts on the Runner graph.
   * 
   * @param    districts     a vector of uint32_t where each index of the vector
   *                         corresponds to the node id
+  * 
+  * @return true iff the input vector is valid
   */
-  void set_districts(vector<uint32_t>& districts);
+  bool set_districts(vector<uint32_t>& districts);
 
   /**
   * Generates random seeds on the current graph. Randomly selects a number of
   * nodes to be the "center" of each district and assigns other nodes reachable
   * from the seed nodes to the respective district.
   * 
-  * @return true iff seeding is successful (i.e, all precincts are reachable),
-  *         fase otherwise
+  * @return true iff seeding is successful (i.e, all precincts are reachable);
+  *         false otherwise
   */
   bool seed();
 
@@ -236,7 +241,7 @@ class Runner {
    * 
    * @return a vector of vector of uint32_t, representing changes at every step
    */
-  vector<vector<uint32_t>&>& getMaps();
+  vector<vector<uint32_t>> getMaps();
 
   /**
   * Gets the list of scores for every step of the walk. The scores consist of
@@ -247,7 +252,7 @@ class Runner {
   * @returns a vector of maps representing the scoring for each of the
   *          maps generated so far in the walk.
   */
-  vector<map<string, double> &>& getScores();
+  vector<map<string, double>> getScores();
 
  //////////////////////////////////////////////////////////////////////////////
  // Helpers

@@ -54,12 +54,6 @@ Runner::~Runner() {
   delete scores_;
 }
 
-void Runner::set_districts(vector<uint32_t>& districts) {
-  for (int i = 0; i < districts.size(); i++) {
-    graph_->nodes_[i]->district_ = districts[i];
-  }
-}
-
 void Runner::add_node(uint32_t node_id,
                       uint32_t county,
                       uint32_t majority_population,
@@ -67,26 +61,25 @@ void Runner::add_node(uint32_t node_id,
   graph_->AddNode(node_id, county, majority_population, minority_population);
 }
 
-void Runner::add_edge(uint32_t node_one, uint32_t node_two) {
-  graph_->AddEdge(node_one, node_two);
+bool Runner::add_edge(uint32_t node_one, uint32_t node_two) {
+  if (graph_->ContainsNode(graph_->GetNode(node_one)) && 
+      graph_->ContainsNode(graph_->GetNode(node_two))) {
+      graph_->AddEdge(node_one, node_two);
+      return true;
+  }
+  return false;
 }
 
-vector<vector<uint32_t>&>& Runner::getMaps() {
-  vector<vector<uint32_t> &>* outer_vector = new vector<vector<uint32_t> &>;
-  for (int i = 0; i < walk_changes_->size(); i++) {
-    vector<uint32_t> inner_vector = *((*walk_changes_)[i]);
-    outer_vector->push_back(inner_vector);
+bool Runner::set_districts(vector<uint32_t>& districts) {
+  if (districts.size() != graph_->GetNumDistricts()) {
+    return false;
   }
-  return *outer_vector;
-}
 
-vector<map<string, double> &>& Runner::getScores() {
-  vector<map<string, double> &>* outer_vector = new vector<map<string, double> &>;
-  for (int i = 0; i < scores_->size(); i++) {
-    map<string, double> inner_map = *((*scores_)[i]);
-    outer_vector->push_back(inner_map);
+  for (int i = 0; i < districts.size(); i++) {
+    graph_->nodes_[i]->district_ = districts[i];
   }
-  return *outer_vector;
+
+  return true;
 }
 
 bool Runner::seed() {
@@ -404,6 +397,24 @@ bool Runner::DoesPathExist(Node *start, Node *target) {
   }
 
   return false;
+}
+
+vector<vector<uint32_t>> Runner::getMaps() {
+  vector<vector<uint32_t>> outer_vector;
+  for (int i = 0; i < walk_changes_->size(); i++) {
+    vector<uint32_t> inner_vector = *((*walk_changes_)[i]);
+    outer_vector.push_back(inner_vector);
+  }
+  return outer_vector;
+}
+
+vector<map<string, double>> Runner::getScores() {
+  vector<map<string, double>> outer_vector;
+  for (int i = 0; i < scores_->size(); i++) {
+    map<string, double> inner_map = *((*scores_)[i]);
+    outer_vector.push_back(inner_map);
+  }
+  return outer_vector;
 }
 
 

@@ -141,13 +141,13 @@ class Graph {
   /////////////////////////////////////////////////////////////////////////////
 
   /*
-  * TO BE REMOVED. Queries whether or not the node exists in the graph.
+  * Queries whether or not the node exists in the graph.
   * 
   * @param    node    the node to test for existence
   * 
   * @return true iff the node exists on the graph, false otherwise
   */
-  bool ContainsNode(const uint32_t node) const;
+  bool ContainsNode(const Node *node) const;
 
   /*
   * Queries whether or not an edge exists between the two nodes.

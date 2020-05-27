@@ -182,6 +182,10 @@ bool Graph::RemoveNodeFromDistrictPerim(uint32_t node_id, int district) {
 // Queries
 ///////////////////////////////////////////////////////////////////////////////
 
+bool Graph::ContainsNode(const Node *node) const {
+  return (nodes_[node->id_] == node);
+}
+
 bool Graph::ContainsEdge(const uint32_t node1_id,
                          const uint32_t node2_id) const {
   Node *node1 = nodes_[node1_id];
