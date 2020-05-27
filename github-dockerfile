@@ -41,6 +41,9 @@ RUN python3.7 -m pip install -r /tmp/requirements.txt
 
 WORKDIR "/home/project"
 
+# Create the directory for statemaps
+ADD .gitignore /var/www/html/stateinfo/.gitignore
+
 COPY . .
 
 RUN touch "a.YOU ARE NOT MOUNTING YOUR DEVELOPMENT DRIVE.YOU ARE IN PRODUCTION MODE"
