@@ -37,6 +37,9 @@ RUN rm /etc/nginx/sites-enabled/default
 COPY requirements.txt /tmp/requirements.txt
 RUN python3.7 -m pip install -r /tmp/requirements.txt
 
+# Install rabbitmq for celery
+RUN apt-get install rabbitmq-server -y
+
 # Download maps from bladecaller
 ADD .gitignore /var/www/html/stateinfo/.gitignore
 COPY configs/downloadMaps.sh /tmp/downloadMaps.sh

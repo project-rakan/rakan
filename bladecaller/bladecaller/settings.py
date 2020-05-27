@@ -52,6 +52,7 @@ INSTALLED_APPS = [
 ] + [
     # Django plugins
     'rest_framework',
+    'django_celery_results',
 ] + [
     # My apps
     'api',
@@ -151,3 +152,14 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 50
 }
+
+# Django + Celery
+# https://docs.celeryproject.org/en/latest/django/first-steps-with-django.html
+
+CELERY_CACHE_BACKEND = 'django-cache'
+BROKER_URL = (
+    f'amqp://{os.getenv("RABBIT_USER", "guest")}'
+    f':{os.getenv("RABBIT_PASS", "guest")}@'
+    f'{os.getenv("RABBIT_LOCATION", "localhost")}:'
+    f'{os.getenv("RABBIT_PORT", "5672")}/{os.getenv("RABBIT_VHOST", "celery")}'
+)

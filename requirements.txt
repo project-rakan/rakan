@@ -1,10 +1,14 @@
+amqp==2.5.2
 asgiref==3.2.7
 asn1crypto==0.24.0
+billiard==3.6.3.0
+celery==4.4.2
 cffi==1.14.0
 click==7.1.2
 cryptography==2.3
 Cython==0.29.18
 Django==3.0.6
+django-celery-results==1.2.1
 djangorestframework==3.11.0
 future==0.18.2
 gunicorn==20.0.4
@@ -14,6 +18,7 @@ Jinja2==2.11.2
 joblib==0.15.1
 keyring==10.6.0
 keyrings.alt==3.0
+kombu==4.6.8
 livereload==2.6.1
 lunr==0.5.8
 Markdown==3.2.2
@@ -39,4 +44,5 @@ sqlparse==0.3.1
 tornado==6.0.4
 tqdm==4.46.0
 unattended-upgrades==0.1
+vine==1.3.0
 zipp==3.1.0
