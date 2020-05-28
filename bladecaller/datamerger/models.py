@@ -24,6 +24,7 @@ class TractBlock(models.Model):
     state = models.ForeignKey(State, on_delete=models.CASCADE)
     geometry = gis_models.GeometryField()
 
+    geoid = models.CharField(max_length=256, unique=True)
     name = models.CharField(max_length=256)
 
     land = models.FloatField()
