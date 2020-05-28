@@ -19,23 +19,25 @@ cdef class Engine:
         "Create an new engine with the initialization data in the jsonLocation"
 
         print('mock init')
-        # self._runner = new cRunner()
         
         with open(jsonLocation) as json_file:
             data = json.load(json_file)
 
-        self._districts = data['numNodes']
-        self._precincts = data['numDistricts']
+        self._districts = data['maxDistricts']
+        self._precincts = len(data['precincts'])
+
+        self._runner = new cRunner(self._precincts, self._districts)
 
     def __dealloc__(self):
         del self._runner
 
     def _addNode(self, int id, int county, int minorityPopulation, int majorityPoplation):
-        print('mock addNode')
-        print(id, county, minorityPopulation, majorityPoplation)
+        dereference(self._runner).add_node(id, county, minorityPopulation, majorityPoplation)
+        
 
     def _addEdge(self, int id1, int id2):
-        print('mock addEdge')
+        if not dereference(self._runner).add_edge(id1, id2):
+            raise Exception()
 
     def setDistricts(self, cvector[int] districts):
         print('mock setDistricts')
@@ -56,7 +58,14 @@ cdef class Engine:
 
     @property
     def districts(self):
-        return self._districts[:]
+        graph = dereference(self._runner).GetGraph()
+
+        districts = []
+        for node_id in range(self._precincts):
+            district = dereference(graph.GetNode(node_id)).GetDistrict()
+            districts.append(district)
+
+        return districts
 
     def visualize(self, output = "output.jpg"):
         "Creates an image with the file name output"
