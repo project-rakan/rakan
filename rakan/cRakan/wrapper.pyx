@@ -19,7 +19,7 @@ cdef class Engine:
     def __cinit__(self, jsonLocation):
         "Create an new engine with the initialization data in the jsonLocation"
 
-        print('mock init')
+        print('initializing')
         
         with open(jsonLocation) as json_file:
             data = json.load(json_file)
@@ -27,17 +27,26 @@ cdef class Engine:
         self._districts = data['numDistricts']
         self._precincts = data['numPrecincts']
 
+        print('loading: ' + jsonLocation)
+        print('state: ' + data['stCode'])
+        print('number of districts: ' + str(data['numDistricts']))
+        print('number of precincts: ' + str(data['numPrecincts']))
+
         self._runner = new cRunner(self._precincts, self._districts)
         
+        print('adding nodes')
         # first pass to add all nodes
         for prec in data['precincts']:
+            print(prec['precID'])
             self._addNode(prec['precID'], prec['county'], prec['minPopulation'], prec['majPopulation'])
         
         #second pass to add all edges
+        print('adding edges')
         edgesFrom = set()
         for prec in data['precincts']:
             for neighbor in prec['neighbors']:
                 if neighbor not in edgesFrom:
+                    print(str(prec['precID']) + ' <--> ' + str(neighbor))
                     self._addEdge(prec['precID'], neighbor)
                 
             edgesFrom.add(prec['precID'])

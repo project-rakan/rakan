@@ -3,19 +3,22 @@ import unittest
 class testAPIExist(unittest.TestCase):
     def setUp(self):
         from rakan import Engine
-        self.runnerClass = Engine
+        self.engineClass = Engine
 
     def test_documented_api(self):
         "Test that this class has the documented API"
-        self.assertTrue(hasattr(self.runnerClass, "_addNode"))
-        self.assertTrue(hasattr(self.runnerClass, "_addEdge"))
-        self.assertTrue(hasattr(self.runnerClass, "setDistricts"))
-        self.assertTrue(hasattr(self.runnerClass, "getMaps"))
-        self.assertTrue(hasattr(self.runnerClass, "getScores"))
-        self.assertTrue(hasattr(self.runnerClass, "seed"))
-        self.assertTrue(hasattr(self.runnerClass, "walk"))
-        self.assertTrue(hasattr(self.runnerClass, "districts"))
-        self.assertTrue(hasattr(self.runnerClass, "visualize"))
+        self.assertTrue(hasattr(self.engineClass, "_addNode"))
+        self.assertTrue(hasattr(self.engineClass, "_addEdge"))
+        self.assertTrue(hasattr(self.engineClass, "setDistricts"))
+        self.assertTrue(hasattr(self.engineClass, "getMaps"))
+        self.assertTrue(hasattr(self.engineClass, "getScores"))
+        self.assertTrue(hasattr(self.engineClass, "seed"))
+        self.assertTrue(hasattr(self.engineClass, "walk"))
+        self.assertTrue(hasattr(self.engineClass, "districts"))
+        self.assertTrue(hasattr(self.engineClass, "visualize"))
+
+    def test_initialize_from_json(self):
+        engine = self.engineClass("./testData/iowa.runner.json")
 
 """
     def setUp(self):
