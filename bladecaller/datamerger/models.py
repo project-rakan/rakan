@@ -20,6 +20,8 @@ class VTDBlock(models.Model):
     minorityPop = models.IntegerField(default=0)
     majorityPop = models.IntegerField(default=0)
 
+    district = models.ForeignKey('DistrictBlock', on_delete=models.SET_NULL, null=True)
+
     @property
     def overlapping_tracts(self):
         return TractBlock.objects.filter(geometry__bboverlaps=self.geometry)
