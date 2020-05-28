@@ -63,7 +63,7 @@ class TractBlock(models.Model):
 
 class DistrictBlock(models.Model):
     state = models.ForeignKey(State, on_delete=models.CASCADE)
-    district_id = models.IntegerField(unique=True)
+    district_id = models.IntegerField()
     geometry = gis_models.GeometryField()
 
     @property
