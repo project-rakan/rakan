@@ -80,7 +80,7 @@ TEST(Test_Runner, TestBFSThreeEdges) {
     unused.insert(i);
   }
 
-  // r2 has 4 precincts {n0, n1, n2, n3}.
+  // r3 has 4 precincts {n0, n1, n2, n3}.
   // n0 <-> n1
   // n0 <-> n3
   // n1 <-> n2
@@ -135,6 +135,56 @@ TEST(Test_Runner, TestBFSThreeEdges) {
   ASSERT_EQ(r3.BFS(n3, &unused), n2);
   unused.erase(2);
   ASSERT_EQ(r3.BFS(n3, &unused), nullptr);
+}
+
+TEST(Test_Runner, TestBFSDisconnectedEdges) {
+  unordered_set<uint32_t> unused;
+  Graph *g;
+  Node *n0, *n1, *n2, *n3;
+
+  for (uint32_t i = 0; i < 4; i++) {
+    unused.insert(i);
+  }
+
+  // r4 has 4 precincts {n0, n1, n2, n3}.
+  // n0 <-> n1
+  // n2 <-> n3
+  Runner r4(4, 1);
+  r4.add_node(0, 1, 0, 0);
+  r4.add_node(1, 1, 0, 0);
+  r4.add_node(2, 1, 0, 0);
+  r4.add_node(3, 1, 0, 0);
+  r4.add_edge(0, 1);
+  r4.add_edge(2, 3);
+
+  n0 = r4.GetGraph()->GetNode(0);
+  n1 = r4.GetGraph()->GetNode(1);
+  n2 = r4.GetGraph()->GetNode(2);
+  n3 = r4.GetGraph()->GetNode(3);
+  
+  // Start BFS at n0, should find n1, then nullptr.
+  unused.erase(0);
+  ASSERT_EQ(r4.BFS(n0, &unused), n1);
+  unused.erase(1);
+  ASSERT_EQ(r4.BFS(n0, &unused), nullptr);
+  unused.insert(0);
+
+  // Start BFS at n1, should find n0, then nullptr.
+  ASSERT_EQ(r4.BFS(n1, &unused), n0);
+  unused.erase(0);
+  ASSERT_EQ(r4.BFS(n1, &unused), nullptr);
+
+  // Start BFS at n2, should find n3, then nullptr.
+  unused.erase(2);
+  ASSERT_EQ(r4.BFS(n2, &unused), n3);
+  unused.erase(3);
+  ASSERT_EQ(r4.BFS(n2, &unused), nullptr);
+  unused.insert(2);
+
+  // Start BFS at n3, should find n2, then nullptr.
+  ASSERT_EQ(r4.BFS(n3, &unused), n2);
+  unused.erase(2);
+  ASSERT_EQ(r4.BFS(n3, &unused), nullptr);
 }
 
 }
