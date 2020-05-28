@@ -1,4 +1,4 @@
 {
-    "numNodes": 4,
-    "numDistricts": 2
+    "maxDistricts": 2,
+    "precincts": []
 }
