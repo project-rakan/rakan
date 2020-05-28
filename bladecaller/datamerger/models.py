@@ -26,6 +26,11 @@ class VTDBlock(models.Model):
     def overlapping_tracts(self):
         return TractBlock.objects.filter(geometry__bboverlaps=self.geometry)
 
+    @property
+    def connected(self):
+        # TODO: Remove self from this query
+        return VTDBlock.objects.filter(geometry__bboverlaps=self.geometry)
+
     def __str__(self):
         return self.name
 
@@ -48,6 +53,11 @@ class TractBlock(models.Model):
     otherPop = models.IntegerField(default=0)
     multiPop = models.IntegerField(default=0)
 
+    @property
+    def connected(self):
+        # TODO: Remove self from this query
+        return TractBlock.objects.filter(geometry__bboverlaps=self.geometry)
+
     def __str__(self):
         return self.name
 
@@ -59,3 +69,8 @@ class DistrictBlock(models.Model):
     @property
     def overlapping_vtds(self):
         return VTDBlock.objects.filter(state=self.state, geometry__bboverlaps=self.geometry)
+
+    @property
+    def connected(self):
+        # TODO: Remove self from this query
+        return DistrictBlock.objects.filter(geometry__bboverlaps=self.geometry)
