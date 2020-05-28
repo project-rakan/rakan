@@ -14,7 +14,7 @@ class State(models.Model):
     fips = models.IntegerField(unique=True)
     precincts = models.IntegerField()
 
-    granularity = models.CharField(max_length=6, choices=(
+    granularity = models.CharField(max_length=7, choices=(
         ('vtd', 'vtd'),
         ('county', 'county'),
     ), default='vtd')
