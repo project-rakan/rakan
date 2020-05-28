@@ -89,6 +89,8 @@ Graph::~Graph() {
   }
 
   delete[] perim_nodes_to_neighbors_;
+
+  delete added_ids_;
 }
 
 
