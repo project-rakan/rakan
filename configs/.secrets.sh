@@ -13,3 +13,4 @@ export RABBIT_LOCATION="localhost"
 
 export RAKAN_LOCATION="/home/project"
 export RAKAN_STATEFILES="/var/www/html/stateinfo"
+export RAKAN_STATE_VISUALIZATIONS="/var/www/html/images/"
