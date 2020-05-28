@@ -56,6 +56,7 @@ INSTALLED_APPS = [
 ] + [
     # My apps
     'api',
+    'datamerger',
 ]
 
 MIDDLEWARE = [
@@ -94,7 +95,7 @@ WSGI_APPLICATION = 'bladecaller.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': os.getenv('DATABASE_TABLE', 'temptable'),
         'USER': os.getenv('DATABASE_USER', 'guest'),
         'PASSWORD': os.getenv('DATABASE_PASS', 'guest'),
