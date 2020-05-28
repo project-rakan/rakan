@@ -143,8 +143,7 @@ bool Runner::SpawnDistricts(unordered_set<Node *> *seed_nodes) {
 }
 
 bool Runner::seed() {
-  unordered_set<Node *> *seed_nodes = GenerateRandomSeeds();
-  return SpawnDistricts(seed_nodes);
+  return SpawnDistricts(GenerateRandomSeeds());
 }
 
 void Runner::populate() {
