@@ -62,8 +62,8 @@ void Runner::add_node(uint32_t node_id,
 }
 
 bool Runner::add_edge(uint32_t node_one, uint32_t node_two) {
-  if (graph_->ContainsNode(graph_->GetNode(node_one)->id_) && 
-      graph_->ContainsNode(graph_->GetNode(node_two)->id_)) {
+  if (graph_->ContainsNode(node_one) && 
+      graph_->ContainsNode(node_two)) {
       graph_->AddEdge(node_one, node_two);
       return true;
   }
