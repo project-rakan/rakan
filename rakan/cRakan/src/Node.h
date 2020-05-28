@@ -129,21 +129,24 @@ class Node {
   void SetDistrict(const uint32_t district) { district_ = district; }
 
   /**
-   * Sets the total population to the specified val.
+   * Sets the total population to the specified val. Does not
+   * alter the other population numbers
    * 
    * @param         val     the new total population
    */
   void SetTotalPop(const uint32_t val) { total_pop_ = val; }
 
   /**
-   * Sets the majority population to the specified val.
+   * Sets the majority population to the specified val. Does not
+   * alter the other population numbers
    * 
    * @param         val     the new majority population
    */
   void SetMajorityPop(const uint32_t val) { majority_pop_ = val; }
 
   /**
-   * Sets the minority population to the specified val.
+   * Sets the minority population to the specified val. Does not
+   * alter the other population numbers
    * 
    * @param         val     the new minority population
    */

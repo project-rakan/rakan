@@ -41,7 +41,7 @@ Runner::Runner() {
 }
 
 Runner::Runner(uint32_t num_precincts, uint32_t num_districts) {
-  graph_ = new Graph(num_precincts, num_districts, 0);
+  graph_ = new Graph(num_precincts, num_districts);
   changes_ = new unordered_map<int, int>;
   // each subsequent sub-vector will be initialized in the walk method.
   walk_changes_ = new vector<vector <uint32_t> *>;
@@ -66,8 +66,8 @@ void Runner::add_node(uint32_t node_id,
 }
 
 bool Runner::add_edge(uint32_t node_one, uint32_t node_two) {
-  if (graph_->ContainsNode(graph_->GetNode(node_one)) && 
-      graph_->ContainsNode(graph_->GetNode(node_two))) {
+  if (graph_->ContainsNode(node_one) && 
+      graph_->ContainsNode(node_two)) {
       graph_->AddEdge(node_one, node_two);
       return true;
   }

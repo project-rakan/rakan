@@ -37,11 +37,9 @@ class Graph {
   * @param    num_nodes       the number of nodes on this graph, must be >= 0
   * @param    num_districts   the number of districts on this graph, must
   *                           be >= 0
-  * @param    state_pop       the population on this graph
   */
  Graph(const uint32_t num_nodes,
-       const uint32_t num_districts,
-       const uint32_t state_pop);
+       const uint32_t num_districts);
 
   /**
   * Default destructor. Also destructs nodes on this graph.
@@ -53,16 +51,19 @@ class Graph {
   /////////////////////////////////////////////////////////////////////////////
 
   /**
-   * Adds a node to this graph.
+   * Adds a node to this graph. Also adds the total population of the node
+   * to the population of the graph.
    * 
    * @param     node      the node to be added
    * 
-   * @return true iff adding node successful; false otherwise
+   * @return true iff node does not exist in the graph; false otherwise
    */
   bool AddNode(Node *node);
 
   /**
   * Constructs a new node and adds the node to this graph.
+  * Also adds the total population of the node
+  * to the population of the graph.
   * 
   * @param    id
   * @param    county
@@ -156,7 +157,7 @@ class Graph {
   * 
   * @return true iff the node exists on the graph, false otherwise
   */
-  bool ContainsNode(const Node *node) const;
+  bool ContainsNode(const uint32_t id) const;
 
   /**
   * Queries whether or not an edge exists between the two nodes.
@@ -287,7 +288,8 @@ class Graph {
   uint32_t state_pop_;
 
   // An array of all the nodes on this graph. The index of the array is
-  // the node ID.
+  // the node ID. Some of the indices may be empty until client adds all
+  // nodes
   Node **nodes_;
 
   // An array of pointers to sets. The index of the array
@@ -299,6 +301,9 @@ class Graph {
   // is the district ID, and the pointer at the index points
   // to a set of nodes on the perimeter of that district.
   unordered_set<int> **nodes_on_perim_;
+
+  // To keep track of all of the nodes that have been added.
+  unordered_set<uint32_t> *added_ids_; 
 
   vector<pair<int, int>> *perim_edges_;
 
