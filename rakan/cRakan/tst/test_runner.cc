@@ -8,17 +8,13 @@
 
 namespace rakan {
 
-TEST(Test_Runner, TestSeveredDistrict) {
+TEST(Test_Runner, TestSeveredDistrictSimple) {
   // r has 7 precincts, 3 districts
   // draws out an H shape
   Runner r(7, 3);
-  r.add_node(0, 1, 0, 0);
-  r.add_node(1, 1, 0, 0);
-  r.add_node(2, 1, 0, 0);
-  r.add_node(3, 1, 0, 0);
-  r.add_node(4, 1, 0, 0);
-  r.add_node(5, 1, 0, 0);
-  r.add_node(6, 1, 0, 0);
+  for (uint32_t i = 0; i < 7; i++) {
+    r.add_node(i, 0, 0, 0);
+  }
   r.add_edge(0, 1);
   r.add_edge(1, 2);
   r.add_edge(1, 3);
@@ -36,13 +32,110 @@ TEST(Test_Runner, TestSeveredDistrict) {
   districts[6] = 2;
 
   r.set_districts(districts);
-  ASSERT_FALSE(r.IsDistrictSevered(r.GetGraph()->GetNode(0)));
-  ASSERT_TRUE(r.IsDistrictSevered(r.GetGraph()->GetNode(1)));
-  ASSERT_FALSE(r.IsDistrictSevered(r.GetGraph()->GetNode(2)));
-  ASSERT_FALSE(r.IsDistrictSevered(r.GetGraph()->GetNode(3)));
-  ASSERT_FALSE(r.IsDistrictSevered(r.GetGraph()->GetNode(4)));
-  ASSERT_TRUE(r.IsDistrictSevered(r.GetGraph()->GetNode(5)));
-  ASSERT_FALSE(r.IsDistrictSevered(r.GetGraph()->GetNode(6)));
+  r.populate();
+  ASSERT_TRUE(r.IsDistrictSevered(r.GetGraph()->GetNode(0), 1));
+  ASSERT_TRUE(r.IsDistrictSevered(r.GetGraph()->GetNode(1), 1));
+  ASSERT_TRUE(r.IsDistrictSevered(r.GetGraph()->GetNode(2), 1));
+  ASSERT_FALSE(r.IsDistrictSevered(r.GetGraph()->GetNode(3), 0));
+  ASSERT_FALSE(r.IsDistrictSevered(r.GetGraph()->GetNode(3), 2));
+  ASSERT_TRUE(r.IsDistrictSevered(r.GetGraph()->GetNode(4), 0));
+  ASSERT_TRUE(r.IsDistrictSevered(r.GetGraph()->GetNode(5), 1));
+  ASSERT_TRUE(r.IsDistrictSevered(r.GetGraph()->GetNode(6), 0));
+}
+
+TEST(Test_Runner, TestIsValidRedistricting) {
+  // r has 16 precincts, 4 districts
+  // draws out a 4x4 square with 4 quadrants
+  Runner r(16, 4);
+  for (uint32_t i = 0; i < 17; i++) {
+    r.add_node(i, 0, 0, 0);
+  }
+  r.add_edge(0, 1);
+  r.add_edge(1, 2);
+  r.add_edge(2, 3);
+  r.add_edge(0, 4);
+  r.add_edge(1, 5);
+  r.add_edge(2, 6);
+  r.add_edge(3, 7);
+  r.add_edge(4, 5);
+  r.add_edge(5, 6);
+  r.add_edge(6, 7);
+  r.add_edge(4, 8);
+  r.add_edge(5, 9);
+  r.add_edge(6, 10);
+  r.add_edge(7, 11);
+  r.add_edge(8, 9);
+  r.add_edge(9, 10);
+  r.add_edge(10, 11);
+  r.add_edge(8, 12);
+  r.add_edge(9, 13);
+  r.add_edge(10, 14);
+  r.add_edge(11, 15);
+  r.add_edge(12, 13);
+  r.add_edge(13, 14);
+  r.add_edge(14, 15);
+
+  vector<uint32_t> districts(16);
+
+  // First quadrant in district 0
+  districts[0] = 0;
+  districts[1] = 0;
+  districts[4] = 0;
+  districts[5] = 0;
+
+  // Second quadrant in district 1
+  districts[2] = 1;
+  districts[3] = 1;
+  districts[6] = 1;
+  districts[7] = 1;
+
+  // Third quadrant in district 2
+  districts[8] = 2;
+  districts[9] = 2;
+  districts[12] = 2;
+  districts[13] = 2;
+
+  // Fourth quadrant in district 3
+  districts[10] = 3;
+  districts[11] = 3;
+  districts[14] = 3;
+  districts[15] = 3;
+
+  r.set_districts(districts);
+  Graph *g = r.GetGraph();
+
+  // Redistricting to self
+  ASSERT_FALSE(r.IsValidRedistricting(g->GetNode(0), g->GetNode(0)));
+  ASSERT_FALSE(r.IsValidRedistricting(g->GetNode(2), g->GetNode(2)));
+  ASSERT_FALSE(r.IsValidRedistricting(g->GetNode(11), g->GetNode(11)));
+  ASSERT_FALSE(r.IsValidRedistricting(g->GetNode(13), g->GetNode(13)));
+
+  // Same districts
+  ASSERT_FALSE(r.IsValidRedistricting(g->GetNode(0), g->GetNode(1)));
+  ASSERT_FALSE(r.IsValidRedistricting(g->GetNode(0), g->GetNode(4)));
+  ASSERT_FALSE(r.IsValidRedistricting(g->GetNode(5), g->GetNode(1)));
+  ASSERT_FALSE(r.IsValidRedistricting(g->GetNode(5), g->GetNode(4)));
+
+  // Just crossing, no severedness
+  ASSERT_TRUE(r.IsValidRedistricting(g->GetNode(1), g->GetNode(2)));
+  ASSERT_TRUE(r.IsValidRedistricting(g->GetNode(5), g->GetNode(6)));
+  ASSERT_TRUE(r.IsValidRedistricting(g->GetNode(4), g->GetNode(8)));
+  ASSERT_TRUE(r.IsValidRedistricting(g->GetNode(5), g->GetNode(9)));
+  ASSERT_TRUE(r.IsValidRedistricting(g->GetNode(6), g->GetNode(10)));
+  ASSERT_TRUE(r.IsValidRedistricting(g->GetNode(7), g->GetNode(11)));
+  ASSERT_TRUE(r.IsValidRedistricting(g->GetNode(9), g->GetNode(10)));
+  ASSERT_TRUE(r.IsValidRedistricting(g->GetNode(13), g->GetNode(14)));
+
+  // No edge
+  ASSERT_FALSE(r.IsValidRedistricting(g->GetNode(0), g->GetNode(2)));
+  ASSERT_FALSE(r.IsValidRedistricting(g->GetNode(1), g->GetNode(3)));
+  ASSERT_FALSE(r.IsValidRedistricting(g->GetNode(5), g->GetNode(8)));
+  ASSERT_FALSE(r.IsValidRedistricting(g->GetNode(5), g->GetNode(10)));
+  ASSERT_FALSE(r.IsValidRedistricting(g->GetNode(6), g->GetNode(11)));
+  ASSERT_FALSE(r.IsValidRedistricting(g->GetNode(10), g->GetNode(13)));
+  ASSERT_FALSE(r.IsValidRedistricting(g->GetNode(8), g->GetNode(10)));
+  ASSERT_FALSE(r.IsValidRedistricting(g->GetNode(12), g->GetNode(14)));
+  ASSERT_FALSE(r.IsValidRedistricting(g->GetNode(0), g->GetNode(15)));
 }
 
 TEST(Test_Runner, TestSeedSimple) {

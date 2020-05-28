@@ -228,15 +228,17 @@ class Runner {
   bool IsEmptyDistrict(int district);
 
   /**
-  * Queries whether or not the district that the proposed node is in will be
-  * severed once the proposed node is removed.
+  * Queries whether or not the district that the proposed node is in and the
+  * district that the proposed node will be moved into will be severed.
   * 
   * @param    proposed_node   the node that will be hypothetically removed
   *                           from its district
+  * @param    new_district    the new district ID that is the proposed node
+  *                           will move into
   * 
   * @return true iff the district will be severed
   */
-  bool IsDistrictSevered(Node *proposed_node);
+  bool IsDistrictSevered(Node *proposed_node, uint32_t new_district);
 
   /**
   * Queries whether or not a path exists between the start node and the target
@@ -282,6 +284,17 @@ class Runner {
  //////////////////////////////////////////////////////////////////////////////
  // Helpers
  //////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * Checks if the redistricting of node1 to node2 is valid. Specifically,
+   * checks to if either districts will be severed and if either districts
+   * will be empty.
+   * 
+   * @param       node1       the node to redistrict
+   * @param       node2       the neighbor node to node1 and the node whose
+   *                          district is the new district of node1
+   */
+  bool IsValidRedistricting(Node *node1, Node *node2);
 
   /**
   * A helper function that implements BFS on the graph. Searches for any node
