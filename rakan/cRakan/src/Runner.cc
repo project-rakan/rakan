@@ -86,28 +86,20 @@ bool Runner::set_districts(vector<uint32_t>& districts) {
   return true;
 }
 
-bool Runner::seed() {
-  uint32_t i;
+unordered_set<Node *>* Runner::GenerateRandomSeeds() {
+  unordered_set<Node *> *seed_nodes = new unordered_set<Node *>;
+  Node *seed_node;
   int32_t prev_random_index, random_index;
   vector<uint32_t> random_indexes;
-  unordered_set<uint32_t> unused;
-  unordered_set<Node *> seed_nodes;
-  unordered_map<int, Node *> last_found;
-  Node *found_node, *seed_node;
 
-  for (i = 0; i < graph_->num_nodes_; i++) {
-    unused.insert(i);
-  }
-
-  for (i = 0; i < graph_->num_districts_; i++) {
+  for (uint32_t i = 0; i < graph_->num_districts_; i++) {
     random_index = rand() % graph_->num_nodes_;
     if (std::find(random_indexes.begin(),
                   random_indexes.end(),
                   random_index) == random_indexes.end()) {
       graph_->AddNodeToDistrict(random_index, i);
       seed_node = graph_->nodes_[random_index];
-      unused.erase(random_index);
-      seed_nodes.insert(seed_node);
+      seed_nodes->insert(seed_node);
       random_indexes.push_back(random_index);
       changes_->insert({seed_node->id_, i});
     } else {
@@ -115,13 +107,26 @@ bool Runner::seed() {
     }
   }
 
-  for (auto &node : seed_nodes) {
+  return seed_nodes;
+}
+
+bool Runner::SpawnDistricts(unordered_set<Node *> *seed_nodes) {
+  unordered_set<uint32_t> unused;
+  unordered_map<int, Node *> last_found;
+  Node *found_node, *seed_node;
+
+  for (uint32_t i = 0; i < graph_->num_nodes_; i++) {
+    unused.insert(i);
+  }
+
+  for (auto &node : *seed_nodes) {
+    unused.erase(node->id_);
     last_found[node->district_] = node;
   }
 
   while (unused.size() > 0) {
     uint32_t check = unused.size();
-    for (int i = 0; i < graph_->num_districts_; i++) {
+    for (uint32_t i = 0; i < graph_->num_districts_; i++) {
       found_node = BFS(last_found[i], &unused);
       if (found_node != nullptr) {
         graph_->AddNodeToDistrict(found_node->id_, i);
@@ -134,8 +139,12 @@ bool Runner::seed() {
       return false;
     }
   }
-
   return true;
+}
+
+bool Runner::seed() {
+  unordered_set<Node *> *seed_nodes = GenerateRandomSeeds();
+  return SpawnDistricts(seed_nodes);
 }
 
 void Runner::populate() {

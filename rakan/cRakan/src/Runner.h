@@ -105,6 +105,24 @@ class Runner {
   */
   void populate();
 
+  /**
+   * Randomly selects num_districts number of indexes on the graph. Selects
+   * those seeds as seed nodes to their distinct districts and returns the
+   * set of seed nodes.
+   * 
+   * @return a pointer to a set of randomly generated seed nodes
+   */
+  unordered_set<Node *>* GenerateRandomSeeds();
+
+  /**
+   * Spawns districts on the graph by traversing the given seed nodes via BFS.
+   * 
+   * @param         seed_nodes        the pointer to the set of seed nodes
+   * 
+   * @return true iff all precincts are connected; false otherwise
+   */
+  bool SpawnDistricts(unordered_set<Node *> *seed_nodes);
+
 
  //////////////////////////////////////////////////////////////////////////////
  // Scoring

@@ -22,6 +22,26 @@ TEST(Test_Runner, TestSeedSimple) {
   ASSERT_EQ(g->GetNode(1)->GetDistrict(), 0);
 }
 
+TEST(Test_Runner, TestSeedMedium) {
+  // r has 6 precincts, 3 district
+  // n0 <-> n1
+  // n2 <-> n3
+  // n4 <-> n5
+  Runner r(6, 3);
+  r.add_node(0, 1, 0, 0);
+  r.add_node(1, 1, 0, 0);
+  r.add_node(2, 1, 0, 0);
+  r.add_node(3, 1, 0, 0);
+  r.add_node(4, 1, 0, 0);
+  r.add_node(5, 1, 0, 0);
+  r.add_edge(0, 1);
+  r.add_edge(2, 3);
+  r.add_edge(4, 5);
+  r.seed();
+
+  Graph *g = r.GetGraph();
+}
+
 TEST(Test_Runner, TestBFSOneEdge) {
   unordered_set<uint32_t> unused;
   Graph *g;
