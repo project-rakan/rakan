@@ -8,6 +8,43 @@
 
 namespace rakan {
 
+TEST(Test_Runner, TestSeveredDistrict) {
+  // r has 7 precincts, 3 districts
+  // draws out an H shape
+  Runner r(7, 3);
+  r.add_node(0, 1, 0, 0);
+  r.add_node(1, 1, 0, 0);
+  r.add_node(2, 1, 0, 0);
+  r.add_node(3, 1, 0, 0);
+  r.add_node(4, 1, 0, 0);
+  r.add_node(5, 1, 0, 0);
+  r.add_node(6, 1, 0, 0);
+  r.add_edge(0, 1);
+  r.add_edge(1, 2);
+  r.add_edge(1, 3);
+  r.add_edge(4, 5);
+  r.add_edge(5, 6);
+  r.add_edge(3, 5);
+
+  vector<uint32_t> districts(7);
+  districts[0] = 0;
+  districts[1] = 0;
+  districts[2] = 0;
+  districts[3] = 1;
+  districts[4] = 2;
+  districts[5] = 2;
+  districts[6] = 2;
+
+  r.set_districts(districts);
+  ASSERT_FALSE(r.IsDistrictSevered(r.GetGraph()->GetNode(0)));
+  ASSERT_TRUE(r.IsDistrictSevered(r.GetGraph()->GetNode(1)));
+  ASSERT_FALSE(r.IsDistrictSevered(r.GetGraph()->GetNode(2)));
+  ASSERT_FALSE(r.IsDistrictSevered(r.GetGraph()->GetNode(3)));
+  ASSERT_FALSE(r.IsDistrictSevered(r.GetGraph()->GetNode(4)));
+  ASSERT_TRUE(r.IsDistrictSevered(r.GetGraph()->GetNode(5)));
+  ASSERT_FALSE(r.IsDistrictSevered(r.GetGraph()->GetNode(6)));
+}
+
 TEST(Test_Runner, TestSeedSimple) {
   // r has 2 precincts, 1 district
   Runner r(2, 1);
@@ -20,6 +57,41 @@ TEST(Test_Runner, TestSeedSimple) {
   ASSERT_EQ(g->GetNodesInDistrict(0)->size(), 2);
   ASSERT_EQ(g->GetNode(0)->GetDistrict(), 0);
   ASSERT_EQ(g->GetNode(1)->GetDistrict(), 0);
+}
+
+TEST(Test_Runner, TestSeedMedium) {
+  // r has 6 precincts, 3 district
+  // n0 <-> n1
+  // n2 <-> n3
+  // n4 <-> n5
+  Runner r(6, 3);
+  r.add_node(0, 1, 0, 0);
+  r.add_node(1, 1, 0, 0);
+  r.add_node(2, 1, 0, 0);
+  r.add_node(3, 1, 0, 0);
+  r.add_node(4, 1, 0, 0);
+  r.add_node(5, 1, 0, 0);
+  r.add_edge(0, 1);
+  r.add_edge(2, 3);
+  r.add_edge(4, 5);
+
+  unordered_set<Node *> seed_nodes;
+  Graph *g = r.GetGraph();
+  seed_nodes.insert(g->GetNode(0));
+  seed_nodes.insert(g->GetNode(2));
+  seed_nodes.insert(g->GetNode(4));
+  g->AddNodeToDistrict(0, 0);
+  g->AddNodeToDistrict(2, 1);
+  g->AddNodeToDistrict(4, 2);
+
+  r.SpawnDistricts(&seed_nodes);
+  ASSERT_EQ(g->GetNodesInDistrict(0)->size(), 2);
+  ASSERT_EQ(g->GetNodesInDistrict(1)->size(), 2);
+  ASSERT_EQ(g->GetNodesInDistrict(2)->size(), 2);
+
+  ASSERT_EQ(g->GetNode(0)->GetDistrict(), g->GetNode(1)->GetDistrict());
+  ASSERT_EQ(g->GetNode(2)->GetDistrict(), g->GetNode(3)->GetDistrict());
+  ASSERT_EQ(g->GetNode(4)->GetDistrict(), g->GetNode(5)->GetDistrict());
 }
 
 TEST(Test_Runner, TestBFSOneEdge) {
