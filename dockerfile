@@ -42,9 +42,7 @@ RUN python3.7 -m pip install -r /tmp/requirements.txt
 
 # Download maps from bladecaller
 ADD .gitignore /var/www/html/stateinfo/.gitignore
-COPY configs/downloadMaps.sh /tmp/downloadMaps.sh
-RUN chmod +x /tmp/downloadMaps.sh
-RUN /tmp/downloadMaps.sh
+ADD .gitignore /var/www/html/images/.gitignore
 
 WORKDIR "/home/project"
 
