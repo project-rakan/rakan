@@ -20,6 +20,7 @@ make build
 cd bladecaller
 python3.7 manage.py makemigrations
 python3.7 manage.py migrate
+python3.7 manage.py populate_db
 python3.7 manage.py collectstatic --noinput
 cd ..
 
