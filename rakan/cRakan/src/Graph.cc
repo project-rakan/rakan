@@ -47,9 +47,11 @@ Graph::Graph(const uint32_t num_nodes,
   perim_edges_ = new vector<pair<int, int>>;
   pop_of_district_ = new uint32_t[num_districts_];
   min_pop_of_district_ = new uint32_t[num_districts_];
+  maj_pop_of_district_ = new uint32_t[num_districts_];
 
   for (int i = 0; i < num_districts_; i++) {
     pop_of_district_[i] = 0;
+    min_pop_of_district_[i] = 0;
     min_pop_of_district_[i] = 0;
   }
 }

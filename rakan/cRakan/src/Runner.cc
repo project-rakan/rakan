@@ -104,9 +104,9 @@ bool Runner::seed() {
     if (std::find(random_indexes.begin(),
                   random_indexes.end(),
                   random_index) == random_indexes.end()) {
+      graph_->AddNodeToDistrict(random_index, i);
       seed_node = graph_->nodes_[random_index];
       unused.erase(random_index);
-      seed_node->SetDistrict(i);
       seed_nodes.insert(seed_node);
       random_indexes.push_back(random_index);
       changes_->insert({seed_node->id_, i});
@@ -124,8 +124,8 @@ bool Runner::seed() {
     for (int i = 0; i < graph_->num_districts_; i++) {
       found_node = BFS(last_found[i], &unused);
       if (found_node != nullptr) {
-        found_node->SetDistrict(i);
-        unused.erase(found_node->GetID());
+        graph_->AddNodeToDistrict(found_node->id_, i);
+        unused.erase(found_node->id_);
         last_found[i] = found_node;
         changes_->insert({found_node->id_, i});
       }
