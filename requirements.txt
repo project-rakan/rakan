@@ -10,6 +10,7 @@ click-plugins==1.1.1
 cligj==0.5.0
 coverage==5.1
 cryptography==2.3
+cycler==0.10.0
 Cython==0.29.18
 Django==3.0.6
 django-celery-results==1.2.1
@@ -24,11 +25,13 @@ Jinja2==2.11.2
 joblib==0.15.1
 keyring==10.6.0
 keyrings.alt==3.0
+kiwisolver==1.2.0
 kombu==4.6.8
 livereload==2.6.1
 lunr==0.5.8
 Markdown==3.2.2
 MarkupSafe==1.1.1
+matplotlib==3.2.1
 mkdocs==1.1.2
 mkdocs-material==5.2.0
 mkdocs-material-extensions==1.0
@@ -43,6 +46,7 @@ pycrypto==2.6.1
 Pygments==2.6.1
 pygobject==3.26.1
 pymdown-extensions==7.1
+pyparsing==2.4.7
 pyproj==2.6.1.post1
 python-apt==1.6.5+ubuntu0.2
 python-dateutil==2.8.1
