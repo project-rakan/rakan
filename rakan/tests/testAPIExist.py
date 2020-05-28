@@ -17,6 +17,10 @@ class testAPIExist(unittest.TestCase):
         self.assertTrue(hasattr(self.runnerClass, "districts"))
         self.assertTrue(hasattr(self.runnerClass, "visualize"))
 
+    def test_canLoad(self):
+        "Test that this class can be instantiated"
+        self.runnerClass(1, 1)
+
 """
     def setUp(self):
         from cRakan import Queue
