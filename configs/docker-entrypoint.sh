@@ -8,7 +8,7 @@ service postgresql start
 rabbitmq-server -detached
 
 # insert credentials into the database if it hasn't already
-su - postgres -c "createdb $DATABASE_TABLE"
+su - postgres -c "createdb $DATABASE_TABLE && psql -c \"CREATE EXTENSION postgis;\""
 su - postgres -c "psql -c \"CREATE USER $DATABASE_USER with encrypted password '$DATABASE_PASS'\""
 su - postgres -c "psql -c \"GRANT ALL PRIVILEGES ON DATABASE $DATABASE_TABLE TO $DATABASE_USER;\""
 su - postgres -c "psql -c \"ALTER USER $DATABASE_USER WITH SUPERUSER;\""
