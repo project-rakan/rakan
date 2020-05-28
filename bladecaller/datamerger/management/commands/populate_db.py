@@ -377,6 +377,8 @@ class Command(BaseCommand):
             state.precincts = state.vtds.all().count()
             state.save()
 
+            bar.next()
+
         bar.finish()
 
     def visualizeStates(self):
