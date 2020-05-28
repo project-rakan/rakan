@@ -6,6 +6,20 @@ from libcpp cimport bool as cbool
 from libc.stdint cimport uint32_t
 from libcpp.map cimport map as cmap
 
+cdef extern from "src/Node.h" namespace "rakan":
+    cdef cppclass Node:
+        uint32_t GetDistrict();
+
+cdef extern from "src/Node.cc" namespace "rakan":
+    pass
+
+cdef extern from "src/Graph.h" namespace "rakan":
+    cdef cppclass Graph:
+        Node * GetNode(uint32_t node_id) except +;
+
+cdef extern from "src/Graph.cc" namespace "rakan":
+    pass
+
 cdef extern from "src/Runner.cc" namespace "rakan":
     pass
 
@@ -27,14 +41,6 @@ cdef extern from "src/Runner.h" namespace "rakan":
         cvector[cvector[uint32_t]] getMaps() except +;
         cvector[cmap[cstring, double]] getScores() except +;
 
-cdef extern from "src/Graph.h" namespace "rakan":
-    pass
+        # For the visualization debugger
+        Graph * GetGraph() except +;
 
-cdef extern from "src/Graph.cc" namespace "rakan":
-    pass
-
-cdef extern from "src/Node.h" namespace "rakan":
-    pass
-
-cdef extern from "src/Node.cc" namespace "rakan":
-    pass
