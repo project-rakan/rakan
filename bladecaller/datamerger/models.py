@@ -1,10 +1,12 @@
 from django.db import models
 from django.contrib.gis.db import models as gis_models
 
+from api.models import State
+
 # Create your models here.
 
 class VTDBlock(models.Model):
-    state = models.CharField(max_length=255)
+    state = models.ForeignKey(State, on_delete=models.CASCADE)
     geoid = models.CharField(max_length=255, unique=True)
     geometry = gis_models.GeometryField()
 
@@ -12,7 +14,7 @@ class VTDBlock(models.Model):
     water = models.FloatField()
 
 class TractBlock(models.Model):
-    state = models.CharField(max_length=255)
+    state = models.ForeignKey(State, on_delete=models.CASCADE)
     geometry = gis_models.GeometryField()
 
     land = models.FloatField()
@@ -28,5 +30,6 @@ class TractBlock(models.Model):
     multiPop = models.IntegerField(default=0)
 
 class DistrictBlock(models.Model):
+    state = models.ForeignKey(State, on_delete=models.CASCADE)
     district_id = models.IntegerField()
     geometry = gis_models.GeometryField()
