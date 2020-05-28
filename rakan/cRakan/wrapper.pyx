@@ -22,6 +22,9 @@ cdef class Engine:
 
         print('initializing')
         
+        with io.open(jsonLocation) as handle:
+            data = json.loads(handle.read())
+
         print('loading: ' + jsonLocation)
         print('state: ' + data['stCode'])
         print('number of districts: ' + str(data['numDistricts']))
