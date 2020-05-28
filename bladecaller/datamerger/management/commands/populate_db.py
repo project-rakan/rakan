@@ -81,16 +81,16 @@ class Command(BaseCommand):
         
 
         df = gpd.read_file(CONGRESS_DIR_NAME)
-        df['GEOID'] = df['GEOID'].astype(int)
+        df['CD116FP'] = df['CD116FP'].astype(int)
         df['STATEFP'] = df['STATEFP'].astype(int)
 
         districts = []
 
         for i, row in df.iterrows():
-            if not DistrictBlock.objects.filter(district_id=row['GEOID']) and State.objects.filter(fips=row['STATEFP']):
+            if not DistrictBlock.objects.filter(district_id=row['CD116FP']) and State.objects.filter(fips=row['STATEFP']):
                 districts.append(DistrictBlock(**{
                     'state': State.objects.get(fips=row['STATEFP']),
-                    'district_id': row['GEOID'],
+                    'district_id': row['CD116FP'],
                     'geometry': GEOSGeometry(row['geometry'].to_wkt())
                 }))
 
@@ -270,6 +270,8 @@ class Command(BaseCommand):
         # Merge populations
         state = State.objects.get(fips=fips)
         for vtdblock in VTDBlock.objects.filter(state=state):
+            if vtdblock.majorityPop != 0 or vtdblock.minorityPop != 0:
+                continue # Skip if already loaded
             for related_tract in vtdblock.overlapping_tracts:
                 # this calculates interesection area
                 overlap = -vtdblock.geometry.union(related_tract.geometry).area + vtdblock.geometry.area + related_tract.geometry.area
@@ -294,6 +296,8 @@ class Command(BaseCommand):
         
         for district in DistrictBlock.objects.filter(state__fips=fips):
             for vtd in district.overlapping_vtds:
+                if not (vtd.district is None):
+                    continue # Skip this check if district exists
                 intersect = vtd.geometry.intersection(district.geometry).area
                 
                 if vtd.geoid in tabledict:
@@ -325,6 +329,31 @@ class Command(BaseCommand):
             vtd.geometry = largestPolygon
             vtd.save()
 
+    def dissolveGranularity(self, state):
+        if state.granularity == 'vtd':
+            return
+        elif state.granularity == 'county':
+            self.dissolveCounty(state)
+        else:
+            raise ValueError("Unknown granularity")  
+
+    def dissolveCounty(self, state):
+        vtds = state.vtds.all()
+        table = {'geometry': [], 'geoid': [], 'county': [], 'land': [], 'water': [], 'minorityPop': [], 'majorityPop': [], 'district': []}
+        for vtd in vtds:
+            table['geometry'].append(vtd.geometry)
+            table['geoid'].append(vtd.geoid)
+            table['county'].append(vtd.county)
+            table['land'].append(vtd.land)
+            table['water'].append(vtd.water)
+            table['minorityPop'].append(vtd.minorityPop)
+            table['majorityPop'].append(vtd.majorityPop)
+            table['district'].append(vtd.district)
+
+        geometries = gpd.GeoDataFrame(table).dissolve('county')
+
+        import pdb; pdb.set_trace()
+
     def cleanStates(self):
         vtds = VTDBlock.objects.all()
         states = State.objects.all()
@@ -340,6 +369,9 @@ class Command(BaseCommand):
                 self.splitMultiPolygon(vtd)
             bar.next()
         
+        bar = IncrementalBar(f'Dissolving {len(states)} VTDs', max=len(states))      # .next() called 2x/vtd
+
         for state in states:
             # adjust for granularity
-            pass
+            self.dissolveGranularity(state)
+
