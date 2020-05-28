@@ -37,9 +37,24 @@ TEST(Test_Runner, TestSeedMedium) {
   r.add_edge(0, 1);
   r.add_edge(2, 3);
   r.add_edge(4, 5);
-  r.seed();
 
+  unordered_set<Node *> seed_nodes;
   Graph *g = r.GetGraph();
+  seed_nodes.insert(g->GetNode(0));
+  seed_nodes.insert(g->GetNode(2));
+  seed_nodes.insert(g->GetNode(4));
+  g->AddNodeToDistrict(0, 0);
+  g->AddNodeToDistrict(2, 1);
+  g->AddNodeToDistrict(4, 2);
+
+  r.SpawnDistricts(&seed_nodes);
+  ASSERT_EQ(g->GetNodesInDistrict(0)->size(), 2);
+  ASSERT_EQ(g->GetNodesInDistrict(1)->size(), 2);
+  ASSERT_EQ(g->GetNodesInDistrict(2)->size(), 2);
+
+  ASSERT_EQ(g->GetNode(0)->GetDistrict(), g->GetNode(1)->GetDistrict());
+  ASSERT_EQ(g->GetNode(2)->GetDistrict(), g->GetNode(3)->GetDistrict());
+  ASSERT_EQ(g->GetNode(4)->GetDistrict(), g->GetNode(5)->GetDistrict());
 }
 
 TEST(Test_Runner, TestBFSOneEdge) {
