@@ -8,6 +8,20 @@
 
 namespace rakan {
 
+TEST(Test_Runner, TestSeedSimple) {
+  // r has 2 precincts, 1 district
+  Runner r(2, 1);
+  r.add_node(0, 1, 0, 0);
+  r.add_node(1, 1, 0, 0);
+  r.add_edge(0, 1);
+  r.seed();
+
+  Graph *g = r.GetGraph();
+  ASSERT_EQ(g->GetNodesInDistrict(0)->size(), 2);
+  ASSERT_EQ(g->GetNode(0)->GetDistrict(), 0);
+  ASSERT_EQ(g->GetNode(1)->GetDistrict(), 0);
+}
+
 TEST(Test_Runner, TestBFSOneEdge) {
   unordered_set<uint32_t> unused;
   Graph *g;
