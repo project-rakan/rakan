@@ -24,6 +24,8 @@ class TractBlock(models.Model):
     state = models.ForeignKey(State, on_delete=models.CASCADE)
     geometry = gis_models.GeometryField()
 
+    name = models.CharField(max_length=256)
+
     land = models.FloatField()
     water = models.FloatField()
 
@@ -35,6 +37,9 @@ class TractBlock(models.Model):
     pacisPop = models.IntegerField(default=0)
     otherPop = models.IntegerField(default=0)
     multiPop = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.name
 
 class DistrictBlock(models.Model):
     state = models.ForeignKey(State, on_delete=models.CASCADE)
