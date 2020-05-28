@@ -10,8 +10,15 @@ class VTDBlock(models.Model):
     geoid = models.CharField(max_length=255, unique=True)
     geometry = gis_models.GeometryField()
 
+    county = models.IntegerField()
+
+    name = models.CharField(max_length=256)
+
     land = models.FloatField()
     water = models.FloatField()
+
+    def __str__(self):
+        return self.name
 
 class TractBlock(models.Model):
     state = models.ForeignKey(State, on_delete=models.CASCADE)
@@ -31,5 +38,5 @@ class TractBlock(models.Model):
 
 class DistrictBlock(models.Model):
     state = models.ForeignKey(State, on_delete=models.CASCADE)
-    district_id = models.IntegerField()
+    district_id = models.IntegerField(unique=True)
     geometry = gis_models.GeometryField()
