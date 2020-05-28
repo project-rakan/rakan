@@ -373,8 +373,6 @@ class Command(BaseCommand):
 
         VTDBlock.objects.bulk_create(new_vtds)
 
-        import pdb; pdb.set_trace()
-
     def cleanStates(self):
         vtds = VTDBlock.objects.all()
         states = State.objects.all()
