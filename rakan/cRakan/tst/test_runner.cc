@@ -187,4 +187,40 @@ TEST(Test_Runner, TestBFSDisconnectedEdges) {
   ASSERT_EQ(r4.BFS(n3, &unused), nullptr);
 }
 
+TEST(Test_Runner, TestBFSNoEdges) {
+  unordered_set<uint32_t> unused;
+  Graph *g;
+  Node *n0, *n1, *n2, *n3;
+
+  for (uint32_t i = 0; i < 4; i++) {
+    unused.insert(i);
+  }
+
+  Runner r5(4, 1);
+  r5.add_node(0, 1, 0, 0);
+  r5.add_node(1, 1, 0, 0);
+  r5.add_node(2, 1, 0, 0);
+  r5.add_node(3, 1, 0, 0);
+
+  n0 = r5.GetGraph()->GetNode(0);
+  n1 = r5.GetGraph()->GetNode(1);
+  n2 = r5.GetGraph()->GetNode(2);
+  n3 = r5.GetGraph()->GetNode(3);
+
+  unused.erase(0);
+  ASSERT_EQ(r5.BFS(n0, &unused), nullptr);
+  unused.insert(0);
+
+  unused.erase(1);
+  ASSERT_EQ(r5.BFS(n1, &unused), nullptr);
+  unused.insert(1);
+
+  unused.erase(2);
+  ASSERT_EQ(r5.BFS(n2, &unused), nullptr);
+  unused.insert(2);
+
+  unused.erase(3);
+  ASSERT_EQ(r5.BFS(n3, &unused), nullptr);
+}
+
 }
