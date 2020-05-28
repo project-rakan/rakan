@@ -219,6 +219,9 @@ bool Graph::ContainsEdge(const uint32_t node1_id,
 
 bool Graph::NodeExistsInDistrict(const uint32_t node_id,
                                  const uint32_t district) const {
+  if (district >= num_districts_) {
+    return false;
+  }
   return (nodes_in_district_[district]->find(node_id) !=
           nodes_in_district_[district]->end());
 }
