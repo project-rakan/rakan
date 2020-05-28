@@ -9,6 +9,7 @@ from progress.bar import IncrementalBar
 
 import pandas as pd
 import geopandas as gpd
+from shapely import wkt
 
 import os
 import io
@@ -19,7 +20,10 @@ VTD_TARGET = "https://www2.census.gov/geo/tiger/TIGER2012/VTD/tl_2012_{fips}_vtd
 TRACT_TARGET = "https://www2.census.gov/geo/tiger/GENZ2018/shp/cb_2018_{fips}_tract_500k.zip"
 
 DATA_LOCATION = os.path.join(os.getenv('RAKAN_LOCATION'), 'data')
-STATE_TABLE = os.path.join(os.getenv('RAKAN_LOCATION'), 'configs', 'stateKeys.csv')
+if DEBUG:
+    STATE_TABLE = os.path.join(os.getenv('RAKAN_LOCATION'), 'configs', 'stateKeys.csv')
+else:
+    STATE_TABLE = os.path.join(os.getenv('RAKAN_LOCATION'), 'configs', 'stateKeysProd.csv')
 
 CONGRESS_ZIP_NAME = os.path.join(DATA_LOCATION, "116_congress.zip")
 CONGRESS_DIR_NAME = os.path.join(DATA_LOCATION, "116_congress")
@@ -57,7 +61,7 @@ class Command(BaseCommand):
         states = []
 
         for line in lines:
-            fips, state_code, state_name, geoid, state_ns, granularity = line.split(',')
+            fips, state_code, state_name, geoid, state_ns, granularity = line.strip().split(',')
             if not State.objects.filter(fips=fips):
                 states.append(State(**{
                     'state': state_code,
@@ -103,8 +107,7 @@ class Command(BaseCommand):
         bar = IncrementalBar(f'Processing {len(lines)} states', max=len(lines) * 18)      # .next() called 18x/state
 
         for line in lines:
-            line = line.strip()
-            fips, state_code, state_name, geoid, state_ns, granularity = line.split(',')
+            fips, state_code, state_name, geoid, state_ns, granularity = line.strip().split(',')
             args = (fips, state_code, state_name, state_ns, ignore_cache, bar)
             bar.next()                       # 1 bar.next() calls (1)
             self.downloadState(*args)        # 6 bar.next() calls (7)
@@ -323,8 +326,7 @@ class Command(BaseCommand):
         return False
 
     def splitMultiPolygon(self, vtd):
-        import pdb; pdb.set_trace()
-        if vtd.geometry.type != 'Polygon':
+        if vtd.geometry.geom_type != 'Polygon':
             largestPolygon = sorted(vtd.geometry, key=lambda _: -_.area)[0]
             vtd.geometry = largestPolygon
             vtd.save()
@@ -341,7 +343,7 @@ class Command(BaseCommand):
         vtds = state.vtds.all()
         table = {'geometry': [], 'geoid': [], 'county': [], 'land': [], 'water': [], 'minorityPop': [], 'majorityPop': [], 'district': []}
         for vtd in vtds:
-            table['geometry'].append(vtd.geometry)
+            table['geometry'].append(wkt.loads(vtd.geometry.wkt))
             table['geoid'].append(vtd.geoid)
             table['county'].append(vtd.county)
             table['land'].append(vtd.land)
@@ -351,6 +353,25 @@ class Command(BaseCommand):
             table['district'].append(vtd.district)
 
         geometries = gpd.GeoDataFrame(table).dissolve('county')
+        state.vtds.all().delete()
+
+        new_vtds = []
+
+        for i, county in geometries.iterrows():
+            new_vtds.append(VTDBlock(**{
+                'state': state,
+                'geometry': GEOSGeometry(county['geometry'].to_wkt()),
+                'geoid': county['geoid'],
+                'county': i,
+                'name': f'County {i}',
+                'land': county['land'],
+                'water': county['water'],
+                'minorityPop': county['minorityPop'],
+                'majorityPop': county['majorityPop'],
+                'district': county['district']
+            }))
+
+        VTDBlock.objects.bulk_create(new_vtds)
 
         import pdb; pdb.set_trace()
 
@@ -358,7 +379,7 @@ class Command(BaseCommand):
         vtds = VTDBlock.objects.all()
         states = State.objects.all()
 
-        bar = IncrementalBar(f'Cleaning {len(vtds)} VTDs', max=len(vtds) * 2)      # .next() called 2x/vtd
+        bar = IncrementalBar(f'Cleaning {vtds.count()} VTDs', max=vtds.count() * 2)      # .next() called 2x/vtd
 
         for vtd in vtds:
             # filter water precincts
@@ -369,9 +390,12 @@ class Command(BaseCommand):
                 self.splitMultiPolygon(vtd)
             bar.next()
         
-        bar = IncrementalBar(f'Dissolving {len(states)} VTDs', max=len(states))      # .next() called 2x/vtd
+        bar.finish()
+
+        bar = IncrementalBar(f'Dissolving/Ignoring {len(states)} VTDs', max=len(states))      # .next() called 2x/vtd
 
         for state in states:
             # adjust for granularity
             self.dissolveGranularity(state)
 
+        bar.finish()
