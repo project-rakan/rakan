@@ -3,39 +3,17 @@ from django.core.management.base import BaseCommand
 from datamerger.models import VTDBlock, DistrictBlock, TractBlock
 from api.models import State
 
-from bladecaller.settings import DEBUG
+from bladecaller.settings import * # A bunch of constants
 
 from progress.bar import IncrementalBar
 
 import pandas as pd
 import geopandas as gpd
 from shapely import wkt
+import matplotlib.pyplot as plt
 
 import os
 import io
-
-CONGRESS_TARGET = "https://www2.census.gov/geo/tiger/GENZ2018/shp/cb_2018_us_cd116_20m.zip"
-CENSUS_TARGET = "http://censusdata.ire.org/{fips}/all_140_in_{fips}.P3.csv"
-VTD_TARGET = "https://www2.census.gov/geo/tiger/TIGER2012/VTD/tl_2012_{fips}_vtd10.zip"
-TRACT_TARGET = "https://www2.census.gov/geo/tiger/GENZ2018/shp/cb_2018_{fips}_tract_500k.zip"
-
-DATA_LOCATION = os.path.join(os.getenv('RAKAN_LOCATION'), 'data')
-if DEBUG:
-    STATE_TABLE = os.path.join(os.getenv('RAKAN_LOCATION'), 'configs', 'stateKeys.csv')
-else:
-    STATE_TABLE = os.path.join(os.getenv('RAKAN_LOCATION'), 'configs', 'stateKeysProd.csv')
-
-CONGRESS_ZIP_NAME = os.path.join(DATA_LOCATION, "116_congress.zip")
-CONGRESS_DIR_NAME = os.path.join(DATA_LOCATION, "116_congress")
-
-STATE_DIR_NAME = os.path.join(DATA_LOCATION, "{state_name}")
-STATE_CENSUS_FILE_NAME = os.path.join(STATE_DIR_NAME, "census.csv")
-
-STATE_VTD_DIR_NAME = os.path.join(STATE_DIR_NAME, "vtd")
-STATE_VTD_ZIP_NAME = os.path.join(STATE_DIR_NAME, "vtd.zip")
-
-STATE_TRACT_DIR_NAME = os.path.join(STATE_DIR_NAME, "tract")
-STATE_TRACT_ZIP_NAME = os.path.join(STATE_DIR_NAME, "tract.zip")
 
 HIDE_OUTPUT = ""
 
@@ -53,6 +31,7 @@ class Command(BaseCommand):
         self.install116Congress()               # Install the congressional districts into the db
         self.installStates(ignore_cache)        # Process all states
         self.cleanStates()                      # Break apart multipolygons/filter water precincts/adjust granularity
+        self.visualizeStates()                  # Visualize the states
 
     def loadStates(self):
         with io.open(STATE_TABLE) as handle:
@@ -395,5 +374,32 @@ class Command(BaseCommand):
         for state in states:
             # adjust for granularity
             self.dissolveGranularity(state)
+            state.precincts = state.vtds.all().count()
+            state.save()
+
+        bar.finish()
+
+    def visualizeStates(self):
+        total_vtds = VTDBlock.objects.all().count()
+        states = State.objects.all()
+
+        bar = IncrementalBar(f'Visualizing {total_vtds} VTDs', max=total_vtds)      # .next() called 1x/vtd
+
+        for state in states:
+            vtds = state.vtds.all()
+
+            table = {'geoid': [], 'geometry': [], 'district': []}
+            for vtd in vtds:
+                table['geometry'].append(wkt.loads(vtd.geometry.wkt))
+                table['geoid'].append(vtd.geoid)
+                table['district'].append(vtd.district.district_id)
+
+                bar.next()
+
+            geometries = gpd.GeoDataFrame(table)
+            geometries.boundary.plot()
+            geometries.plot(column='district')
+
+            plt.savefig(os.path.join(RAKAN_STATE_VISUALIZATIONS, f"{state.state}.png"))
 
         bar.finish()

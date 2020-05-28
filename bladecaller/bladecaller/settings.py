@@ -164,3 +164,31 @@ BROKER_URL = (
     f'{os.getenv("RABBIT_LOCATION", "localhost")}:'
     f'{os.getenv("RABBIT_PORT", "5672")}/{os.getenv("RABBIT_VHOST", "celery")}'
 )
+
+# Rakan settings
+
+CONGRESS_TARGET = "https://www2.census.gov/geo/tiger/GENZ2018/shp/cb_2018_us_cd116_20m.zip"
+CENSUS_TARGET = "http://censusdata.ire.org/{fips}/all_140_in_{fips}.P3.csv"
+VTD_TARGET = "https://www2.census.gov/geo/tiger/TIGER2012/VTD/tl_2012_{fips}_vtd10.zip"
+TRACT_TARGET = "https://www2.census.gov/geo/tiger/GENZ2018/shp/cb_2018_{fips}_tract_500k.zip"
+
+DATA_LOCATION = os.path.join(os.getenv('RAKAN_LOCATION'), 'data')
+
+if DEBUG:
+    STATE_TABLE = os.path.join(os.getenv('RAKAN_LOCATION'), 'configs', 'stateKeys.csv')
+else:
+    STATE_TABLE = os.path.join(os.getenv('RAKAN_LOCATION'), 'configs', 'stateKeysProd.csv')
+
+CONGRESS_ZIP_NAME = os.path.join(DATA_LOCATION, "116_congress.zip")
+CONGRESS_DIR_NAME = os.path.join(DATA_LOCATION, "116_congress")
+
+STATE_DIR_NAME = os.path.join(DATA_LOCATION, "{state_name}")
+STATE_CENSUS_FILE_NAME = os.path.join(STATE_DIR_NAME, "census.csv")
+
+STATE_VTD_DIR_NAME = os.path.join(STATE_DIR_NAME, "vtd")
+STATE_VTD_ZIP_NAME = os.path.join(STATE_DIR_NAME, "vtd.zip")
+
+STATE_TRACT_DIR_NAME = os.path.join(STATE_DIR_NAME, "tract")
+STATE_TRACT_ZIP_NAME = os.path.join(STATE_DIR_NAME, "tract.zip")
+
+RAKAN_STATE_VISUALIZATIONS = os.getenv("RAKAN_STATE_VISUALIZATIONS", "media/")
