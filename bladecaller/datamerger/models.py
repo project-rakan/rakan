@@ -3,10 +3,10 @@ from django.contrib.gis.db import models as gis_models
 
 from api.models import State
 
-# Create your models here.
+
 
 class VTDBlock(models.Model):
-    state = models.ForeignKey(State, on_delete=models.CASCADE)
+    state = models.ForeignKey(State, on_delete=models.CASCADE, related_name='vtds')
     geoid = models.CharField(max_length=255, unique=True)
     geometry = gis_models.GeometryField()
 
