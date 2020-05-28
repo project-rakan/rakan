@@ -465,7 +465,7 @@ bool Runner::IsValidRedistricting(Node *node1, Node *node2) {
     return false;
   }
   // Graph must contain nodes.
-  if (!graph_->ContainsNode(node1) || !graph_->ContainsNode(node2)) {
+  if (!graph_->ContainsNode(node1->id_) || !graph_->ContainsNode(node2->id_)) {
     return false;
   }
   // Graph must contain bi-directional edges between both nodes.
