@@ -17,6 +17,13 @@ class VTDBlock(models.Model):
     land = models.FloatField()
     water = models.FloatField()
 
+    minorityPop = models.IntegerField(default=0)
+    majorityPop = models.IntegerField(default=0)
+
+    @property
+    def overlapping_tracts(self):
+        return TractBlock.objects.filter(geometry__bboverlaps=self.geometry)
+
     def __str__(self):
         return self.name
 
@@ -46,3 +53,7 @@ class DistrictBlock(models.Model):
     state = models.ForeignKey(State, on_delete=models.CASCADE)
     district_id = models.IntegerField(unique=True)
     geometry = gis_models.GeometryField()
+
+    @property
+    def overlapping_vtds(self):
+        return VTDBlock.objects.filter(state=self.state, geometry__bboverlaps=self.geometry)
