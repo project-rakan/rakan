@@ -14,6 +14,11 @@ class State(models.Model):
     fips = models.IntegerField(unique=True)
     precincts = models.IntegerField()
 
+    granularity = models.CharField(max_length=6, choices=(
+        ('vtd', 'vtd'),
+        ('county', 'county'),
+    ), default='vtd')
+
     def __str__(self):
         return self.state
 
