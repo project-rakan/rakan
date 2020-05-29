@@ -16,13 +16,12 @@ cdef class Engine:
     cpdef int _precincts
     cpdef cstring _filepath;
 
-    def __cinit__(self, jsonLocation):
+    def __cinit__(self, handle):
         "Create an new engine with the initialization data in the jsonLocation"
 
         print('initializing')
         
-        with open(jsonLocation) as json_file:
-            data = json.load(json_file)
+        data = pickle.load(handle.read())
 
         self._districts = data['numDistricts']
         self._precincts = data['numPrecincts']
