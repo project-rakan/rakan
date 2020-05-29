@@ -497,6 +497,29 @@ bool Runner::IsValidRedistricting(Node *node1, Node *node2) {
   return true;
 }
 
+bool Runner::IsDistrictConnected(uint32_t district_id) {
+  unordered_set<int> *nodes = graph_->GetNodesInDistrict(district_id);
+  unordered_set<int>::iterator itr = nodes->begin();
+  Node *node, *neighbor_node;
+  
+  for (uint32_t i = 0; i < nodes->size() - 1; i++) {
+    if (itr == nodes->end()) {
+      break;
+    }
+    node = graph_->nodes_[*itr];
+    itr++;
+    if (itr == nodes->end()) {
+      break;
+    }
+    neighbor_node = graph_->nodes_[*itr];
+    if (!DoesPathExist(node, neighbor_node)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 Node *Runner::BFS(Node *start, unordered_set<uint32_t> *set) {
   Node *current_node;
   unordered_set<Node *> processed;

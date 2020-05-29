@@ -296,6 +296,8 @@ class Runner {
    */
   bool IsValidRedistricting(Node *node1, Node *node2);
 
+  bool IsDistrictConnected(uint32_t district_id);
+
   /**
   * A helper function that implements BFS on the graph. Searches for any node
   * that exists in the given set from start.
