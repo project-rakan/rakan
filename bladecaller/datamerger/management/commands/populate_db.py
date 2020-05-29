@@ -296,6 +296,20 @@ class Command(BaseCommand):
             vtd.district = district
             vtd.save()
 
+        # KNN the unknowns
+        for vtd in VTDBlock.objects.filter(state__fips=fips).filter(district_id__isnull=True):
+            votes = {}
+            neighbors = vtd.connected
+            for neighbor in neighbors:
+                if neighbor == vtd:
+                    continue
+
+                votes.setdefault(neighbor.district, 0)
+                votes[neighbor.district] += 1
+            
+            vtd.district = sorted(list(votes.items()), key=lambda _: _[1])[-1][0]
+            vtd.save()
+
         bar.next()
         
     def filterWater(self, vtd):
