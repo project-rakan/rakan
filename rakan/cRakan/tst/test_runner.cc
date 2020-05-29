@@ -97,6 +97,36 @@ Runner* GenerateHMap() {
   return r;
 }
 
+Runner* GenerateHourglassMap() {
+  Runner *r = new Runner(7, 3);
+  for (uint32_t i = 0; i < 7; i++) {
+    r->add_node(i, 0, 0, 0);
+  }
+  r->add_edge(0, 1);
+  r->add_edge(0, 3);
+  r->add_edge(1, 2);
+  r->add_edge(1, 3);
+  r->add_edge(2, 3);
+  r->add_edge(3, 4);
+  r->add_edge(3, 5);
+  r->add_edge(3, 6);
+  r->add_edge(4, 5);
+  r->add_edge(5, 6);
+
+  vector<uint32_t> districts(7);
+  districts[0] = 0;
+  districts[1] = 1;
+  districts[2] = 1;
+  districts[3] = 0;
+  districts[4] = 0;
+  districts[5] = 2;
+  districts[6] = 2;
+
+  r->set_districts(districts);
+  r->populate();
+  return r;
+}
+
 
 TEST(Test_Runner, TestBFSOneEdge) {
   unordered_set<uint32_t> unused;
@@ -313,7 +343,7 @@ TEST(Test_Runner, TestBFSNoEdges) {
   ASSERT_EQ(r5.BFS(n3, &unused), nullptr);
 }
 
-TEST(Test_Runner, TestRedistrict) {
+TEST(Test_Runner, TestRedistrict4x4Map) {
   Runner *r = Generate4x4Map();
   Graph *g = r->GetGraph();
   Node *victim_node, *idle_node;
@@ -328,9 +358,8 @@ TEST(Test_Runner, TestRedistrict) {
   expected_crossing_edges.emplace(9, 10);
   expected_crossing_edges.emplace(13, 14);
 
-  r->populate();
   crossing_edges = g->GetCrossingEdges();
-  ASSERT_EQ(crossing_edges->size(), 8);
+  ASSERT_EQ(crossing_edges->size(), expected_crossing_edges.size());
 
   // Node 1 currently in district 0
   victim_node = g->GetNode(1);
@@ -341,13 +370,12 @@ TEST(Test_Runner, TestRedistrict) {
   r->Redistrict(victim_node, idle_node);
   ASSERT_EQ(victim_node->GetDistrict(), 1);
   ASSERT_EQ(g->GetPerimNodeNeighbors(0, 1), nullptr);
-  ASSERT_EQ(crossing_edges->size(), 9);
 
   Edge e1(1, 2);
   expected_crossing_edges.erase(e1);
   expected_crossing_edges.emplace(0, 1);
   expected_crossing_edges.emplace(1, 5);
-  ASSERT_EQ(crossing_edges->size(), 9);
+  ASSERT_EQ(crossing_edges->size(), expected_crossing_edges.size());
   unordered_set<Edge, EdgeHash>::iterator itr = expected_crossing_edges.begin();
   for (uint32_t i = 0; i < expected_crossing_edges.size(); i++) {
     Edge expected = *itr;
@@ -370,12 +398,12 @@ TEST(Test_Runner, TestRedistrict) {
   r->Redistrict(victim_node, idle_node);
   ASSERT_EQ(victim_node->GetDistrict(), 0);
   ASSERT_EQ(g->GetPerimNodeNeighbors(2, 9), nullptr);
-  ASSERT_EQ(crossing_edges->size(), 10);
 
   Edge e2(5, 9);
   expected_crossing_edges.erase(e2);
   expected_crossing_edges.emplace(8, 9);
   expected_crossing_edges.emplace(9, 13);
+  ASSERT_EQ(crossing_edges->size(), expected_crossing_edges.size());
   itr = expected_crossing_edges.begin();
   for (uint32_t i = 0; i < expected_crossing_edges.size(); i++) {
     Edge expected = *itr;
@@ -399,11 +427,11 @@ TEST(Test_Runner, TestRedistrict) {
   ASSERT_EQ(victim_node->GetDistrict(), 0);
   ASSERT_EQ(g->GetPerimNodeNeighbors(2, 13), nullptr);
   ASSERT_NE(g->GetPerimNodeNeighbors(2, 12), nullptr);
-  ASSERT_EQ(crossing_edges->size(), 10);
 
   Edge e3(9, 13);
   expected_crossing_edges.erase(e3);
   expected_crossing_edges.emplace(12, 13);
+  ASSERT_EQ(crossing_edges->size(), expected_crossing_edges.size());
   itr = expected_crossing_edges.begin();
   for (uint32_t i = 0; i < expected_crossing_edges.size(); i++) {
     Edge expected = *itr;
@@ -427,12 +455,12 @@ TEST(Test_Runner, TestRedistrict) {
   ASSERT_EQ(victim_node->GetDistrict(), 3);
   ASSERT_EQ(g->GetPerimNodeNeighbors(1, 7), nullptr);
   ASSERT_NE(g->GetPerimNodeNeighbors(3, 7), nullptr);
-  ASSERT_EQ(crossing_edges->size(), 11);
 
   Edge e4(7, 11);
   expected_crossing_edges.erase(e4);
   expected_crossing_edges.emplace(3, 7);
   expected_crossing_edges.emplace(6, 7);
+  ASSERT_EQ(crossing_edges->size(), expected_crossing_edges.size());
   itr = expected_crossing_edges.begin();
   for (uint32_t i = 0; i < expected_crossing_edges.size(); i++) {
     Edge expected = *itr;
@@ -453,13 +481,13 @@ TEST(Test_Runner, TestRedistrict) {
   ASSERT_EQ(g->GetPerimNodeNeighbors(3, 7), nullptr);
   ASSERT_NE(g->GetPerimNodeNeighbors(1, 7), nullptr);
   ASSERT_EQ(g->GetPerimNodeNeighbors(3, 7), nullptr);
-  ASSERT_EQ(crossing_edges->size(), 10);
 
   Edge e5(3, 7);
   Edge e6(6, 7);
   expected_crossing_edges.erase(e5);
   expected_crossing_edges.erase(e6);
   expected_crossing_edges.emplace(7, 11);
+  ASSERT_EQ(crossing_edges->size(), expected_crossing_edges.size());
   itr = expected_crossing_edges.begin();
   for (uint32_t i = 0; i < expected_crossing_edges.size(); i++) {
     Edge expected = *itr;
@@ -472,6 +500,109 @@ TEST(Test_Runner, TestRedistrict) {
   ASSERT_EQ(g->GetNodesInDistrict(1)->size(), 5);
   ASSERT_EQ(g->GetNodesInDistrict(2)->size(), 2);
   ASSERT_EQ(g->GetNodesInDistrict(3)->size(), 4);
+}
+
+TEST(Test_Runner, TestRedistrictHourglassMap) {
+  Runner *r = GenerateHourglassMap();
+  Graph *g = r->GetGraph();
+  Node *victim_node, *idle_node;
+  unordered_set<Edge, EdgeHash> *crossing_edges;
+  unordered_set<Edge, EdgeHash> expected_crossing_edges;
+  expected_crossing_edges.emplace(0, 1);
+  expected_crossing_edges.emplace(1, 3);
+  expected_crossing_edges.emplace(2, 3);
+  expected_crossing_edges.emplace(3, 5);
+  expected_crossing_edges.emplace(3, 6);
+  expected_crossing_edges.emplace(4, 5);
+  crossing_edges = g->GetCrossingEdges();
+  ASSERT_EQ(crossing_edges->size(), expected_crossing_edges.size());
+
+  // Node 3 currently in district 0, try to move it into district 1
+  // Should NOT be allowed because district 0 will be disconnected
+  victim_node = g->GetNode(3);
+  idle_node = g->GetNode(1);
+  ASSERT_FALSE(r->IsValidRedistricting(victim_node, idle_node));
+  ASSERT_EQ(victim_node->GetDistrict(), 0);
+
+  // Node 1 currently in district 1
+  victim_node = g->GetNode(1);
+  idle_node = g->GetNode(3);
+
+  // Redistrict node 1 -> node 3
+  ASSERT_TRUE(r->IsValidRedistricting(victim_node, idle_node));
+  r->Redistrict(victim_node, idle_node);
+  ASSERT_EQ(victim_node->GetDistrict(), 0);
+  ASSERT_EQ(g->GetPerimNodeNeighbors(1, 1), nullptr);
+  ASSERT_EQ(g->GetPerimNodeNeighbors(0, 0), nullptr);
+  ASSERT_NE(g->GetPerimNodeNeighbors(0, 1), nullptr);
+
+  Edge e1(0, 1);
+  Edge e2(1, 3);
+  expected_crossing_edges.erase(e1);
+  expected_crossing_edges.erase(e2);
+  expected_crossing_edges.emplace(1, 2);
+  ASSERT_EQ(crossing_edges->size(), expected_crossing_edges.size());
+  unordered_set<Edge, EdgeHash>::iterator itr = expected_crossing_edges.begin();
+  for (uint32_t i = 0; i < expected_crossing_edges.size(); i++) {
+    Edge expected = *itr;
+    ASSERT_NE(crossing_edges->find(expected), crossing_edges->end());
+    Edge actual = *crossing_edges->find(expected);
+    ASSERT_EQ(expected, expected);
+    itr++;
+  }
+  ASSERT_EQ(g->GetNodesInDistrict(0)->size(), 4);
+  ASSERT_EQ(g->GetNodesInDistrict(1)->size(), 1);
+  ASSERT_EQ(g->GetNodesInDistrict(2)->size(), 2);
+
+  // Node 2 currently in district 1, try to move it into district 0
+  // Should NOT be allowed because district 1 will be empty
+  victim_node = g->GetNode(2);
+  idle_node = g->GetNode(1);
+  ASSERT_FALSE(r->IsValidRedistricting(victim_node, idle_node));
+  ASSERT_EQ(victim_node->GetDistrict(), 1);
+
+  // Node 3 currently in district 0, try to move it into district 2
+  // Should NOT be allowed because district 0 will be disconnected
+  victim_node = g->GetNode(3);
+  idle_node = g->GetNode(5);
+  ASSERT_FALSE(r->IsValidRedistricting(victim_node, idle_node));
+  ASSERT_EQ(victim_node->GetDistrict(), 0);
+
+  // Node 4 currently in district 0
+  victim_node = g->GetNode(4);
+  idle_node = g->GetNode(5);
+
+  // Redistrict node 4 -> node 5
+  ASSERT_TRUE(r->IsValidRedistricting(victim_node, idle_node));
+  r->Redistrict(victim_node, idle_node);
+  ASSERT_EQ(victim_node->GetDistrict(), 2);
+  ASSERT_EQ(g->GetPerimNodeNeighbors(0, 4), nullptr);
+  ASSERT_NE(g->GetPerimNodeNeighbors(2, 4), nullptr);
+  ASSERT_NE(g->GetPerimNodeNeighbors(0, 3), nullptr);
+  ASSERT_NE(g->GetPerimNodeNeighbors(2, 5), nullptr);
+
+  Edge e3(4, 5);
+  expected_crossing_edges.erase(e3);
+  expected_crossing_edges.emplace(3, 4);
+  ASSERT_EQ(crossing_edges->size(), expected_crossing_edges.size());
+  itr = expected_crossing_edges.begin();
+  for (uint32_t i = 0; i < expected_crossing_edges.size(); i++) {
+    Edge expected = *itr;
+    ASSERT_NE(crossing_edges->find(expected), crossing_edges->end());
+    Edge actual = *crossing_edges->find(expected);
+    ASSERT_EQ(expected, expected);
+    itr++;
+  }
+  ASSERT_EQ(g->GetNodesInDistrict(0)->size(), 3);
+  ASSERT_EQ(g->GetNodesInDistrict(1)->size(), 1);
+  ASSERT_EQ(g->GetNodesInDistrict(2)->size(), 3);
+
+  // Node 5 currently in district 2, try to move it into district 0
+  // Should NOT be allowed because district 2 will be disconnected
+  victim_node = g->GetNode(5);
+  idle_node = g->GetNode(3);
+  ASSERT_FALSE(r->IsValidRedistricting(victim_node, idle_node));
+  ASSERT_EQ(victim_node->GetDistrict(), 2);
 }
 
 TEST(Test_Runner, TestSeveredDistrictSimple) {
