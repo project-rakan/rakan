@@ -21,6 +21,7 @@ cd bladecaller
 python3.7 manage.py makemigrations
 python3.7 manage.py migrate
 python3.7 manage.py populate_db
+python3.7 manage.py create_frontend_json
 python3.7 manage.py collectstatic --noinput
 cd ..
 
