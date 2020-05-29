@@ -106,7 +106,7 @@ class Graph {
   * @return true iff node does not already belong in district and addition
   *         successful, false otherwise
   */
-  bool AddNodeToDistrict(uint32_t node, int district);
+  bool AddNodeToDistrict(uint32_t node, uint32_t district);
 
   /**
   * Removes the given node from the given district. Node must exist in district
@@ -119,7 +119,7 @@ class Graph {
   * @return true iff node exists in district and removal successful, false
   *         otherwise
   */
-  bool RemoveNodeFromDistrict(uint32_t node, int district);
+  bool RemoveNodeFromDistrict(uint32_t node, uint32_t district);
 
   /**
   * Adds the given node to the given district's set of perim nodes. Node must
@@ -131,7 +131,7 @@ class Graph {
   * @return true iff node exists in district and addition to perim nodes list
   *         successful, false otherwise
   */
-  bool AddNodeToDistrictPerim(uint32_t node, int district);
+  bool AddNodeToDistrictPerim(uint32_t node, uint32_t district);
 
   /**
   * Removes the given node from the given district's set of perim nodes. Node
@@ -143,7 +143,7 @@ class Graph {
   * @return true iff node is a perimeter node in given district and removal
   *         successful, false otherwise
   */
-  bool RemoveNodeFromDistrictPerim(uint32_t node, int district);
+  bool RemoveNodeFromDistrictPerim(uint32_t node, uint32_t district);
 
 
   /////////////////////////////////////////////////////////////////////////////

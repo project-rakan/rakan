@@ -46,6 +46,7 @@ Graph::Graph(const uint32_t num_nodes,
   perim_edges_ = new vector<pair<int, int>>;
   pop_of_district_ = new uint32_t[num_districts_];
   min_pop_of_district_ = new uint32_t[num_districts_];
+  maj_pop_of_district_ = new uint32_t[num_districts_];
 
   for (int i = 0; i < num_districts_; i++) {
     pop_of_district_[i] = 0;
@@ -137,7 +138,7 @@ void Graph::AddStatePop(uint32_t val) {
   state_pop_ += val;
 }
 
-bool Graph::AddNodeToDistrict(uint32_t node_id, int district) {
+bool Graph::AddNodeToDistrict(uint32_t node_id, uint32_t district) {
   if (nodes_in_district_[district]->find(node_id) !=
       nodes_in_district_[district]->end()) {
     return false;
@@ -150,7 +151,7 @@ bool Graph::AddNodeToDistrict(uint32_t node_id, int district) {
   return true;
 }
 
-bool Graph::RemoveNodeFromDistrict(uint32_t node_id, int district) {
+bool Graph::RemoveNodeFromDistrict(uint32_t node_id, uint32_t district) {
   if (nodes_in_district_[district]->find(node_id) ==
       nodes_in_district_[district]->end()) {
     return false;
@@ -163,7 +164,7 @@ bool Graph::RemoveNodeFromDistrict(uint32_t node_id, int district) {
   return true;
 }
 
-bool Graph::AddNodeToDistrictPerim(uint32_t node_id, int district) {
+bool Graph::AddNodeToDistrictPerim(uint32_t node_id, uint32_t district) {
   Node *node = nodes_[node_id];
   if (nodes_on_perim_[node->district_]->find(node->id_) !=
       nodes_on_perim_[node->district_]->end()) {
@@ -180,7 +181,7 @@ bool Graph::AddNodeToDistrictPerim(uint32_t node_id, int district) {
   return true;
 }
 
-bool Graph::RemoveNodeFromDistrictPerim(uint32_t node_id, int district) {
+bool Graph::RemoveNodeFromDistrictPerim(uint32_t node_id, uint32_t district) {
   Node *node = nodes_[node_id];
   if (nodes_on_perim_[district]->find(node->id_) ==
       nodes_on_perim_[district]->end()) {
