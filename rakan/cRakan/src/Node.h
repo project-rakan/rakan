@@ -14,127 +14,169 @@ namespace rakan {
 
 class Node {
  public:
+
   /////////////////////////////////////////////////////////////////////////////
   // Constructors, destructors, and operators
   /////////////////////////////////////////////////////////////////////////////
 
-  // Default constructor.
-  Node();
-
-  // Constructor with a unique ID.
-  explicit Node(const uint32_t id);
-
-  // Constructor with a unique ID and a district ID.
-  Node(const uint32_t id, const uint32_t district);
-
-  // Constructor with a unique ID, a district ID, and a set
-  // of neighbors. Assumes the neighbors are dynamically
-  // allocated via new.
+  /**
+  * Default constructor.
+  * 
+  * @param    id              the id to identify this node as
+  * @param    county          the county this node resides in
+  * @param    majority_pop    the population that is of the majority race
+  * @param    minority_pop    the population that is of the minority races
+  */
   Node(const uint32_t id,
-       const uint32_t district,
-       unordered_set<uint32_t> *neighbors);
+       const uint32_t county,
+       const uint32_t majority_pop,
+       const uint32_t minority_pop);
 
-  // Destructor.
-  ~Node() { delete neighbors_; delete demographics_; }
+  /**
+   * Default destructor.
+   */
+  ~Node();
 
-  // Operator == for equality check.
-  //
-  // Arguments:
-  //  - other: the other node to check for equality
-  //
-  // Returns:
-  //  - true iff all fields in the nodes are the same
-  //  - false otherwise
+  /**
+   * Operator == for equality check.
+   * 
+   * @param     other     the other node to check for equality
+   * 
+   * @return true iff all fields in the nodes are the same, false otherwise
+   */
   bool operator== (const Node& other) const;
+
 
   /////////////////////////////////////////////////////////////////////////////
   // Accessors
   /////////////////////////////////////////////////////////////////////////////
 
-  // Returns the district this node resides in.
-  uint32_t GetDistrict() { return district_; }
-
+  /**
+   * Gets the ID of this node.
+   * 
+   * @return the node id
+   */
   uint32_t GetID() { return id_; }
 
-  uint32_t GetArea() { return area_; }
+  /**
+   * Gets the county this node resides in.
+   * 
+   * @return the county
+   */
+  uint32_t GetCounty() { return county_; }
 
+  /**
+   * Gets the district this node resides in.
+   * 
+   * @return the district
+   */
+  uint32_t GetDistrict() { return district_; }
+
+  /**
+   * Gets the total population of this node.
+   * 
+   * @return the total population
+   */
+  uint32_t GetTotalPop() { return total_pop_; }
+
+  /**
+   * Gets the majority population of this node.
+   * 
+   * @return the majority population
+   */
+  uint32_t GetMajorityPop() { return majority_pop_; }
+
+  /**
+   * Gets the minority population of this node.
+   * 
+   * @return the majority population
+   */
+  uint32_t GetMinorityPop() { return minority_pop_; }
+
+  /**
+   * Gets the set of neighbors of this node.
+   * 
+   * @return a pointer to the set of neighbors
+   */
   unordered_set<uint32_t>* GetNeighbors() { return neighbors_; }
-
-  unordered_map<string, uint32_t>* GetDemographics() { return demographics_; }
-
-  uint32_t GetTotalPop() { return (*demographics_)["total"]; }
-  uint32_t GetMinPop() { return ((*demographics_)["total"] - (*demographics_)["ca"]); }
   
   /////////////////////////////////////////////////////////////////////////////
   // Mutators
   /////////////////////////////////////////////////////////////////////////////
 
-  // Adds other node as a neighbor to this node. Also adds
-  // this node as a neighbor to the other node. The relationship
-  // is bi-directional.
-  //
-  // Arguments:
-  //  - other: the neighbor to this node
-  //
-  // Returns:
-  //  - true iff the relationship is new
-  //  - false otherwise
-  bool AddNeighbor(const Node& other);
+  /**
+   * Adds the specified neighbor to the neighbor list.
+   * 
+   * @param     neighbor    the id of the neighbor to add
+   * 
+   * @return true iff the neighbor is not already in the neighbor list, false
+   *         otherwise
+   */
+  bool AddNeighbor(const uint32_t neighbor);
 
+  /**
+   * Sets the county to the specified county.
+   * 
+   * @param         county        the new county
+   */
+  void SetCounty(const uint32_t county) { county_ = county; }
+
+  /**
+   * Sets the district to the specified county.
+   * 
+   * @param         district      the new district
+   */
   void SetDistrict(const uint32_t district) { district_ = district; }
 
-  // Sets the total population in this node to be val.
-  void SetTotalPop(const uint32_t val) {
-    demographics_->insert({"total", val});
-  }
+  /**
+   * Sets the total population to the specified val. Does not
+   * alter the other population numbers
+   * 
+   * @param         val     the new total population
+   */
+  void SetTotalPop(const uint32_t val) { total_pop_ = val; }
 
-  // Sets the African American population in this node to
-  // be val.
-  void SetAAPop(const uint32_t val) {
-    demographics_->insert({"aa", val});
-  }
+  /**
+   * Sets the majority population to the specified val. Does not
+   * alter the other population numbers
+   * 
+   * @param         val     the new majority population
+   */
+  void SetMajorityPop(const uint32_t val) { majority_pop_ = val; }
 
-  // Sets the American Indian population in this node to
-  // be val.
-  void SetAIPop(const uint32_t val) {
-    demographics_->insert({"ai", val});
-  }
-
-  // Sets the Asian population in this node to be val.
-  void SetASPop(const uint32_t val) {
-    demographics_->insert({"as", val});
-  }
-
-  // Sets the Caucasian population in this node to be val.
-  void SetCAPop(const uint32_t val) {
-    demographics_->insert({"ca", val});
-  }
-
-  // Sets the other population in this node to be val.
-  void SetOtherPop(const uint32_t val) {
-    demographics_->insert({"other", val});
-  }
+  /**
+   * Sets the minority population to the specified val. Does not
+   * alter the other population numbers
+   * 
+   * @param         val     the new minority population
+   */
+  void SetMinorityPop(const uint32_t val) { minority_pop_ = val; }
 
  private:
   // The unique node ID.
   uint32_t id_;
 
-  // The area of this node.
-  uint32_t area_;
+  // The county this node resides in.
+  uint32_t county_;
 
   // The district this node resides in.
   uint32_t district_;
 
+  // The total population of this node.
+  uint32_t total_pop_;
+
+  // The total majority population of this node.
+  uint32_t majority_pop_;
+
+  // The total minority population of this node.
+  uint32_t minority_pop_;
+
   // The set of neighbors this node has.
   unordered_set<uint32_t> *neighbors_;
-
-  // A demographics map.
-  unordered_map<string, uint32_t> *demographics_;
 
   // Needed for populating data structures in graph from file.
   friend class Runner;
   friend class Graph;
-  friend class Reader;
 };        // class Node
 
 }         // namespace rakan
