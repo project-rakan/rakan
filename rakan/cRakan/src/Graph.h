@@ -149,7 +149,7 @@ class Graph {
   * @return true iff node does not already belong in district and addition
   *         successful, false otherwise
   */
-  bool AddNodeToDistrict(uint32_t node, int district);
+  bool AddNodeToDistrict(uint32_t node, uint32_t district);
 
   /**
   * Removes the given node from the given district. Node must exist in district
@@ -162,7 +162,7 @@ class Graph {
   * @return true iff node exists in district and removal successful, false
   *         otherwise
   */
-  bool RemoveNodeFromDistrict(uint32_t node, int district);
+  bool RemoveNodeFromDistrict(uint32_t node, uint32_t district);
 
   /**
   * Adds the given node to the given district's set of perim nodes. Node must
@@ -174,7 +174,7 @@ class Graph {
   * @return true iff node exists in district and addition to perim nodes list
   *         successful, false otherwise
   */
-  bool AddNodeToDistrictPerim(uint32_t node, int district);
+  bool AddNodeToDistrictPerim(uint32_t node, uint32_t district);
 
   /**
   * Removes the given node from the given district's set of perim nodes. Node
@@ -186,7 +186,7 @@ class Graph {
   * @return true iff node is a perimeter node in given district and removal
   *         successful, false otherwise
   */
-  bool RemoveNodeFromDistrictPerim(uint32_t node, int district);
+  bool RemoveNodeFromDistrictPerim(uint32_t node, uint32_t district);
 
   /**
    * Updates the map of perimeter nodes to neighbors. Evaluates whether the
@@ -373,13 +373,12 @@ class Graph {
   // to a set of nodes on the perimeter of that district.
   unordered_set<int> **nodes_on_perim_;
 
-  // To keep track of all of the nodes that have been added.
-  unordered_set<uint32_t> *added_ids_; 
-
   // A map of an index to an edge that contain two nodes in different
   // districts.
   unordered_set<Edge, EdgeHash> *crossing_edges_;
-  // vector<pair<int, int>> *perim_edges_;
+  
+  // To keep track of all of the nodes that have been added.
+  unordered_set<uint32_t> *added_ids_; 
 
   // An array of maps. The index of the map is the district
   // ID. Each district map stores node IDs as keys, and each
