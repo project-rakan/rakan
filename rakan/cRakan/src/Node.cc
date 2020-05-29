@@ -18,9 +18,8 @@ Node::Node(const uint32_t id,
                                           county_(county),
                                           majority_pop_(majority_pop),
                                           minority_pop_(minority_pop) {
-  
-  neighbors_ = new unordered_set<uint32_t>;
   total_pop_ = majority_pop + minority_pop;
+  neighbors_ = new unordered_set<uint32_t>;
 }
 
 Node::~Node() {

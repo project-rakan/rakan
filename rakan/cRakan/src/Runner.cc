@@ -1,5 +1,9 @@
 #include "./Runner.h"
 
+///////////////////////////////////////////////////////////////
+#include <iostream>     // FOR DEBUGGING, REMOVE FOR PRODUCTION
+///////////////////////////////////////////////////////////////
+
 #include <math.h>               // for pow(), log(), fmin()
 #include <inttypes.h>           // for uint32_t, etc.
 #include <stdlib.h>             // for rand()
@@ -71,37 +75,38 @@ bool Runner::add_edge(uint32_t node_one, uint32_t node_two) {
 }
 
 bool Runner::set_districts(vector<uint32_t>& districts) {
-  if (districts.size() != graph_->GetNumDistricts()) {
+  if (districts.size() != graph_->num_nodes_) {
     return false;
   }
 
   for (int i = 0; i < districts.size(); i++) {
-    graph_->nodes_[i]->district_ = districts[i];
+    if (districts[i] >= graph_->num_districts_) {
+      return false;
+    }
+    Node *node = graph_->nodes_[i];
+    if (graph_->NodeExistsInDistrict(node->id_, node->district_)) {
+      graph_->RemoveNodeFromDistrict(node->id_, node->district_);
+    }
+    graph_->AddNodeToDistrict(node->id_, districts[i]);
   }
 
   return true;
 }
 
-bool Runner::seed() {
-  uint32_t i;
+unordered_set<Node *>* Runner::GenerateRandomSeeds() {
+  unordered_set<Node *> *seed_nodes = new unordered_set<Node *>;
+  Node *seed_node;
   int32_t prev_random_index, random_index;
   vector<uint32_t> random_indexes;
-  unordered_set<Node *> unused, seed_nodes;
-  unordered_map<int, Node *> last_found;
-  Node *found_node, *seed_node;
 
-  for (i = 0; i < graph_->num_nodes_; i++) {
-    unused.insert(graph_->nodes_[i]);
-  }
-
-  for (i = 0; i < graph_->num_districts_; i++) {
+  for (uint32_t i = 0; i < graph_->num_districts_; i++) {
     random_index = rand() % graph_->num_nodes_;
     if (std::find(random_indexes.begin(),
                   random_indexes.end(),
                   random_index) == random_indexes.end()) {
+      graph_->AddNodeToDistrict(random_index, i);
       seed_node = graph_->nodes_[random_index];
-      seed_node->SetDistrict(i);
-      seed_nodes.insert(seed_node);
+      seed_nodes->insert(seed_node);
       random_indexes.push_back(random_index);
       changes_->insert({seed_node->id_, i});
     } else {
@@ -109,18 +114,30 @@ bool Runner::seed() {
     }
   }
 
-  for (auto &node : seed_nodes) {
-    unused.erase(node);
+  return seed_nodes;
+}
+
+bool Runner::SpawnDistricts(unordered_set<Node *> *seed_nodes) {
+  unordered_set<uint32_t> unused;
+  unordered_map<int, Node *> last_found;
+  Node *found_node, *seed_node;
+
+  for (uint32_t i = 0; i < graph_->num_nodes_; i++) {
+    unused.insert(i);
+  }
+
+  for (auto &node : *seed_nodes) {
+    unused.erase(node->id_);
     last_found[node->district_] = node;
   }
 
   while (unused.size() > 0) {
     uint32_t check = unused.size();
-    for (int i = 0; i < graph_->num_districts_; i++) {
+    for (uint32_t i = 0; i < graph_->num_districts_; i++) {
       found_node = BFS(last_found[i], &unused);
       if (found_node != nullptr) {
-        found_node->SetDistrict(i);
-        unused.erase(found_node);
+        graph_->AddNodeToDistrict(found_node->id_, i);
+        unused.erase(found_node->id_);
         last_found[i] = found_node;
         changes_->insert({found_node->id_, i});
       }
@@ -129,8 +146,11 @@ bool Runner::seed() {
       return false;
     }
   }
-
   return true;
+}
+
+bool Runner::seed() {
+  return SpawnDistricts(GenerateRandomSeeds());
 }
 
 void Runner::populate() {
@@ -146,14 +166,8 @@ void Runner::populate() {
     for (auto &neighbor_id : *current_node->neighbors_) {
       neighbor_node = graph_->nodes_[neighbor_id];
       if (neighbor_node->district_ != current_district) {
-        if (std::find(graph_->perim_edges_->begin(),
-                      graph_->perim_edges_->end(),
-                      std::make_pair<int, int>(neighbor_id, i))
-                      == graph_->perim_edges_->end()) {
-          graph_->perim_edges_->push_back({i, neighbor_id});
-        }
+        graph_->MarkCrossingEdge(i, neighbor_id);
         graph_->nodes_on_perim_[current_district]->insert(i);
-
         map = graph_->perim_nodes_to_neighbors_[current_district];
         if (map->find(i) == map->end()) {
           (*map)[i] = new unordered_set<uint32_t>;
@@ -238,46 +252,49 @@ double Runner::LogScore() {
 
 double Runner::MetropolisHastings() {
   double old_score, new_score, ratio;
-  uint32_t random_index, random_number, old_district, new_district;
-  std::pair<int, int> edge;
-  Node *node;
+  uint32_t i, random_index, random_number, old_district, new_district;
+  Edge edge;
+  Node *victim_node, *idle_node;
   bool is_valid = false, accepted = false;
 
   // random number generators initialization
   unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
   std::default_random_engine generator(seed);
-  uniform_real_distribution<double> index(0, graph_->perim_edges_->size());
-  uniform_real_distribution<double> number(0, graph_->perim_edges_->size());
+  uniform_real_distribution<double> index(0, graph_->crossing_edges_->size());
+  uniform_real_distribution<double> number(0, graph_->crossing_edges_->size());
   uniform_real_distribution<double> decimal_number(0, 1);
 
   while (!is_valid) {
     random_index = floor(index(generator));
-    edge.first = (*graph_->perim_edges_)[random_index].first;
-    edge.second = (*graph_->perim_edges_)[random_index].second;
+    i = 0;
+    unordered_set<Edge, EdgeHash>::iterator itr = graph_->crossing_edges_->begin();
+    while (i < random_index) {
+      itr++;
+      i++;
+    }
+    edge = *itr;
 
     random_number = floor(number(generator));
-    if (random_number > graph_->perim_edges_->size() / 2) {
-      node = graph_->nodes_[edge.first];
-      new_district = graph_->nodes_[edge.second]->district_;
+    if (random_number > graph_->crossing_edges_->size() / 2) {
+      victim_node = graph_->nodes_[edge.node1];
+      idle_node = graph_->nodes_[edge.node2];
     } else {
-      node = graph_->nodes_[edge.second];
-      new_district = graph_->nodes_[edge.first]->district_;
+      victim_node = graph_->nodes_[edge.node2];
+      idle_node = graph_->nodes_[edge.node1];
     }
 
-    old_district = node->district_;
-    is_valid = !IsEmptyDistrict(old_district) && !IsDistrictSevered(node);
-    is_valid &= (graph_->nodes_[edge.first]->district_ !=
-                 graph_->nodes_[edge.second]->district_);
-    is_valid &= (edge.first != edge.second);
+    old_district = victim_node->district_;
+    is_valid = IsValidRedistricting(victim_node, idle_node);
   }
 
   old_score = LogScore();
-  new_score = Redistrict(node, new_district);
+  new_score = Redistrict(victim_node, idle_node);
 
   if (new_score > old_score) {
     ratio = decimal_number(generator);
     if (ratio <= (old_score / new_score)) {
-      Redistrict(node, old_district);
+      victim_node->district_ = old_district;
+      Redistrict(victim_node, victim_node);
       score_ = old_score;
     } else {
       score_ = new_score;
@@ -288,38 +305,22 @@ double Runner::MetropolisHastings() {
     accepted = true;
   }
   
-  (*changes_)[node->id_] = node->district_;
+  (*changes_)[victim_node->id_] = victim_node->district_;
   num_steps_++;
 
   return old_score - new_score;
 }
 
-double Runner::Redistrict(Node *node, int new_district) {
-  int old_district = node->district_;
+double Runner::Redistrict(Node *victim_node, Node *idle_node) {
+  int old_district = victim_node->district_;
+  int new_district = idle_node->district_;
 
-  graph_->RemoveNodeFromDistrict(node->id_, old_district);
-  graph_->RemoveNodeFromDistrictPerim(node->id_, old_district);
-
-  vector<pair<int, int>>::iterator iter = graph_->perim_edges_->begin();
-  vector<pair<int, int>> *new_perim_edges = new vector<pair<int, int>>;
-  while (iter != graph_->perim_edges_->end()) {
-    pair<int, int> edge = *iter;
-    if (edge.first != node->id_ && edge.second != node->id_) {
-      new_perim_edges->push_back(edge);
-    }
-    iter++;
-  }
-  delete graph_->perim_edges_;
-  graph_->perim_edges_ = new_perim_edges;
-
-  graph_->AddNodeToDistrict(node->id_, new_district);
-  graph_->AddNodeToDistrictPerim(node->id_, new_district);
-
-  for (auto &neighbor_id : *node->neighbors_) {
-    if (graph_->nodes_[neighbor_id]->district_ != new_district) {
-        graph_->perim_edges_->push_back({node->id_, neighbor_id});
-    }
-  }
+  graph_->RemoveNodeFromDistrict(victim_node->id_, old_district);
+  graph_->RemoveNodeFromDistrictPerim(victim_node->id_, old_district);
+  graph_->AddNodeToDistrict(victim_node->id_, new_district);
+  graph_->AddNodeToDistrictPerim(victim_node->id_, new_district);
+  graph_->UpdatePerimNode(victim_node);
+  graph_->UpdatePerimNode(idle_node);
 
   return LogScore();
 }
@@ -347,7 +348,7 @@ bool Runner::IsEmptyDistrict(int old_district) {
   return graph_->nodes_in_district_[old_district]->size() <= 1;
 }
 
-bool Runner::IsDistrictSevered(Node *proposed_node) {
+bool Runner::IsDistrictSevered(Node *proposed_node, uint32_t new_district) {
   unordered_map<int, vector<Node *>> map;
   Node *start;
   int old_district = proposed_node->district_;
@@ -366,6 +367,24 @@ bool Runner::IsDistrictSevered(Node *proposed_node) {
       }
     }
   }
+
+  graph_->AddNodeToDistrict(proposed_node->id_, new_district);
+  unordered_set<int> *nodes = graph_->GetNodesInDistrict(new_district);
+  if (nodes->size() > 1) {
+    unordered_set<int>::iterator itr = nodes->begin();
+    while (1) {
+      Node *first = graph_->GetNode(*itr);
+      if (itr == nodes->end() || ++itr == nodes->end()) {
+        break;
+      }
+      Node *second = graph_->GetNode(*itr);
+      if (!DoesPathExist(first, second)) {
+        proposed_node->district_ = old_district;
+        return true;
+      }
+    }
+  }
+  graph_->RemoveNodeFromDistrict(proposed_node->id_, new_district);
 
   proposed_node->district_ = old_district;
   return false;
@@ -422,7 +441,32 @@ vector<map<string, double>> Runner::getScores() {
  // Helpers
  //////////////////////////////////////////////////////////////////////////////
 
-Node *Runner::BFS(Node *start, unordered_set<Node *> *set) {
+bool Runner::IsValidRedistricting(Node *node1, Node *node2) {
+  // Nodes must be different and in different districts.
+  if (node1 == node2 || node1->district_ == node2->district_) {
+    return false;
+  }
+  // Graph must contain nodes.
+  if (!graph_->ContainsNode(node1->id_) || !graph_->ContainsNode(node2->id_)) {
+    return false;
+  }
+  // Graph must contain bi-directional edges between both nodes.
+  if (!graph_->ContainsEdge(node1->id_, node2->id_) || 
+      !graph_->ContainsEdge(node2->id_, node1->id_)) {
+    return false;
+  }
+  // Old district must not be empty after redistricting.
+  if (IsEmptyDistrict(node1->district_)) {
+    return false;
+  }
+  // Old district and new district must not be severed after redistricting.
+  if (IsDistrictSevered(node1, node2->district_)) {
+    return false;
+  }
+  return true;
+}
+
+Node *Runner::BFS(Node *start, unordered_set<uint32_t> *set) {
   Node *current_node;
   unordered_set<Node *> processed;
   queue<Node *> q;
@@ -432,7 +476,7 @@ Node *Runner::BFS(Node *start, unordered_set<Node *> *set) {
     current_node = q.front();
     q.pop();
 
-    if (set->find(current_node) != set->end()) {
+    if (set->find(current_node->id_) != set->end()) {
       return current_node;
     }
 

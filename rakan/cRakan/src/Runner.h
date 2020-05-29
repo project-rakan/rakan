@@ -105,6 +105,24 @@ class Runner {
   */
   void populate();
 
+  /**
+   * Randomly selects num_districts number of indexes on the graph. Selects
+   * those seeds as seed nodes to their distinct districts and returns the
+   * set of seed nodes.
+   * 
+   * @return a pointer to a set of randomly generated seed nodes
+   */
+  unordered_set<Node *>* GenerateRandomSeeds();
+
+  /**
+   * Spawns districts on the graph by traversing the given seed nodes via BFS.
+   * 
+   * @param         seed_nodes        the pointer to the set of seed nodes
+   * 
+   * @return true iff all precincts are connected; false otherwise
+   */
+  bool SpawnDistricts(unordered_set<Node *> *seed_nodes);
+
 
  //////////////////////////////////////////////////////////////////////////////
  // Scoring
@@ -176,7 +194,7 @@ class Runner {
   * 
   * @return the score of this redistricting
   */
-  double Redistrict(Node *node, int new_district);
+  double Redistrict(Node *victim_node, Node *idle_node);
 
   /**
   * Walks along the graph this Runner has loaded. Implements the
@@ -210,15 +228,17 @@ class Runner {
   bool IsEmptyDistrict(int district);
 
   /**
-  * Queries whether or not the district that the proposed node is in will be
-  * severed once the proposed node is removed.
+  * Queries whether or not the district that the proposed node is in and the
+  * district that the proposed node will be moved into will be severed.
   * 
   * @param    proposed_node   the node that will be hypothetically removed
   *                           from its district
+  * @param    new_district    the new district ID that is the proposed node
+  *                           will move into
   * 
   * @return true iff the district will be severed
   */
-  bool IsDistrictSevered(Node *proposed_node);
+  bool IsDistrictSevered(Node *proposed_node, uint32_t new_district);
 
   /**
   * Queries whether or not a path exists between the start node and the target
@@ -232,6 +252,13 @@ class Runner {
   * belong in the same district
   */
   bool DoesPathExist(Node *start, Node *target);
+
+  /**
+   * Gets the graph this instance runs on.
+   * 
+   * @return a pointer to the internal graph
+   */
+  Graph *GetGraph() { return graph_; }
 
   /**
    * Gets the list of changes of the graph on every step of the walk. The
@@ -259,15 +286,26 @@ class Runner {
  //////////////////////////////////////////////////////////////////////////////
 
   /**
+   * Checks if the redistricting of node1 to node2 is valid. Specifically,
+   * checks to if either districts will be severed and if either districts
+   * will be empty.
+   * 
+   * @param       node1       the node to redistrict
+   * @param       node2       the neighbor node to node1 and the node whose
+   *                          district is the new district of node1
+   */
+  bool IsValidRedistricting(Node *node1, Node *node2);
+
+  /**
   * A helper function that implements BFS on the graph. Searches for any node
   * that exists in the given set from start.
   *
-  * @param    start     The node to start the traversal from
-  * @param    set       The set of target nodes
+  * @param    start     the node to start the traversal from
+  * @param    set       the set of target nodes
   *
   * @return the pointer to the first node found in set; nullptr if not found
   */
-  Node *BFS(Node *start, unordered_set<Node *> *set);
+  Node *BFS(Node *start, unordered_set<uint32_t> *set);
 
 
  private:
