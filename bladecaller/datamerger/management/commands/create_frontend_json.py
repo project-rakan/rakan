@@ -27,32 +27,24 @@ class Command(BaseCommand):
         parser.add_argument('--ignore-cache', type=bool, default=False)
 
     def handle(self, *args, **options):
-        # raise NotImplementedError("Abstract!")
-        
-        djangoDF = pd.DataFrame(list(VTDBlock.objects.all().values()))
-        
         for state in State.objects.all():
-            self.toJSON(djangoDF[djangoDF['state_id'] == state.id], state)
+            df = pd.DataFrame(list(state.vtds.all().values()))
+            self.toJSON(df, state)
 
     def toJSON(self, df1, state):
-
         df = df1.reset_index()
         # Convert each precinct's POLYGON into a list of (x,y) coordinates
         stCode = state.state
         maxDistricts = state.maxDistricts
         fips = state.fips
 
-
-
         coordLists = self.getPolyCoords(df.geometry)
 
-        
-        import pdb; pdb.set_trace()
         precincts = []
+        dflen = len(df) - 1
         for index, prec in df.iterrows():
             precName = prec['name']
-            precID = index
-
+            precID = dflen - index
             vertices = []
             for v in coordLists[index]:
                 coord = {
@@ -67,7 +59,7 @@ class Command(BaseCommand):
                 "vertices": vertices,
             }
             precincts.append(precinctEntry)
-
+        precincts.reverse()
         dictionary = {
             "state": stCode,
             "maxDistricts": maxDistricts,
@@ -78,9 +70,9 @@ class Command(BaseCommand):
         json_loc = OUTPUT_JSON_LOCATION.format(code=stCode)+'.json'
 
         with open(json_loc, "w") as outfile:
-            return outfile.write(json.dumps(dictionary, indent = 4))
+            outfile.write(json.dumps(dictionary, indent = 4))
 
-        toJSONDict(df, stCode)
+        self.toJSONDict(df, stCode)
 
 
     def getPolyCoords(self, geo):
@@ -91,14 +83,18 @@ class Command(BaseCommand):
             coordsList.append(geo[i].coords[0])
         return coordsList
 
-    def toJSONDict(df, stCode):
+    def toJSONDict(self, df, stCode):
         mapping = []
+        dflen = len(df) - 1
         for index, prec in df.iterrows():
-            mapping.append([int(index), prec['district']])
+            district = DistrictBlock.objects.filter(id=prec['district_id'])[0]
+            mapping.append([dflen - index, district.district_id])
+
+        mapping.reverse()
         output = {
             "state": stCode,
             "map": mapping
         }
         districtsLoc = OUTPUT_JSON_LOCATION.format(code=stCode)+'.districts.json'
         with open(districtsLoc, "w") as outfile:
-            return outfile.write(json.dumps(output, indent = 4))
+            outfile.write(json.dumps(output, indent = 4))
