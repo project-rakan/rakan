@@ -225,6 +225,9 @@ bool Graph::UpdatePerimNode(Node *node) {
       crossing_neighbors.insert(neighbor);
       if (crossing_edges_->find(e) == crossing_edges_->end()) {
         crossing_edges_->insert(e);
+        if (!IsPerimNode(neighbor)) {
+          AddNodeToDistrictPerim(neighbor, nodes_[neighbor]->district_);
+        }
       }
     } else if (crossing_edges_->find(e) != crossing_edges_->end()) {
       crossing_edges_->erase(e);
@@ -262,6 +265,13 @@ bool Graph::NodeExistsInDistrict(const uint32_t node_id,
           nodes_in_district_[district]->end());
 }
 
+bool Graph::IsPerimNode(const uint32_t node_id) const {
+  if (perim_nodes_to_neighbors_[nodes_[node_id]->district_]->find(node_id) ==
+      perim_nodes_to_neighbors_[nodes_[node_id]->district_]->end()) {
+        return false;
+  }
+  return true;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Accessors

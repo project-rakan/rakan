@@ -230,10 +230,20 @@ class Graph {
   * @param    node        the node to test for existence
   * @param    district    the district to test whether it contains node
   * 
-  * @return true iff the node exists on the graph and is in distric, false
+  * @return true iff the node exists on the graph and is in district; false
   *         otherwise
   */
   bool NodeExistsInDistrict(const uint32_t node, uint32_t district) const;
+
+  /**
+   * Queries whether or not the node is on the perimeter of its district.
+   * 
+   * @param   node        the node to test if it is on the perimeter for
+   *
+   * @return true iff the node is on the perimeter of its district; false
+   *         otherwise
+   */
+  bool IsPerimNode(const uint32_t node) const;
 
 
   /////////////////////////////////////////////////////////////////////////////

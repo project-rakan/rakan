@@ -1,5 +1,7 @@
 #include <inttypes.h>
 
+#include <iostream>
+
 #include "../src/Runner.h"
 #include "../src/Graph.h"
 #include "../src/Node.h"
@@ -73,6 +75,15 @@ TEST(Test_Runner, TestRedistrict) {
   Graph *g = r->GetGraph();
   Node *victim_node, *idle_node;
   unordered_set<Edge, EdgeHash> *crossing_edges;
+  unordered_set<Edge, EdgeHash> expected_crossing_edges;
+  expected_crossing_edges.emplace(1, 2);
+  expected_crossing_edges.emplace(5, 6);
+  expected_crossing_edges.emplace(4, 8);
+  expected_crossing_edges.emplace(5, 9);
+  expected_crossing_edges.emplace(6, 10);
+  expected_crossing_edges.emplace(7, 11);
+  expected_crossing_edges.emplace(9, 10);
+  expected_crossing_edges.emplace(13, 14);
 
   r->populate();
   crossing_edges = g->GetCrossingEdges();
@@ -83,40 +94,114 @@ TEST(Test_Runner, TestRedistrict) {
   idle_node = g->GetNode(2);
   ASSERT_EQ(victim_node->GetDistrict(), 0);
 
-  // Redistrict node 1 into district 1
+  // Redistrict node 1 -> node 2
   r->Redistrict(victim_node, idle_node);
   ASSERT_EQ(victim_node->GetDistrict(), 1);
-  // node 1 should no longer exist in district 0
   ASSERT_EQ(g->GetPerimNodeNeighbors(0, 1), nullptr);
-  // node 1 should now exist in district 1
   ASSERT_EQ(crossing_edges->size(), 9);
+
   Edge e1(1, 2);
-  ASSERT_EQ(crossing_edges->find(e1), crossing_edges->end());
-  Edge e2(0, 1);
-  ASSERT_NE(crossing_edges->find(e2), crossing_edges->end());
-  Edge e3(1, 5);
-  ASSERT_NE(crossing_edges->find(e3), crossing_edges->end());
+  expected_crossing_edges.erase(e1);
+  expected_crossing_edges.emplace(0, 1);
+  expected_crossing_edges.emplace(1, 5);
+  ASSERT_EQ(crossing_edges->size(), 9);
+  unordered_set<Edge, EdgeHash>::iterator itr = expected_crossing_edges.begin();
+  for (uint32_t i = 0; i < expected_crossing_edges.size(); i++) {
+    Edge expected = *itr;
+    ASSERT_NE(crossing_edges->find(expected), crossing_edges->end());
+    Edge actual = *crossing_edges->find(expected);
+    ASSERT_EQ(expected, expected);
+    itr++;
+  }
+  ASSERT_EQ(g->GetNodesInDistrict(0)->size(), 3);
+  ASSERT_EQ(g->GetNodesInDistrict(1)->size(), 5);
+  ASSERT_EQ(g->GetNodesInDistrict(2)->size(), 4);
+  ASSERT_EQ(g->GetNodesInDistrict(3)->size(), 4);
 
   // Node 9 currently in district 2
   victim_node = g->GetNode(9);
   idle_node = g->GetNode(5);
   ASSERT_EQ(victim_node->GetDistrict(), 2);
 
-  // Redistrict node 9 into district 0
+  // Redistrict node 9 -> node 5
   r->Redistrict(victim_node, idle_node);
   ASSERT_EQ(victim_node->GetDistrict(), 0);
-  // node 9 should no longer exist in district 2
   ASSERT_EQ(g->GetPerimNodeNeighbors(2, 9), nullptr);
-  // node 9 should now exist in district 0
   ASSERT_EQ(crossing_edges->size(), 10);
-  Edge e4(5, 9);
-  ASSERT_EQ(crossing_edges->find(e4), crossing_edges->end());
-  Edge e5(8, 9);
-  ASSERT_NE(crossing_edges->find(e5), crossing_edges->end());
-  Edge e6(9, 13);
-  ASSERT_NE(crossing_edges->find(e6), crossing_edges->end());
-  Edge e7(9, 10);
-  ASSERT_NE(crossing_edges->find(e7), crossing_edges->end());
+
+  Edge e2(5, 9);
+  expected_crossing_edges.erase(e2);
+  expected_crossing_edges.emplace(8, 9);
+  expected_crossing_edges.emplace(9, 13);
+  itr = expected_crossing_edges.begin();
+  for (uint32_t i = 0; i < expected_crossing_edges.size(); i++) {
+    Edge expected = *itr;
+    ASSERT_NE(crossing_edges->find(expected), crossing_edges->end());
+    Edge actual = *crossing_edges->find(expected);
+    ASSERT_EQ(expected, expected);
+    itr++;
+  }
+  ASSERT_EQ(g->GetNodesInDistrict(0)->size(), 4);
+  ASSERT_EQ(g->GetNodesInDistrict(1)->size(), 5);
+  ASSERT_EQ(g->GetNodesInDistrict(2)->size(), 3);
+  ASSERT_EQ(g->GetNodesInDistrict(3)->size(), 4);
+
+  // Node 13 currently in district 2
+  victim_node = g->GetNode(13);
+  idle_node = g->GetNode(9);
+  ASSERT_EQ(victim_node->GetDistrict(), 2);
+
+  // Redistrict node 13 -> node 9
+  r->Redistrict(victim_node, idle_node);
+  ASSERT_EQ(victim_node->GetDistrict(), 0);
+  ASSERT_EQ(g->GetPerimNodeNeighbors(2, 13), nullptr);
+  ASSERT_NE(g->GetPerimNodeNeighbors(2, 12), nullptr);
+  ASSERT_EQ(crossing_edges->size(), 10);
+
+  Edge e3(9, 13);
+  expected_crossing_edges.erase(e3);
+  expected_crossing_edges.emplace(12, 13);
+  itr = expected_crossing_edges.begin();
+  for (uint32_t i = 0; i < expected_crossing_edges.size(); i++) {
+    Edge expected = *itr;
+    ASSERT_NE(crossing_edges->find(expected), crossing_edges->end());
+    Edge actual = *crossing_edges->find(expected);
+    ASSERT_EQ(expected, expected);
+    itr++;
+  }
+  ASSERT_EQ(g->GetNodesInDistrict(0)->size(), 5);
+  ASSERT_EQ(g->GetNodesInDistrict(1)->size(), 5);
+  ASSERT_EQ(g->GetNodesInDistrict(2)->size(), 2);
+  ASSERT_EQ(g->GetNodesInDistrict(3)->size(), 4);
+
+  // Node 7 currently in district 1
+  victim_node = g->GetNode(7);
+  idle_node = g->GetNode(11);
+  ASSERT_EQ(victim_node->GetDistrict(), 1);
+
+  // Redistrict node 7 -> node 11
+  r->Redistrict(victim_node, idle_node);
+  ASSERT_EQ(victim_node->GetDistrict(), 3);
+  ASSERT_EQ(g->GetPerimNodeNeighbors(1, 7), nullptr);
+  ASSERT_NE(g->GetPerimNodeNeighbors(3, 7), nullptr);
+  ASSERT_EQ(crossing_edges->size(), 11);
+
+  Edge e4(7, 11);
+  expected_crossing_edges.erase(e4);
+  expected_crossing_edges.emplace(3, 7);
+  expected_crossing_edges.emplace(6, 7);
+  itr = expected_crossing_edges.begin();
+  for (uint32_t i = 0; i < expected_crossing_edges.size(); i++) {
+    Edge expected = *itr;
+    ASSERT_NE(crossing_edges->find(expected), crossing_edges->end());
+    Edge actual = *crossing_edges->find(expected);
+    ASSERT_EQ(expected, expected);
+    itr++;
+  }
+  ASSERT_EQ(g->GetNodesInDistrict(0)->size(), 5);
+  ASSERT_EQ(g->GetNodesInDistrict(1)->size(), 4);
+  ASSERT_EQ(g->GetNodesInDistrict(2)->size(), 2);
+  ASSERT_EQ(g->GetNodesInDistrict(3)->size(), 5);
 }
 
 TEST(Test_Runner, TestSeveredDistrictSimple) {
