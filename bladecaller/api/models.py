@@ -28,38 +28,9 @@ class State(models.Model):
     def stateJsonLocation(self):
         return os.path.join(MAP_ROOT, f"{self.state}.json")
 
+    @property
     def stateEngineData(self):
-        path = os.path.join(MAP_ROOT, f'{self.state}.pkl')
-        if not os.path.isfile(path):
-            precinct_id_map = {vtd: i for i, vtd in enumerate(self.vtds.all())}
-            precincts = []
-            edges = {()}
-
-            for vtd, i in precinct_id_map.items():
-                precincts.append({
-                    "nodeID": i,
-                    "curDistrict": vtd.district.district_id,
-                    "county": vtd.county,
-                    "area": vtd.land,
-                    "minPopulation": vtd.minorityPop,
-                    "majPopulation": vtd.majorityPop
-                })
-
-                for neighbor in vtd.connected:
-                    edges.add(tuple(sorted([precinct_id_map[neighbor], i])))
-
-            payload = {
-                'stCode': self.state,
-                'numPrecincts': self.precincts,
-                'numDistricts': self.maxDistricts,
-                'precincts': precincts,
-                'edges': edges
-            }
-
-            with io.open(path, 'wb') as handle:
-                handle.write(pickle.dumps(payload))
-        
-        return io.open(path, 'rb')
+        return os.path.join(MAP_ROOT, f'{self.state}.pkl')
         
 
 class GeneratedMap(models.Model):
@@ -76,6 +47,7 @@ class GeneratedMap(models.Model):
     borderRespect = models.FloatField()
     vra = models.FloatField()
 
+    visualization = models.ImageField()
 
 class Job(models.Model):
     added = models.DateTimeField(auto_now_add=True)
