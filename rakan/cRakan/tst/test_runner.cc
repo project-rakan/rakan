@@ -67,6 +67,33 @@ Runner* Generate4x4Map() {
   districts[15] = 3;
 
   r->set_districts(districts);
+  r->populate();
+  return r;
+}
+
+Runner* GenerateHMap() {
+  Runner *r = new Runner(7, 3);
+  for (uint32_t i = 0; i < 7; i++) {
+    r->add_node(i, 0, 0, 0);
+  }
+  r->add_edge(0, 1);
+  r->add_edge(1, 2);
+  r->add_edge(1, 3);
+  r->add_edge(4, 5);
+  r->add_edge(5, 6);
+  r->add_edge(3, 5);
+
+  vector<uint32_t> districts(7);
+  districts[0] = 0;
+  districts[1] = 0;
+  districts[2] = 0;
+  districts[3] = 1;
+  districts[4] = 2;
+  districts[5] = 2;
+  districts[6] = 2;
+
+  r->set_districts(districts);
+  r->populate();
   return r;
 }
 
@@ -450,36 +477,15 @@ TEST(Test_Runner, TestRedistrict) {
 TEST(Test_Runner, TestSeveredDistrictSimple) {
   // r has 7 precincts, 3 districts
   // draws out an H shape
-  Runner r(7, 3);
-  for (uint32_t i = 0; i < 7; i++) {
-    r.add_node(i, 0, 0, 0);
-  }
-  r.add_edge(0, 1);
-  r.add_edge(1, 2);
-  r.add_edge(1, 3);
-  r.add_edge(4, 5);
-  r.add_edge(5, 6);
-  r.add_edge(3, 5);
-
-  vector<uint32_t> districts(7);
-  districts[0] = 0;
-  districts[1] = 0;
-  districts[2] = 0;
-  districts[3] = 1;
-  districts[4] = 2;
-  districts[5] = 2;
-  districts[6] = 2;
-
-  r.set_districts(districts);
-  r.populate();
-  ASSERT_TRUE(r.IsDistrictSevered(r.GetGraph()->GetNode(0), 1));
-  ASSERT_TRUE(r.IsDistrictSevered(r.GetGraph()->GetNode(1), 1));
-  ASSERT_TRUE(r.IsDistrictSevered(r.GetGraph()->GetNode(2), 1));
-  ASSERT_FALSE(r.IsDistrictSevered(r.GetGraph()->GetNode(3), 0));
-  ASSERT_FALSE(r.IsDistrictSevered(r.GetGraph()->GetNode(3), 2));
-  ASSERT_TRUE(r.IsDistrictSevered(r.GetGraph()->GetNode(4), 0));
-  ASSERT_TRUE(r.IsDistrictSevered(r.GetGraph()->GetNode(5), 1));
-  ASSERT_TRUE(r.IsDistrictSevered(r.GetGraph()->GetNode(6), 0));
+  Runner *r = GenerateHMap();
+  ASSERT_TRUE(r->IsDistrictSevered(r->GetGraph()->GetNode(0), 1));
+  ASSERT_TRUE(r->IsDistrictSevered(r->GetGraph()->GetNode(1), 1));
+  ASSERT_TRUE(r->IsDistrictSevered(r->GetGraph()->GetNode(2), 1));
+  ASSERT_FALSE(r->IsDistrictSevered(r->GetGraph()->GetNode(3), 0));
+  ASSERT_FALSE(r->IsDistrictSevered(r->GetGraph()->GetNode(3), 2));
+  ASSERT_TRUE(r->IsDistrictSevered(r->GetGraph()->GetNode(4), 0));
+  ASSERT_TRUE(r->IsDistrictSevered(r->GetGraph()->GetNode(5), 1));
+  ASSERT_TRUE(r->IsDistrictSevered(r->GetGraph()->GetNode(6), 0));
 }
 
 TEST(Test_Runner, TestIsValidRedistricting) {
