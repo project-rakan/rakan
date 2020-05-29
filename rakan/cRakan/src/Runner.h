@@ -194,7 +194,7 @@ class Runner {
   * 
   * @return the score of this redistricting
   */
-  double Redistrict(Node *node, int new_district);
+  double Redistrict(Node *victim_node, Node *idle_node);
 
   /**
   * Walks along the graph this Runner has loaded. Implements the

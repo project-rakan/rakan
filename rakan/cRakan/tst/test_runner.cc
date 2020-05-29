@@ -71,6 +71,52 @@ Runner* Generate4x4Map() {
 TEST(Test_Runner, TestRedistrict) {
   Runner *r = Generate4x4Map();
   Graph *g = r->GetGraph();
+  Node *victim_node, *idle_node;
+  unordered_set<Edge, EdgeHash> *crossing_edges;
+
+  r->populate();
+  crossing_edges = g->GetCrossingEdges();
+  ASSERT_EQ(crossing_edges->size(), 8);
+
+  // Node 1 currently in district 0
+  victim_node = g->GetNode(1);
+  idle_node = g->GetNode(2);
+  ASSERT_EQ(victim_node->GetDistrict(), 0);
+
+  // Redistrict node 1 into district 1
+  r->Redistrict(victim_node, idle_node);
+  ASSERT_EQ(victim_node->GetDistrict(), 1);
+  // node 1 should no longer exist in district 0
+  ASSERT_EQ(g->GetPerimNodeNeighbors(0, 1), nullptr);
+  // node 1 should now exist in district 1
+  ASSERT_EQ(crossing_edges->size(), 9);
+  Edge e1(1, 2);
+  ASSERT_EQ(crossing_edges->find(e1), crossing_edges->end());
+  Edge e2(0, 1);
+  ASSERT_NE(crossing_edges->find(e2), crossing_edges->end());
+  Edge e3(1, 5);
+  ASSERT_NE(crossing_edges->find(e3), crossing_edges->end());
+
+  // Node 9 currently in district 2
+  victim_node = g->GetNode(9);
+  idle_node = g->GetNode(5);
+  ASSERT_EQ(victim_node->GetDistrict(), 2);
+
+  // Redistrict node 9 into district 0
+  r->Redistrict(victim_node, idle_node);
+  ASSERT_EQ(victim_node->GetDistrict(), 0);
+  // node 9 should no longer exist in district 2
+  ASSERT_EQ(g->GetPerimNodeNeighbors(2, 9), nullptr);
+  // node 9 should now exist in district 0
+  ASSERT_EQ(crossing_edges->size(), 10);
+  Edge e4(5, 9);
+  ASSERT_EQ(crossing_edges->find(e4), crossing_edges->end());
+  Edge e5(8, 9);
+  ASSERT_NE(crossing_edges->find(e5), crossing_edges->end());
+  Edge e6(9, 13);
+  ASSERT_NE(crossing_edges->find(e6), crossing_edges->end());
+  Edge e7(9, 10);
+  ASSERT_NE(crossing_edges->find(e7), crossing_edges->end());
 }
 
 TEST(Test_Runner, TestSeveredDistrictSimple) {

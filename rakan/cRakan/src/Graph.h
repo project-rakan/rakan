@@ -18,6 +18,36 @@ using std::vector;
 
 namespace rakan {
 
+struct Edge {
+  Edge() {}
+
+  Edge(uint32_t n1, uint32_t n2) {
+    if (n1 < n2) {
+      node1 = n1;
+      node2 = n2;
+    } else if (n2 < n1) {
+      node1 = n2;
+      node2 = n1;
+    }
+  }
+
+  Edge(const Edge &other) = default;
+
+  bool operator==(const Edge &edge) const {
+    return (node1 == edge.node1 && node2 == edge.node2);
+  }
+
+  uint32_t node1;
+  uint32_t node2;
+};
+
+class EdgeHash {
+ public:
+  size_t operator()(const Edge &edge) const {
+    return edge.node1 + edge.node2;
+  }
+};
+
 class Graph {
  public:
 
@@ -89,6 +119,19 @@ class Graph {
   bool AddEdge(uint32_t node1, uint32_t node2);
 
   /**
+   * Marks the edge between the two supplied nodes as crossing. There must
+   * not exist an edge between node1 and node2 and their districts must be
+   * different.
+   * 
+   * @param   node1   the crossing neighbor of node2
+   * @param   node2   the crossing neighbor of node1
+   * 
+   * @return true iff edge exists between node1 and node2 and their districts
+   *         are different
+   */
+  bool MarkCrossingEdge(uint32_t node1, uint32_t node2);
+
+  /**
   * Adds to the state population.
   * 
   * @param    val   the value to add to the state population
@@ -144,6 +187,17 @@ class Graph {
   *         successful, false otherwise
   */
   bool RemoveNodeFromDistrictPerim(uint32_t node, int district);
+
+  /**
+   * Updates the map of perimeter nodes to neighbors. Evaluates whether the
+   * node is on the perimeter of its district and refreshes its list of
+   * neighbors that are in different districts.
+   * 
+   * @param       node     the node to update
+   * 
+   * @return true iff the node exists; false otherwise
+   */
+  bool UpdatePerimNode(Node *node);
 
 
   /////////////////////////////////////////////////////////////////////////////
@@ -258,6 +312,13 @@ class Graph {
                                                  const uint32_t node) const;
 
   /**
+   * Gets the set of edges that are crossing.
+   * 
+   * @return a pointer to the set of crossing edges
+   */
+  unordered_set<Edge, EdgeHash>* GetCrossingEdges();
+
+  /**
   * Gets the total population of the given district.
   * 
   * @param    district    the district to get the total population of
@@ -305,7 +366,10 @@ class Graph {
   // To keep track of all of the nodes that have been added.
   unordered_set<uint32_t> *added_ids_; 
 
-  vector<pair<int, int>> *perim_edges_;
+  // A map of an index to an edge that contain two nodes in different
+  // districts.
+  unordered_set<Edge, EdgeHash> *crossing_edges_;
+  // vector<pair<int, int>> *perim_edges_;
 
   // An array of maps. The index of the map is the district
   // ID. Each district map stores node IDs as keys, and each
