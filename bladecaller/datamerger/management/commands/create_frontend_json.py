@@ -17,7 +17,7 @@ import json
 
 
 env = os.getenv("RAKAN_STATEFILES")
-OUTPUT_JSON_LOCATION = env + "/{code}.json"
+OUTPUT_JSON_LOCATION = env + "/{code}"
 
 
 class Command(BaseCommand):
@@ -75,10 +75,12 @@ class Command(BaseCommand):
             "precincts": precincts
         }
 
-        json_loc = OUTPUT_JSON_LOCATION.format(code=stCode)
+        json_loc = OUTPUT_JSON_LOCATION.format(code=stCode)+'.json'
 
         with open(json_loc, "w") as outfile:
             return outfile.write(json.dumps(dictionary, indent = 4))
+
+        toJSONDict(df, stCode)
 
 
     def getPolyCoords(self, geo):
@@ -88,3 +90,15 @@ class Command(BaseCommand):
         for i in range(len(geo)):
             coordsList.append(geo[i].coords[0])
         return coordsList
+
+    def toJSONDict(df, stCode):
+        mapping = []
+        for index, prec in df.iterrows():
+            mapping.append([int(index), prec['district']])
+        output = {
+            "state": stCode,
+            "map": mapping
+        }
+        districtsLoc = OUTPUT_JSON_LOCATION.format(code=stCode)+'.districts.json'
+        with open(districtsLoc, "w") as outfile:
+            return outfile.write(json.dumps(output, indent = 4))
