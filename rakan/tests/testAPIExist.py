@@ -17,12 +17,9 @@ class testAPIExist(unittest.TestCase):
         self.assertTrue(hasattr(self.engineClass, "districts"))
         self.assertTrue(hasattr(self.engineClass, "visualize"))
 
-    def test_initialize_from_json(self):
-        engine = self.engineClass("./testData/iowa.runner.json")
-
     def test_canLoad(self):
         "Test that this class can be instantiated"
-        self.runnerClass("/var/www/html/stateinfo/IA.json")
+        self.engineClass("/var/www/html/stateinfo/IA.runner.json")
 
 """
     def setUp(self):
