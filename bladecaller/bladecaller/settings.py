@@ -144,7 +144,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = '/var/www/html/static/'
-MAP_ROOT = '/var/www/html/stateinfo/'
+MAP_ROOT = os.getenv('RAKAN_STATEFILES', '/var/www/html/stateinfo/')
 
 # Django Restframework
 # https://www.django-rest-framework.org/
