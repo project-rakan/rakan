@@ -4,6 +4,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 import os
+import io
+import pickle
 from bladecaller.settings import MAP_ROOT
 
 # Create your models here.
@@ -26,9 +28,14 @@ class State(models.Model):
     def stateJsonLocation(self):
         return os.path.join(MAP_ROOT, f"{self.state}.json")
 
-    @property
-    def stateDistrictJsonLocation(self):
-        return os.path.join(MAP_ROOT, f"{self.state}.districts.json")
+    def stateEngineData(self):
+        f = io.StringIO()
+
+
+
+        f.seek(0)
+        return f
+        
 
 class GeneratedMap(models.Model):
     added = models.DateTimeField(auto_now_add=True)

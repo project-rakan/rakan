@@ -92,7 +92,7 @@ def scoreMap(request):
 
     # Connect to single threaded engine (blocking & ids don't matter)
 
-    engine = engine(stateModel.stateJsonLocation)
+    engine = engine(stateModel.stateEngineData())
     engine.setDistricts(districting)
     scores = engine.getScores()
 
