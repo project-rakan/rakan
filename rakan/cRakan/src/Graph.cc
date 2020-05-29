@@ -21,11 +21,10 @@ namespace rakan {
 ///////////////////////////////////////////////////////////////////////////////
 
 Graph::Graph(const uint32_t num_nodes,
-             const uint32_t num_districts,
-             const uint32_t state_pop)
+             const uint32_t num_districts)
     : num_nodes_(num_nodes),
       num_districts_(num_districts),
-      state_pop_(state_pop) {
+      state_pop_(0) {
   nodes_ = new Node*[num_nodes_];
 
   nodes_in_district_ = new unordered_set<int>*[num_districts_];
@@ -52,8 +51,10 @@ Graph::Graph(const uint32_t num_nodes,
   for (int i = 0; i < num_districts_; i++) {
     pop_of_district_[i] = 0;
     min_pop_of_district_[i] = 0;
-    min_pop_of_district_[i] = 0;
+    maj_pop_of_district_[i] = 0;
   }
+
+  added_ids_ = new unordered_set<uint32_t>;
 }
 
 Graph::~Graph() {
@@ -66,8 +67,9 @@ Graph::~Graph() {
   delete[] min_pop_of_district_;
 
   // Delete all node pointers in nodes_.
-  for (i = 0; i < num_nodes_; i++) {
-    delete nodes_[i];
+  unordered_set<uint32_t>::iterator itr; 
+  for (itr = added_ids_->begin(); itr != added_ids_->end(); itr++) {
+    delete nodes_[*itr];
   }
   delete[] nodes_;
 
@@ -89,6 +91,8 @@ Graph::~Graph() {
   }
 
   delete[] perim_nodes_to_neighbors_;
+
+  delete added_ids_;
 }
 
 
@@ -100,8 +104,12 @@ bool Graph::AddNode(Node *node) {
   if (node->id_ > num_nodes_) {
     return false;
   }
-
+  if (added_ids_->find(node->id_) != added_ids_->end()) {
+    return false;
+  }
   nodes_[node->id_] = node;
+  state_pop_ += node->total_pop_;
+  added_ids_->insert(node->id_);
   return true;
 }
 
@@ -112,7 +120,11 @@ bool Graph::AddNode(const uint32_t id,
   if (id > num_nodes_) {
     return false;
   }
-
+  if (added_ids_->find(id) != added_ids_->end()) {
+    return false;
+  }
+  added_ids_->insert(id);
+  state_pop_ += majority_pop + minority_pop;
   nodes_[id] = new Node(id, county, majority_pop, minority_pop);
   return true;
 }
@@ -138,7 +150,7 @@ void Graph::AddStatePop(uint32_t val) {
   state_pop_ += val;
 }
 
-bool Graph::AddNodeToDistrict(uint32_t node_id, int district) {
+bool Graph::AddNodeToDistrict(uint32_t node_id, uint32_t district) {
   if (nodes_in_district_[district]->find(node_id) !=
       nodes_in_district_[district]->end()) {
     return false;
@@ -151,7 +163,7 @@ bool Graph::AddNodeToDistrict(uint32_t node_id, int district) {
   return true;
 }
 
-bool Graph::RemoveNodeFromDistrict(uint32_t node_id, int district) {
+bool Graph::RemoveNodeFromDistrict(uint32_t node_id, uint32_t district) {
   if (nodes_in_district_[district]->find(node_id) ==
       nodes_in_district_[district]->end()) {
     return false;
@@ -164,7 +176,7 @@ bool Graph::RemoveNodeFromDistrict(uint32_t node_id, int district) {
   return true;
 }
 
-bool Graph::AddNodeToDistrictPerim(uint32_t node_id, int district) {
+bool Graph::AddNodeToDistrictPerim(uint32_t node_id, uint32_t district) {
   Node *node = nodes_[node_id];
   if (nodes_on_perim_[node->district_]->find(node->id_) !=
       nodes_on_perim_[node->district_]->end()) {
@@ -181,7 +193,7 @@ bool Graph::AddNodeToDistrictPerim(uint32_t node_id, int district) {
   return true;
 }
 
-bool Graph::RemoveNodeFromDistrictPerim(uint32_t node_id, int district) {
+bool Graph::RemoveNodeFromDistrictPerim(uint32_t node_id, uint32_t district) {
   Node *node = nodes_[node_id];
   if (nodes_on_perim_[district]->find(node->id_) ==
       nodes_on_perim_[district]->end()) {
@@ -232,8 +244,8 @@ bool Graph::UpdatePerimNode(Node *node) {
 // Queries
 ///////////////////////////////////////////////////////////////////////////////
 
-bool Graph::ContainsNode(const Node *node) const {
-  return (nodes_[node->id_] == node);
+bool Graph::ContainsNode(const uint32_t id) const {
+  return (added_ids_->find(id) != added_ids_->end());
 }
 
 bool Graph::ContainsEdge(const uint32_t node1_id,
