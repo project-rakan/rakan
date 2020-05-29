@@ -70,6 +70,33 @@ Runner* Generate4x4Map() {
   return r;
 }
 
+TEST(Test_Runner, TestWalkOneStep) {
+  Runner *r = Generate4x4Map();
+  Graph *g;
+  vector<vector<uint32_t>> all_maps;
+  vector<uint32_t> map;
+  uint32_t i, j;
+  unordered_map<uint32_t, vector<uint32_t>> district_nodes;
+
+  r->populate();
+  r->Walk(1, 0, 0, 0, 0);
+  g = r->GetGraph();
+  all_maps = r->getMaps();
+
+  for (i = 0; i < all_maps.size(); i++) {
+    map = all_maps[i];
+
+    for (j = 0; j < g->GetNumNodes(); j++) {
+      district_nodes[map[j]].push_back(j);
+    }
+
+    ASSERT_EQ(district_nodes[0].size(), g->GetNodesInDistrict(0)->size());
+    ASSERT_EQ(district_nodes[1].size(), g->GetNodesInDistrict(1)->size());
+    ASSERT_EQ(district_nodes[2].size(), g->GetNodesInDistrict(2)->size());
+    ASSERT_EQ(district_nodes[3].size(), g->GetNodesInDistrict(3)->size());
+  }
+}
+
 TEST(Test_Runner, TestRedistrict) {
   Runner *r = Generate4x4Map();
   Graph *g = r->GetGraph();
