@@ -29,12 +29,37 @@ class State(models.Model):
         return os.path.join(MAP_ROOT, f"{self.state}.json")
 
     def stateEngineData(self):
-        f = io.StringIO()
+        path = os.path.join(MAP_ROOT, f'{self.state}.pkl')
+        if not os.path.isfile(path):
+            precinct_id_map = {vtd: i for i, vtd in enumerate(self.vtds.all())}
+            precincts = []
+            edges = {()}
 
+            for vtd, i in precinct_id_map.items():
+                precincts.append({
+                    "nodeID": i,
+                    "curDistrict": vtd.district.district_id,
+                    "county": vtd.county,
+                    "area": vtd.land,
+                    "minPopulation": vtd.minorityPop,
+                    "majPopulation": vtd.majorityPop
+                })
 
+                for neighbor in vtd.connected:
+                    edges.add(tuple(sorted([precinct_id_map[neighbor], i])))
 
-        f.seek(0)
-        return f
+            payload = {
+                'stCode': self.state,
+                'numPrecincts': self.precincts,
+                'numDistricts': self.maxDistricts,
+                'precincts': precincts,
+                'edges': edges
+            }
+
+            with io.open(path, 'wb') as handle:
+                handle.write(pickle.dumps(payload))
+        
+        return io.open(path, 'rb')
         
 
 class GeneratedMap(models.Model):

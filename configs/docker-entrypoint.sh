@@ -39,7 +39,6 @@ cd ..
 
 # start a shell if it's dev mode
 if [ $DEBUG_MODE = true ]; then
-    cp $RAKAN_LOCATION/bladecaller/api/tests/*.json $RAKAN_STATEFILES
     /bin/bash
 else
     # run the gunicorn if it hasn't already
