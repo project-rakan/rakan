@@ -716,7 +716,6 @@ TEST(Test_Runner, TestWalkOneStep) {
   uint32_t i, j;
   unordered_map<uint32_t, vector<uint32_t>> district_nodes;
 
-  r->populate();
   r->Walk(1, 0, 0, 0, 0);
   g = r->GetGraph();
   all_maps = r->getMaps();
@@ -735,6 +734,25 @@ TEST(Test_Runner, TestWalkOneStep) {
   ASSERT_EQ(district_nodes[1].size(), g->GetNodesInDistrict(1)->size());
   ASSERT_EQ(district_nodes[2].size(), g->GetNodesInDistrict(2)->size());
   ASSERT_EQ(district_nodes[3].size(), g->GetNodesInDistrict(3)->size());
+
+  Runner *r1 = GenerateHourglassMap();
+  r1->Walk(1, 0, 0, 0, 0);
+  g = r1->GetGraph();
+  all_maps = r1->getMaps();
+  map = all_maps[all_maps.size() - 1];
+  district_nodes.clear();
+
+  r1->IsDistrictConnected(0);
+  r1->IsDistrictConnected(1);
+  r1->IsDistrictConnected(2);
+
+  for (i = 0; i < g->GetNumNodes(); i++) {
+      district_nodes[map[i]].push_back(i);
+  }
+
+  ASSERT_EQ(district_nodes[0].size(), g->GetNodesInDistrict(0)->size());
+  ASSERT_EQ(district_nodes[1].size(), g->GetNodesInDistrict(1)->size());
+  ASSERT_EQ(district_nodes[2].size(), g->GetNodesInDistrict(2)->size());
 }
 
 TEST(Test_Runner, TestWalkTwoSteps) {
@@ -764,6 +782,25 @@ TEST(Test_Runner, TestWalkTwoSteps) {
   ASSERT_EQ(district_nodes[1].size(), g->GetNodesInDistrict(1)->size());
   ASSERT_EQ(district_nodes[2].size(), g->GetNodesInDistrict(2)->size());
   ASSERT_EQ(district_nodes[3].size(), g->GetNodesInDistrict(3)->size());
+
+  Runner *r1 = GenerateHourglassMap();
+  r1->Walk(2, 0, 0, 0, 0);
+  g = r1->GetGraph();
+  all_maps = r1->getMaps();
+  map = all_maps[all_maps.size() - 1];
+  district_nodes.clear();
+
+  r1->IsDistrictConnected(0);
+  r1->IsDistrictConnected(1);
+  r1->IsDistrictConnected(2);
+
+  for (i = 0; i < g->GetNumNodes(); i++) {
+      district_nodes[map[i]].push_back(i);
+  }
+
+  ASSERT_EQ(district_nodes[0].size(), g->GetNodesInDistrict(0)->size());
+  ASSERT_EQ(district_nodes[1].size(), g->GetNodesInDistrict(1)->size());
+  ASSERT_EQ(district_nodes[2].size(), g->GetNodesInDistrict(2)->size());
 }
 
 TEST(Test_Runner, TestWalkThreeSteps) {
@@ -793,6 +830,25 @@ TEST(Test_Runner, TestWalkThreeSteps) {
   ASSERT_EQ(district_nodes[1].size(), g->GetNodesInDistrict(1)->size());
   ASSERT_EQ(district_nodes[2].size(), g->GetNodesInDistrict(2)->size());
   ASSERT_EQ(district_nodes[3].size(), g->GetNodesInDistrict(3)->size());
+
+  Runner *r1 = GenerateHourglassMap();
+  r1->Walk(3, 0, 0, 0, 0);
+  g = r1->GetGraph();
+  all_maps = r1->getMaps();
+  map = all_maps[all_maps.size() - 1];
+  district_nodes.clear();
+
+  r1->IsDistrictConnected(0);
+  r1->IsDistrictConnected(1);
+  r1->IsDistrictConnected(2);
+
+  for (i = 0; i < g->GetNumNodes(); i++) {
+      district_nodes[map[i]].push_back(i);
+  }
+
+  ASSERT_EQ(district_nodes[0].size(), g->GetNodesInDistrict(0)->size());
+  ASSERT_EQ(district_nodes[1].size(), g->GetNodesInDistrict(1)->size());
+  ASSERT_EQ(district_nodes[2].size(), g->GetNodesInDistrict(2)->size());
 }
 
 TEST(Test_Runner, TestWalkTenSteps) {
@@ -822,6 +878,25 @@ TEST(Test_Runner, TestWalkTenSteps) {
   ASSERT_EQ(district_nodes[1].size(), g->GetNodesInDistrict(1)->size());
   ASSERT_EQ(district_nodes[2].size(), g->GetNodesInDistrict(2)->size());
   ASSERT_EQ(district_nodes[3].size(), g->GetNodesInDistrict(3)->size());
+
+  Runner *r1 = GenerateHourglassMap();
+  r1->Walk(10, 0, 0, 0, 0);
+  g = r1->GetGraph();
+  all_maps = r1->getMaps();
+  map = all_maps[all_maps.size() - 1];
+  district_nodes.clear();
+
+  r1->IsDistrictConnected(0);
+  r1->IsDistrictConnected(1);
+  r1->IsDistrictConnected(2);
+
+  for (i = 0; i < g->GetNumNodes(); i++) {
+      district_nodes[map[i]].push_back(i);
+  }
+
+  ASSERT_EQ(district_nodes[0].size(), g->GetNodesInDistrict(0)->size());
+  ASSERT_EQ(district_nodes[1].size(), g->GetNodesInDistrict(1)->size());
+  ASSERT_EQ(district_nodes[2].size(), g->GetNodesInDistrict(2)->size());
 }
 
 TEST(Test_Runner, TestWalkHundredSteps) {
@@ -851,6 +926,25 @@ TEST(Test_Runner, TestWalkHundredSteps) {
   ASSERT_EQ(district_nodes[1].size(), g->GetNodesInDistrict(1)->size());
   ASSERT_EQ(district_nodes[2].size(), g->GetNodesInDistrict(2)->size());
   ASSERT_EQ(district_nodes[3].size(), g->GetNodesInDistrict(3)->size());
+
+  Runner *r1 = GenerateHourglassMap();
+  r1->Walk(100, 0, 0, 0, 0);
+  g = r1->GetGraph();
+  all_maps = r1->getMaps();
+  map = all_maps[all_maps.size() - 1];
+  district_nodes.clear();
+
+  r1->IsDistrictConnected(0);
+  r1->IsDistrictConnected(1);
+  r1->IsDistrictConnected(2);
+
+  for (i = 0; i < g->GetNumNodes(); i++) {
+      district_nodes[map[i]].push_back(i);
+  }
+
+  ASSERT_EQ(district_nodes[0].size(), g->GetNodesInDistrict(0)->size());
+  ASSERT_EQ(district_nodes[1].size(), g->GetNodesInDistrict(1)->size());
+  ASSERT_EQ(district_nodes[2].size(), g->GetNodesInDistrict(2)->size());
 }
 
 }
