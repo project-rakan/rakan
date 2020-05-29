@@ -35,8 +35,6 @@ cd bladecaller
 ( celery -A bladecaller worker > $RAKAN_LOCATION/logs/celery.log ) &
 cd ..
 
-cp $RAKAN_LOCATION/bladecaller/api/tests/*.json $RAKAN_STATEFILES
-
 make build
 
 if [ $? -eq 0 ]
