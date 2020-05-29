@@ -34,6 +34,7 @@ class VTDBlock(models.Model):
     def __str__(self):
         return self.name
 
+
 class TractBlock(models.Model):
     state = models.ForeignKey(State, on_delete=models.CASCADE)
     geometry = gis_models.GeometryField()
@@ -60,6 +61,7 @@ class TractBlock(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class DistrictBlock(models.Model):
     state = models.ForeignKey(State, on_delete=models.CASCADE)
