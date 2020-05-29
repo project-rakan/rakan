@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.gis.db import models as gis_models
+from django.db.models import Q
 
 from api.models import State
 
@@ -28,8 +29,7 @@ class VTDBlock(models.Model):
 
     @property
     def connected(self):
-        # TODO: Remove self from this query
-        return VTDBlock.objects.filter(geometry__bboverlaps=self.geometry)
+        return VTDBlock.objects.filter(geometry__bboverlaps=self.geometry).filter(~Q(id = self.id))
 
     def __str__(self):
         return self.name
@@ -74,5 +74,4 @@ class DistrictBlock(models.Model):
 
     @property
     def connected(self):
-        # TODO: Remove self from this query
-        return DistrictBlock.objects.filter(geometry__bboverlaps=self.geometry)
+        return DistrictBlock.objects.filter(geometry__bboverlaps=self.geometry).filter(~Q(id = self.id))
