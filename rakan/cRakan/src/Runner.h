@@ -296,6 +296,19 @@ class Runner {
    */
   bool IsValidRedistricting(Node *node1, Node *node2);
 
+  /**
+   * Checks if a district is connected.
+   * 
+   * Compared to IsDistrictSevered, this method takes in a district ID instead
+   * of a node. This method ONLY checks if the given district is connected,
+   * whereas IsDistrictSevered checks if all the neighbor districts of the
+   * given node is connected.
+   * 
+   * @param       district_id     the district ID to check
+   * 
+   * @return true iff all nodes in the district have a path to each other;
+   *         false otherwise
+   */
   bool IsDistrictConnected(uint32_t district_id);
 
   /**
