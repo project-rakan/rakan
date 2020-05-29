@@ -11,6 +11,7 @@ import pandas as pd
 import geopandas as gpd
 from shapely import wkt
 import matplotlib.pyplot as plt
+import pickle
 
 import os
 import io
@@ -32,6 +33,48 @@ class Command(BaseCommand):
         self.installStates(ignore_cache)        # Process all states
         self.cleanStates()                      # Break apart multipolygons/filter water precincts/adjust granularity
         self.visualizeStates()                  # Visualize the states
+        self.generateEngineInputs(ignore_cache) # Generate inputs for the engine
+
+    def generateEngineInputs(self, ignore_cache: bool):
+
+        states = State.objects.all()
+
+        bar = IncrementalBar(f'Generating binaries of {states.count()} states', max=states.count())      # .next() called 18x/state
+
+        for state in states:
+            path = os.path.join(MAP_ROOT, f'{state.state}.pkl')
+            if ignore_cache or not os.path.isfile(path):
+                precinct_id_map = {vtd: i for i, vtd in enumerate(state.vtds.all())}
+                precincts = []
+                edges = {()}
+
+                for vtd, i in precinct_id_map.items():
+                    precincts.append({
+                        "nodeID": i,
+                        "curDistrict": vtd.district.district_id,
+                        "county": vtd.county,
+                        "area": vtd.land,
+                        "minPopulation": vtd.minorityPop,
+                        "majPopulation": vtd.majorityPop
+                    })
+
+                    for neighbor in vtd.connected:
+                        edges.add(tuple(sorted([precinct_id_map[neighbor], i])))
+
+                payload = {
+                    'stCode': state.state,
+                    'numPrecincts': state.precincts,
+                    'numDistricts': state.maxDistricts,
+                    'precincts': precincts,
+                    'edges': edges
+                }
+
+                with io.open(path, 'wb') as handle:
+                    handle.write(pickle.dumps(payload))
+
+            bar.next()
+
+        bar.finish()
 
     def loadStates(self):
         with io.open(STATE_TABLE) as handle:
