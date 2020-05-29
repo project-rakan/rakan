@@ -202,6 +202,33 @@ TEST(Test_Runner, TestRedistrict) {
   ASSERT_EQ(g->GetNodesInDistrict(1)->size(), 4);
   ASSERT_EQ(g->GetNodesInDistrict(2)->size(), 2);
   ASSERT_EQ(g->GetNodesInDistrict(3)->size(), 5);
+
+  // Redistrict node 7 -> node 3
+  idle_node = g->GetNode(3);
+  r->Redistrict(victim_node, idle_node);
+  ASSERT_EQ(victim_node->GetDistrict(), 1);
+  ASSERT_EQ(g->GetPerimNodeNeighbors(3, 7), nullptr);
+  ASSERT_NE(g->GetPerimNodeNeighbors(1, 7), nullptr);
+  ASSERT_EQ(g->GetPerimNodeNeighbors(3, 7), nullptr);
+  ASSERT_EQ(crossing_edges->size(), 10);
+
+  Edge e5(3, 7);
+  Edge e6(6, 7);
+  expected_crossing_edges.erase(e5);
+  expected_crossing_edges.erase(e6);
+  expected_crossing_edges.emplace(7, 11);
+  itr = expected_crossing_edges.begin();
+  for (uint32_t i = 0; i < expected_crossing_edges.size(); i++) {
+    Edge expected = *itr;
+    ASSERT_NE(crossing_edges->find(expected), crossing_edges->end());
+    Edge actual = *crossing_edges->find(expected);
+    ASSERT_EQ(expected, expected);
+    itr++;
+  }
+  ASSERT_EQ(g->GetNodesInDistrict(0)->size(), 5);
+  ASSERT_EQ(g->GetNodesInDistrict(1)->size(), 5);
+  ASSERT_EQ(g->GetNodesInDistrict(2)->size(), 2);
+  ASSERT_EQ(g->GetNodesInDistrict(3)->size(), 4);
 }
 
 TEST(Test_Runner, TestSeveredDistrictSimple) {
