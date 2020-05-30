@@ -18,10 +18,10 @@ def performMetropolisHastingsWalk(jobId: int):
         mapModel = GeneratedMap.objects.create(
             state=job.state,
             mapContents=map_,
-            compactness=score_['compactness'],
-            vra=score_['vra'],
-            distribution=score_['population'],
-            borderRespect=score_['political'],
+            compactness=score_[b'compact'],
+            vra=score_[b'vra'],
+            distribution=score_[b'distribution'],
+            borderRespect=score_[b'border'],
         )
         job.generatedMaps.add(mapModel)
 
