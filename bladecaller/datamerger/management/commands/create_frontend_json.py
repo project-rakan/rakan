@@ -15,6 +15,7 @@ import os
 import io
 import json
 
+from progress.bar import IncrementalBar
 
 env = os.getenv("RAKAN_STATEFILES")
 OUTPUT_JSON_LOCATION = env + "/{code}"
@@ -27,39 +28,42 @@ class Command(BaseCommand):
         parser.add_argument('--ignore-cache', type=bool, default=False)
 
     def handle(self, *args, **options):
+        bar = IncrementalBar("Outputting JSON for frontend API", max=State.objects.all().count() * 2)
+        
         for state in State.objects.all():
-            df = pd.DataFrame(list(state.vtds.all().values()))
-            self.toJSON(df, state)
+            self.outputJSON(state)
+            bar.next()
+            self.toJSONDict(state)
+            bar.next()
 
-    def toJSON(self, df1, state):
-        df = df1.reset_index()
+        bar.finish()
+
+    def outputJSON(self, state):
         # Convert each precinct's POLYGON into a list of (x,y) coordinates
         stCode = state.state
+        vtds = state.vtds.all().order_by('engine_id')
         maxDistricts = state.maxDistricts
         fips = state.fips
 
-        coordLists = self.getPolyCoords(df.geometry)
+        coordLists = self.getPolyCoords([_.geometry for _ in vtds])
 
         precincts = []
-        dflen = len(df) - 1
-        for index, prec in df.iterrows():
-            precName = prec['name']
-            precID = dflen - index
-            vertices = []
-            for v in coordLists[index]:
-                coord = {
-                    "lat": float(v[1]),
-                    "lng": float(v[0])
-                }
-                vertices.append(coord)
+
+        for prec in vtds:
+            precName = prec.name
+            try:
+                vertices = [{"lat": lat, "lng": lng} for lng, lat in coordLists[prec.engine_id]]
+            except Exception:
+                import pdb; pdb.set_trace()
 
             precinctEntry = {
                 "name": precName,
-                "id": precID,
+                "id": prec.engine_id,
                 "vertices": vertices,
             }
+
             precincts.append(precinctEntry)
-        precincts.reverse()
+
         dictionary = {
             "state": stCode,
             "maxDistricts": maxDistricts,
@@ -67,12 +71,8 @@ class Command(BaseCommand):
             "precincts": precincts
         }
 
-        json_loc = OUTPUT_JSON_LOCATION.format(code=stCode)+'.json'
-
-        with open(json_loc, "w") as outfile:
+        with io.open(f'{OUTPUT_JSON_LOCATION.format(code=stCode)}.json', "w") as outfile:
             outfile.write(json.dumps(dictionary))
-
-        self.toJSONDict(df, stCode)
 
 
     def getPolyCoords(self, geo):
@@ -83,18 +83,16 @@ class Command(BaseCommand):
             coordsList.append(geo[i].coords[0])
         return coordsList
 
-    def toJSONDict(self, df, stCode):
+    def toJSONDict(self, state):
         mapping = []
-        dflen = len(df) - 1
-        for index, prec in df.iterrows():
-            district = DistrictBlock.objects.filter(id=prec['district_id'])[0]
-            mapping.append([dflen - index, district.district_id])
 
-        mapping.reverse()
+        for prec in state.vtds.all().order_by('engine_id'):
+            mapping.append([prec.engine_id, prec.district.district_id])
+
         output = {
-            "state": stCode,
+            "state": state.state,
             "map": mapping
         }
-        districtsLoc = OUTPUT_JSON_LOCATION.format(code=stCode)+'.districts.json'
-        with open(districtsLoc, "w") as outfile:
-            outfile.write(json.dumps(output, indent = 4))
+
+        with open(f'{OUTPUT_JSON_LOCATION.format(code=state.state)}.districts.json', "w") as outfile:
+            outfile.write(json.dumps(output))
