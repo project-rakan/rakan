@@ -713,7 +713,7 @@ TEST(Test_Runner, TestWalkOneStep) {
   Graph *g;
   vector<vector<uint32_t>> all_maps;
   vector<uint32_t> map;
-  uint32_t i, j;
+  uint32_t i;
   unordered_map<uint32_t, vector<uint32_t>> district_nodes;
 
   r->Walk(1, 0, 0, 0, 0);
@@ -760,7 +760,7 @@ TEST(Test_Runner, TestWalkTwoSteps) {
   Graph *g;
   vector<vector<uint32_t>> all_maps;
   vector<uint32_t> map;
-  uint32_t i, j;
+  uint32_t i;
   unordered_map<uint32_t, vector<uint32_t>> district_nodes;
 
   r->populate();
@@ -789,7 +789,7 @@ TEST(Test_Runner, TestWalkTwoSteps) {
   all_maps = r1->getMaps();
   map = all_maps[all_maps.size() - 1];
   district_nodes.clear();
-  
+
   ASSERT_TRUE(r1->IsDistrictConnected(0));
   ASSERT_TRUE(r1->IsDistrictConnected(1));
   ASSERT_TRUE(r1->IsDistrictConnected(2));
@@ -808,7 +808,7 @@ TEST(Test_Runner, TestWalkThreeSteps) {
   Graph *g;
   vector<vector<uint32_t>> all_maps;
   vector<uint32_t> map;
-  uint32_t i, j;
+  uint32_t i;
   unordered_map<uint32_t, vector<uint32_t>> district_nodes;
 
   r->populate();
@@ -856,7 +856,7 @@ TEST(Test_Runner, TestWalkTenSteps) {
   Graph *g;
   vector<vector<uint32_t>> all_maps;
   vector<uint32_t> map;
-  uint32_t i, j;
+  uint32_t i;
   unordered_map<uint32_t, vector<uint32_t>> district_nodes;
 
   r->populate();
@@ -904,7 +904,7 @@ TEST(Test_Runner, TestWalkHundredSteps) {
   Graph *g;
   vector<vector<uint32_t>> all_maps;
   vector<uint32_t> map;
-  uint32_t i, j;
+  uint32_t i;
   unordered_map<uint32_t, vector<uint32_t>> district_nodes;
 
   r->populate();
