@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TransactionTestCase
 from django.test.utils import override_settings
 from rest_framework.test import APITestCase
 
@@ -108,25 +108,3 @@ class EngineTests(APITestCase):
         self.assertEqual(Job.objects.all()[0].gamma, 0.)
         self.assertEqual(Job.objects.all()[0].eta, 0.)
         self.assertTrue(Job.objects.all()[0].finished)
-
-
-    @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
-    def test_post_startMap_fires_signal(self):
-        from api.models import Job
-        guid = '1'
-        response = self.client.post('/create-job/', {
-            'id': guid,
-            'state': 'IA',
-            'alpha': 0,
-            'beta': 0,
-            'gamma': 0,
-            'eta': 0
-        }, format='json')
-        self.assertEqual(response.status_code, 201)
-        self.assertEqual(len(Job.objects.all()), 1)
-        self.assertEqual(Job.objects.all()[0].jobId, guid)
-        self.assertEqual(Job.objects.all()[0].state.state, 'IA')
-        self.assertEqual(Job.objects.all()[0].alpha, 0.)
-        self.assertEqual(Job.objects.all()[0].beta, 0.)
-        self.assertEqual(Job.objects.all()[0].gamma, 0.)
-        self.assertEqual(Job.objects.all()[0].eta, 0.)
