@@ -97,8 +97,7 @@ bool Runner::set_districts(vector<uint32_t>& districts) {
 unordered_set<Node *>* Runner::GenerateRandomSeeds() {
   unordered_set<Node *> *seed_nodes = new unordered_set<Node *>;
   Node *seed_node;
-  uint32_t i;
-  int32_t random_index;
+  uint32_t i, random_index;
   vector<uint32_t> random_indexes;
   vector<uint32_t> *changes = new vector<uint32_t>(graph_->num_nodes_);
 
@@ -339,7 +338,7 @@ double Runner::MetropolisHastings() {
     scores_->push_back(scores);
   }
 
-  return old_score - new_score;
+  return new_score - old_score;
 }
 
 double Runner::Redistrict(Node *victim_node, Node *idle_node) {
