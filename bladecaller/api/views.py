@@ -212,8 +212,6 @@ def updateMapJob(request):
 
     jobId = request.data['id']
 
-    
-
     # Check jobID is valid
     if len(models.Job.objects.filter(id=jobId)) == 0:
         return Response({'msg': 'Unable to find jobId', 'id': jobId}, status=status.HTTP_400_BAD_REQUEST)
