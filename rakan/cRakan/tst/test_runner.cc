@@ -916,14 +916,14 @@ TEST(Test_Runner, TestSeed4x4Map) {
   ASSERT_TRUE(r->IsDistrictConnected(3));
 }
 
-// TEST(Test_Runner, TestSeedIowaMap) {
-//   Runner *r = GenerateIowa();
-//   ASSERT_TRUE(r->seed());
-//   ASSERT_TRUE(r->IsDistrictConnected(0));
-//   ASSERT_TRUE(r->IsDistrictConnected(1));
-//   ASSERT_TRUE(r->IsDistrictConnected(2));
-//   ASSERT_TRUE(r->IsDistrictConnected(3));
-// }
+TEST(Test_Runner, TestSeedIowaMap) {
+  Runner *r = GenerateIowa();
+  ASSERT_TRUE(r->seed());
+  ASSERT_TRUE(r->IsDistrictConnected(0));
+  ASSERT_TRUE(r->IsDistrictConnected(1));
+  ASSERT_TRUE(r->IsDistrictConnected(2));
+  ASSERT_TRUE(r->IsDistrictConnected(3));
+}
 
 TEST(Test_Runner, TestWalkOneStep) {
   Runner *r = Generate4x4Map(false);
