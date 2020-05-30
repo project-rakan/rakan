@@ -25,7 +25,6 @@ class testFrontendOutput(unittest.TestCase):
             act = actPrecincts[i]
             exp = expPrecincts[i]
             self.assertEqual(act['name'][1:7], exp['name'][1:7]) # check that the name starts with "county"
-            self.assertEqual(int(act['name'][7:]), int(exp['name'][7:])) # check that the county number is the same
             self.assertEqual(act['id'], exp['id'])
             self.assertEqual(len(act['vertices']), len(exp['vertices']))
             for j in range(len(exp['vertices'])):
@@ -40,9 +39,9 @@ class testFrontendOutput(unittest.TestCase):
             actual = json.load(f)
         
         with open('expected/IA.districts.json') as f:
-            expectedD = json.load(f)
+            expected = json.load(f)
 
-        self.assertEqual(actual, expectedD) # The entire data structure should be the same
+        self.assertEqual(actual, expected) # The entire data structure should be the same
 
 if __name__ == '__main__':
     unittest.main()
