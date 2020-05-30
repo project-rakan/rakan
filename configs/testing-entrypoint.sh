@@ -1,5 +1,6 @@
 #!/bin/sh -l
 . /home/project/configs/.secrets.sh
+export DEBUG_MODE=true
 
 # launch postgres using values in . .secrets.sh
 service postgresql start
@@ -16,15 +17,22 @@ su - postgres -c "psql -c \"ALTER USER $DATABASE_USER WITH SUPERUSER;\""
 # Start a build for the celery worker
 make build
 
+if [ $? -eq 0 ]
+then
+  echo "Building Successful."
+else
+  echo "Build Failed"
+  exit 1
+fi
+
 # Create migrations and whatnot
 cd bladecaller
 python3.7 manage.py makemigrations
 python3.7 manage.py migrate
+python3.7 manage.py populate_db
+python3.7 manage.py create_frontend_json
 python3.7 manage.py collectstatic --noinput
 cd ..
-
-# run nginx if it isn't running already
-service nginx start
 
 # Configure rabbit
 rabbitmqctl add_user $RABBIT_USER $RABBIT_PASS
@@ -34,16 +42,6 @@ rabbitmqctl add_vhost $RABBIT_VHOST
 cd bladecaller
 ( celery -A bladecaller worker > $RAKAN_LOCATION/logs/celery.log ) &
 cd ..
-
-make build
-
-if [ $? -eq 0 ]
-then
-  echo "Building Successful."
-else
-  echo "Build Failed"
-  exit 1
-fi
 
 make test
 
