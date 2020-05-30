@@ -48,9 +48,9 @@ class Command(BaseCommand):
                 precincts = []
                 edges = set()
 
-                for vtd, i in precinct_id_map.items():
+                for vtd in state.vtds.all():
                     precincts.append({
-                        "nodeID": i,
+                        "nodeID": vtd.vtd_state_id,
                         "curDistrict": vtd.district.district_id,
                         "county": vtd.county,
                         "area": vtd.land,
@@ -59,7 +59,7 @@ class Command(BaseCommand):
                     })
 
                     for neighbor in vtd.connected:
-                        edges.add(tuple(sorted([precinct_id_map[neighbor], i])))
+                        edges.add(tuple(sorted([neighbor.vtd_state_id, vtd.vtd_state_id])))
 
                 payload = {
                     'stCode': state.state,
@@ -220,6 +220,7 @@ class Command(BaseCommand):
                     'name': row['NAME10'],
                     'land': row['ALAND10'],
                     'water': row['AWATER10'],
+                    'vtd_state_id': i,
                 }))
 
         bar.next()
@@ -388,7 +389,7 @@ class Command(BaseCommand):
             table['majorityPop'].append(vtd.majorityPop)
             table['district'].append(vtd.district)
 
-        geometries = gpd.GeoDataFrame(table).dissolve('county')
+        geometries = gpd.GeoDataFrame(table).dissolve('county').reset_index(drop=True)
         state.vtds.all().delete()
 
         new_vtds = []
@@ -397,9 +398,10 @@ class Command(BaseCommand):
             new_vtds.append(VTDBlock(**{
                 'state': state,
                 'geometry': GEOSGeometry(county['geometry'].to_wkt()),
+                'vtd_state_id': i,
                 'geoid': county['geoid'],
                 'county': i,
-                'name': f'County {i}',
+                'name': f'County {i + 1}',
                 'land': county['land'],
                 'water': county['water'],
                 'minorityPop': county['minorityPop'],

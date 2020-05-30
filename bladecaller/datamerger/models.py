@@ -11,6 +11,8 @@ class VTDBlock(models.Model):
     geoid = models.CharField(max_length=255, unique=True)
     geometry = gis_models.GeometryField()
 
+    engine_id = models.IntegerField(default=-1)
+
     county = models.IntegerField()
 
     name = models.CharField(max_length=256)
