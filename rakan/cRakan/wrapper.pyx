@@ -5,6 +5,7 @@ from cython.operator import dereference, preincrement, address
 from libcpp.vector cimport vector as cvector
 from libcpp.string cimport string as cstring
 from libc.stdint cimport uint32_t as cuint32_t
+from libcpp cimport bool as cbool
 
 from wrapper cimport Runner as cRunner
 
@@ -15,6 +16,7 @@ cdef class Engine:
     cdef cRunner* _runner
     cpdef int _districts
     cpdef int _precincts
+    cpdef cbool _redistricted;
     cpdef cstring _filepath;
 
     def __cinit__(self, binLocation):
@@ -24,7 +26,7 @@ cdef class Engine:
             data = pickle.loads(handle.read())
 
         self._runner = new cRunner(self._precincts, self._districts)
-        
+
         # first pass to add all nodes
         for prec in data['precincts']:
             self._addNode(prec['nodeID'], prec['county'], prec['minPopulation'], prec['majPopulation'])
@@ -33,6 +35,8 @@ cdef class Engine:
         for brother, sister in data['edges']:
             self._addEdge(brother, sister)
 
+        self._redistricted = False
+
     def __dealloc__(self):
         del self._runner
 
@@ -40,22 +44,31 @@ cdef class Engine:
         dereference(self._runner).add_node(id, county, minorityPopulation, majorityPoplation);
 
     def _addEdge(self, int id1, int id2):
-        dereference(self._runner).add_edge(id1, id2)
+        if not dereference(self._runner).add_edge(id1, id2):
+            raise ValueError(f"Incorrect ids: {id1} {id2}")
 
     def setDistricts(self, cvector[cuint32_t] districts):
-        dereference(self._runner).set_districts(districts)
+        if not dereference(self._runner).set_districts(districts):
+            raise ValueError()
 
     def getMaps(self):
-        return dereference(self._runner).getMaps()
+        if self._redistricted:
+            return dereference(self._runner).getMaps()
+        raise Exception("Map is not redistricted")
 
     def getScores(self):
-        return dereference(self._runner).getScores()
+        if self._redistricted:
+            return dereference(self._runner).getScores()
+        raise Exception("Map is not redistricted")
 
     def seed(self):
+        self._redistricted = True
         return dereference(self._runner).seed()
 
     def walk(self, int stepsToTake, double alpha, double beta, double gamma, double eta):
-        return dereference(self._runner).Walk(stepsToTake, alpha, beta, gamma, eta)
+        if self._redistricted:
+            return dereference(self._runner).Walk(stepsToTake, alpha, beta, gamma, eta)
+        raise Exception("Map is not redistricted")
 
     @property
     def districts(self):
