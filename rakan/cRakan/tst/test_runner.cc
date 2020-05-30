@@ -721,10 +721,10 @@ TEST(Test_Runner, TestWalkOneStep) {
   all_maps = r->getMaps();
   map = all_maps[all_maps.size() - 1];
 
-  r->IsDistrictConnected(0);
-  r->IsDistrictConnected(1);
-  r->IsDistrictConnected(2);
-  r->IsDistrictConnected(3);
+  ASSERT_TRUE(r->IsDistrictConnected(0));
+  ASSERT_TRUE(r->IsDistrictConnected(1));
+  ASSERT_TRUE(r->IsDistrictConnected(2));
+  ASSERT_TRUE(r->IsDistrictConnected(3));
 
   for (i = 0; i < g->GetNumNodes(); i++) {
       district_nodes[map[i]].push_back(i);
@@ -742,9 +742,9 @@ TEST(Test_Runner, TestWalkOneStep) {
   map = all_maps[all_maps.size() - 1];
   district_nodes.clear();
 
-  r1->IsDistrictConnected(0);
-  r1->IsDistrictConnected(1);
-  r1->IsDistrictConnected(2);
+  ASSERT_TRUE(r1->IsDistrictConnected(0));
+  ASSERT_TRUE(r1->IsDistrictConnected(1));
+  ASSERT_TRUE(r1->IsDistrictConnected(2));
 
   for (i = 0; i < g->GetNumNodes(); i++) {
       district_nodes[map[i]].push_back(i);
@@ -769,10 +769,10 @@ TEST(Test_Runner, TestWalkTwoSteps) {
   all_maps = r->getMaps();
   map = all_maps[all_maps.size() - 1];
 
-  r->IsDistrictConnected(0);
-  r->IsDistrictConnected(1);
-  r->IsDistrictConnected(2);
-  r->IsDistrictConnected(3);
+  ASSERT_TRUE(r->IsDistrictConnected(0));
+  ASSERT_TRUE(r->IsDistrictConnected(1));
+  ASSERT_TRUE(r->IsDistrictConnected(2));
+  ASSERT_TRUE(r->IsDistrictConnected(3));
 
   for (i = 0; i < g->GetNumNodes(); i++) {
       district_nodes[map[i]].push_back(i);
@@ -789,10 +789,10 @@ TEST(Test_Runner, TestWalkTwoSteps) {
   all_maps = r1->getMaps();
   map = all_maps[all_maps.size() - 1];
   district_nodes.clear();
-
-  r1->IsDistrictConnected(0);
-  r1->IsDistrictConnected(1);
-  r1->IsDistrictConnected(2);
+  
+  ASSERT_TRUE(r1->IsDistrictConnected(0));
+  ASSERT_TRUE(r1->IsDistrictConnected(1));
+  ASSERT_TRUE(r1->IsDistrictConnected(2));
 
   for (i = 0; i < g->GetNumNodes(); i++) {
       district_nodes[map[i]].push_back(i);
@@ -817,10 +817,10 @@ TEST(Test_Runner, TestWalkThreeSteps) {
   all_maps = r->getMaps();
   map = all_maps[all_maps.size() - 1];
 
-  r->IsDistrictConnected(0);
-  r->IsDistrictConnected(1);
-  r->IsDistrictConnected(2);
-  r->IsDistrictConnected(3);
+  ASSERT_TRUE(r->IsDistrictConnected(0));
+  ASSERT_TRUE(r->IsDistrictConnected(1));
+  ASSERT_TRUE(r->IsDistrictConnected(2));
+  ASSERT_TRUE(r->IsDistrictConnected(3));
 
   for (i = 0; i < g->GetNumNodes(); i++) {
       district_nodes[map[i]].push_back(i);
@@ -838,9 +838,9 @@ TEST(Test_Runner, TestWalkThreeSteps) {
   map = all_maps[all_maps.size() - 1];
   district_nodes.clear();
 
-  r1->IsDistrictConnected(0);
-  r1->IsDistrictConnected(1);
-  r1->IsDistrictConnected(2);
+  ASSERT_TRUE(r1->IsDistrictConnected(0));
+  ASSERT_TRUE(r1->IsDistrictConnected(1));
+  ASSERT_TRUE(r1->IsDistrictConnected(2));
 
   for (i = 0; i < g->GetNumNodes(); i++) {
       district_nodes[map[i]].push_back(i);
@@ -865,10 +865,10 @@ TEST(Test_Runner, TestWalkTenSteps) {
   all_maps = r->getMaps();
   map = all_maps[all_maps.size() - 1];
 
-  r->IsDistrictConnected(0);
-  r->IsDistrictConnected(1);
-  r->IsDistrictConnected(2);
-  r->IsDistrictConnected(3);
+  ASSERT_TRUE(r->IsDistrictConnected(0));
+  ASSERT_TRUE(r->IsDistrictConnected(1));
+  ASSERT_TRUE(r->IsDistrictConnected(2));
+  ASSERT_TRUE(r->IsDistrictConnected(3));
 
   for (i = 0; i < g->GetNumNodes(); i++) {
       district_nodes[map[i]].push_back(i);
@@ -886,9 +886,9 @@ TEST(Test_Runner, TestWalkTenSteps) {
   map = all_maps[all_maps.size() - 1];
   district_nodes.clear();
 
-  r1->IsDistrictConnected(0);
-  r1->IsDistrictConnected(1);
-  r1->IsDistrictConnected(2);
+  ASSERT_TRUE(r1->IsDistrictConnected(0));
+  ASSERT_TRUE(r1->IsDistrictConnected(1));
+  ASSERT_TRUE(r1->IsDistrictConnected(2));
 
   for (i = 0; i < g->GetNumNodes(); i++) {
       district_nodes[map[i]].push_back(i);
@@ -913,10 +913,10 @@ TEST(Test_Runner, TestWalkHundredSteps) {
   all_maps = r->getMaps();
   map = all_maps[all_maps.size() - 1];
 
-  r->IsDistrictConnected(0);
-  r->IsDistrictConnected(1);
-  r->IsDistrictConnected(2);
-  r->IsDistrictConnected(3);
+  ASSERT_TRUE(r->IsDistrictConnected(0));
+  ASSERT_TRUE(r->IsDistrictConnected(1));
+  ASSERT_TRUE(r->IsDistrictConnected(2));
+  ASSERT_TRUE(r->IsDistrictConnected(3));
 
   for (i = 0; i < g->GetNumNodes(); i++) {
       district_nodes[map[i]].push_back(i);
@@ -934,9 +934,9 @@ TEST(Test_Runner, TestWalkHundredSteps) {
   map = all_maps[all_maps.size() - 1];
   district_nodes.clear();
 
-  r1->IsDistrictConnected(0);
-  r1->IsDistrictConnected(1);
-  r1->IsDistrictConnected(2);
+  ASSERT_TRUE(r1->IsDistrictConnected(0));
+  ASSERT_TRUE(r1->IsDistrictConnected(1));
+  ASSERT_TRUE(r1->IsDistrictConnected(2));
 
   for (i = 0; i < g->GetNumNodes(); i++) {
       district_nodes[map[i]].push_back(i);
