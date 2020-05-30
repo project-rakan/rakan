@@ -46,7 +46,7 @@ class Command(BaseCommand):
             if ignore_cache or not os.path.isfile(path):
                 precinct_id_map = {vtd: i for i, vtd in enumerate(state.vtds.all())}
                 precincts = []
-                edges = {()}
+                edges = set()
 
                 for vtd, i in precinct_id_map.items():
                     precincts.append({
@@ -376,7 +376,7 @@ class Command(BaseCommand):
             raise ValueError("Unknown granularity")  
 
     def dissolveCounty(self, state):
-        vtds = state.vtds.all()
+        vtds = state.vtds.all().order_by('county')
         table = {'geometry': [], 'geoid': [], 'county': [], 'land': [], 'water': [], 'minorityPop': [], 'majorityPop': [], 'district': []}
         for vtd in vtds:
             table['geometry'].append(wkt.loads(vtd.geometry.wkt))
