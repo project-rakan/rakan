@@ -67,7 +67,6 @@ Runner* Generate4x4Map() {
   districts[15] = 3;
 
   r->set_districts(districts);
-  r->populate();
   return r;
 }
 
@@ -93,7 +92,6 @@ Runner* GenerateHMap() {
   districts[6] = 2;
 
   r->set_districts(districts);
-  r->populate();
   return r;
 }
 
@@ -123,7 +121,6 @@ Runner* GenerateHourglassMap() {
   districts[6] = 2;
 
   r->set_districts(districts);
-  r->populate();
   return r;
 }
 
@@ -713,7 +710,7 @@ TEST(Test_Runner, TestWalkOneStep) {
   Graph *g;
   vector<vector<uint32_t>> all_maps;
   vector<uint32_t> map;
-  uint32_t i, j;
+  uint32_t i;
   unordered_map<uint32_t, vector<uint32_t>> district_nodes;
 
   r->Walk(1, 0, 0, 0, 0);
@@ -721,10 +718,10 @@ TEST(Test_Runner, TestWalkOneStep) {
   all_maps = r->getMaps();
   map = all_maps[all_maps.size() - 1];
 
-  r->IsDistrictConnected(0);
-  r->IsDistrictConnected(1);
-  r->IsDistrictConnected(2);
-  r->IsDistrictConnected(3);
+  ASSERT_TRUE(r->IsDistrictConnected(0));
+  ASSERT_TRUE(r->IsDistrictConnected(1));
+  ASSERT_TRUE(r->IsDistrictConnected(2));
+  ASSERT_TRUE(r->IsDistrictConnected(3));
 
   for (i = 0; i < g->GetNumNodes(); i++) {
       district_nodes[map[i]].push_back(i);
@@ -742,9 +739,9 @@ TEST(Test_Runner, TestWalkOneStep) {
   map = all_maps[all_maps.size() - 1];
   district_nodes.clear();
 
-  r1->IsDistrictConnected(0);
-  r1->IsDistrictConnected(1);
-  r1->IsDistrictConnected(2);
+  ASSERT_TRUE(r1->IsDistrictConnected(0));
+  ASSERT_TRUE(r1->IsDistrictConnected(1));
+  ASSERT_TRUE(r1->IsDistrictConnected(2));
 
   for (i = 0; i < g->GetNumNodes(); i++) {
       district_nodes[map[i]].push_back(i);
@@ -760,19 +757,18 @@ TEST(Test_Runner, TestWalkTwoSteps) {
   Graph *g;
   vector<vector<uint32_t>> all_maps;
   vector<uint32_t> map;
-  uint32_t i, j;
+  uint32_t i;
   unordered_map<uint32_t, vector<uint32_t>> district_nodes;
 
-  r->populate();
   r->Walk(2, 0, 0, 0, 0);
   g = r->GetGraph();
   all_maps = r->getMaps();
   map = all_maps[all_maps.size() - 1];
 
-  r->IsDistrictConnected(0);
-  r->IsDistrictConnected(1);
-  r->IsDistrictConnected(2);
-  r->IsDistrictConnected(3);
+  ASSERT_TRUE(r->IsDistrictConnected(0));
+  ASSERT_TRUE(r->IsDistrictConnected(1));
+  ASSERT_TRUE(r->IsDistrictConnected(2));
+  ASSERT_TRUE(r->IsDistrictConnected(3));
 
   for (i = 0; i < g->GetNumNodes(); i++) {
       district_nodes[map[i]].push_back(i);
@@ -790,9 +786,9 @@ TEST(Test_Runner, TestWalkTwoSteps) {
   map = all_maps[all_maps.size() - 1];
   district_nodes.clear();
 
-  r1->IsDistrictConnected(0);
-  r1->IsDistrictConnected(1);
-  r1->IsDistrictConnected(2);
+  ASSERT_TRUE(r1->IsDistrictConnected(0));
+  ASSERT_TRUE(r1->IsDistrictConnected(1));
+  ASSERT_TRUE(r1->IsDistrictConnected(2));
 
   for (i = 0; i < g->GetNumNodes(); i++) {
       district_nodes[map[i]].push_back(i);
@@ -808,19 +804,18 @@ TEST(Test_Runner, TestWalkThreeSteps) {
   Graph *g;
   vector<vector<uint32_t>> all_maps;
   vector<uint32_t> map;
-  uint32_t i, j;
+  uint32_t i;
   unordered_map<uint32_t, vector<uint32_t>> district_nodes;
 
-  r->populate();
   r->Walk(3, 0, 0, 0, 0);
   g = r->GetGraph();
   all_maps = r->getMaps();
   map = all_maps[all_maps.size() - 1];
 
-  r->IsDistrictConnected(0);
-  r->IsDistrictConnected(1);
-  r->IsDistrictConnected(2);
-  r->IsDistrictConnected(3);
+  ASSERT_TRUE(r->IsDistrictConnected(0));
+  ASSERT_TRUE(r->IsDistrictConnected(1));
+  ASSERT_TRUE(r->IsDistrictConnected(2));
+  ASSERT_TRUE(r->IsDistrictConnected(3));
 
   for (i = 0; i < g->GetNumNodes(); i++) {
       district_nodes[map[i]].push_back(i);
@@ -838,9 +833,9 @@ TEST(Test_Runner, TestWalkThreeSteps) {
   map = all_maps[all_maps.size() - 1];
   district_nodes.clear();
 
-  r1->IsDistrictConnected(0);
-  r1->IsDistrictConnected(1);
-  r1->IsDistrictConnected(2);
+  ASSERT_TRUE(r1->IsDistrictConnected(0));
+  ASSERT_TRUE(r1->IsDistrictConnected(1));
+  ASSERT_TRUE(r1->IsDistrictConnected(2));
 
   for (i = 0; i < g->GetNumNodes(); i++) {
       district_nodes[map[i]].push_back(i);
@@ -856,19 +851,18 @@ TEST(Test_Runner, TestWalkTenSteps) {
   Graph *g;
   vector<vector<uint32_t>> all_maps;
   vector<uint32_t> map;
-  uint32_t i, j;
+  uint32_t i;
   unordered_map<uint32_t, vector<uint32_t>> district_nodes;
 
-  r->populate();
   r->Walk(10, 0, 0, 0, 0);
   g = r->GetGraph();
   all_maps = r->getMaps();
   map = all_maps[all_maps.size() - 1];
 
-  r->IsDistrictConnected(0);
-  r->IsDistrictConnected(1);
-  r->IsDistrictConnected(2);
-  r->IsDistrictConnected(3);
+  ASSERT_TRUE(r->IsDistrictConnected(0));
+  ASSERT_TRUE(r->IsDistrictConnected(1));
+  ASSERT_TRUE(r->IsDistrictConnected(2));
+  ASSERT_TRUE(r->IsDistrictConnected(3));
 
   for (i = 0; i < g->GetNumNodes(); i++) {
       district_nodes[map[i]].push_back(i);
@@ -886,9 +880,9 @@ TEST(Test_Runner, TestWalkTenSteps) {
   map = all_maps[all_maps.size() - 1];
   district_nodes.clear();
 
-  r1->IsDistrictConnected(0);
-  r1->IsDistrictConnected(1);
-  r1->IsDistrictConnected(2);
+  ASSERT_TRUE(r1->IsDistrictConnected(0));
+  ASSERT_TRUE(r1->IsDistrictConnected(1));
+  ASSERT_TRUE(r1->IsDistrictConnected(2));
 
   for (i = 0; i < g->GetNumNodes(); i++) {
       district_nodes[map[i]].push_back(i);
@@ -904,19 +898,18 @@ TEST(Test_Runner, TestWalkHundredSteps) {
   Graph *g;
   vector<vector<uint32_t>> all_maps;
   vector<uint32_t> map;
-  uint32_t i, j;
+  uint32_t i;
   unordered_map<uint32_t, vector<uint32_t>> district_nodes;
 
-  r->populate();
   r->Walk(100, 0, 0, 0, 0);
   g = r->GetGraph();
   all_maps = r->getMaps();
   map = all_maps[all_maps.size() - 1];
 
-  r->IsDistrictConnected(0);
-  r->IsDistrictConnected(1);
-  r->IsDistrictConnected(2);
-  r->IsDistrictConnected(3);
+  ASSERT_TRUE(r->IsDistrictConnected(0));
+  ASSERT_TRUE(r->IsDistrictConnected(1));
+  ASSERT_TRUE(r->IsDistrictConnected(2));
+  ASSERT_TRUE(r->IsDistrictConnected(3));
 
   for (i = 0; i < g->GetNumNodes(); i++) {
       district_nodes[map[i]].push_back(i);
@@ -934,9 +927,9 @@ TEST(Test_Runner, TestWalkHundredSteps) {
   map = all_maps[all_maps.size() - 1];
   district_nodes.clear();
 
-  r1->IsDistrictConnected(0);
-  r1->IsDistrictConnected(1);
-  r1->IsDistrictConnected(2);
+  ASSERT_TRUE(r1->IsDistrictConnected(0));
+  ASSERT_TRUE(r1->IsDistrictConnected(1));
+  ASSERT_TRUE(r1->IsDistrictConnected(2));
 
   for (i = 0; i < g->GetNumNodes(); i++) {
       district_nodes[map[i]].push_back(i);
