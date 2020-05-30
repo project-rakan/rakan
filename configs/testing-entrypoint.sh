@@ -2,6 +2,8 @@
 . /home/project/configs/.secrets.sh
 export DEBUG_MODE=true
 
+make clean
+
 # launch postgres using values in . .secrets.sh
 service postgresql start
 
@@ -16,6 +18,8 @@ su - postgres -c "psql -c \"ALTER USER $DATABASE_USER WITH SUPERUSER;\""
 
 # Start a build for the celery worker
 make build
+
+ls
 
 if [ $? -eq 0 ]
 then
