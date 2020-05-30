@@ -231,6 +231,7 @@ bool Graph::UpdatePerimNode(Node *node) {
       }
     } else if (crossing_edges_->find(e) != crossing_edges_->end()) {
       crossing_edges_->erase(e);
+      UpdatePerimNode(nodes_[neighbor]);
     }
   }
   if (crossing_neighbors.empty()) {
@@ -318,7 +319,7 @@ unordered_set<uint32_t>*
     Graph::GetPerimNodeNeighbors(const uint32_t district,
                                  const uint32_t node) const {
   if (district > num_districts_ || node > num_nodes_ ||
-      !NodeExistsInDistrict(node, district)) {
+      !NodeExistsInDistrict(node, district) || !IsPerimNode(node)) {
     return nullptr;
   }
   return (*perim_nodes_to_neighbors_[district]->find(node)).second;
