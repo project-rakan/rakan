@@ -296,7 +296,7 @@ class Graph {
   * @return a pointer to the set of nodes in the district; nullptr if the
   *         district does not exist
   */
-  unordered_set<int>* GetNodesInDistrict(const uint32_t district) const;
+  unordered_set<uint32_t>* GetNodesInDistrict(const uint32_t district) const;
 
   /**
   * Gets the set of nodes on the given district's perimeter.
@@ -306,7 +306,7 @@ class Graph {
   * @return a pointer to the set of nodes on the district perimeter; nullptr
   *         if the district does not exist
   */
-  unordered_set<int>* GetPerimNodes(const uint32_t district) const;
+  unordered_set<uint32_t>* GetPerimNodes(const uint32_t district) const;
 
   /**
   * Gets the set of neighbors of the node. Assumes the node is on the
@@ -366,12 +366,12 @@ class Graph {
   // An array of pointers to sets. The index of the array
   // is the district ID, and the pointer at the index points
   // to a set of nodes in that district.
-  unordered_set<int> **nodes_in_district_;
+  unordered_set<uint32_t> **nodes_in_district_;
 
   // An array of pointers to sets. The index of the array
   // is the district ID, and the pointer at the index points
   // to a set of nodes on the perimeter of that district.
-  unordered_set<int> **nodes_on_perim_;
+  unordered_set<uint32_t> **nodes_on_perim_;
 
   // A map of an index to an edge that contain two nodes in different
   // districts.
@@ -385,7 +385,8 @@ class Graph {
   // node must be on the perimeter of the district. Corresponding
   // to each key contains a set of node IDs that are neighbors
   // to the perimeter node.
-  unordered_map<int, unordered_set<uint32_t> *> **perim_nodes_to_neighbors_;
+  unordered_map<uint32_t, unordered_set<uint32_t> *> 
+      **perim_nodes_to_neighbors_;
 
   // An array of populations. The index of the array is the district
   // ID. The value at that index corresponds to the population in

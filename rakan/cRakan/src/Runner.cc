@@ -1,9 +1,5 @@
 #include "./Runner.h"
 
-///////////////////////////////////////////////////////////////
-#include <iostream>     // FOR DEBUGGING, REMOVE FOR PRODUCTION
-///////////////////////////////////////////////////////////////
-
 #include <math.h>               // for pow(), log(), fmin()
 #include <inttypes.h>           // for uint32_t, etc.
 #include <stdlib.h>             // for rand()
@@ -97,8 +93,7 @@ bool Runner::set_districts(vector<uint32_t>& districts) {
 unordered_set<Node *>* Runner::GenerateRandomSeeds() {
   unordered_set<Node *> *seed_nodes = new unordered_set<Node *>;
   Node *seed_node;
-  uint32_t i;
-  int32_t random_index;
+  uint32_t i, random_index;
   vector<uint32_t> random_indexes;
   vector<uint32_t> *changes = new vector<uint32_t>(graph_->num_nodes_);
 
@@ -173,7 +168,7 @@ bool Runner::seed() {
 }
 
 void Runner::populate() {
-  unordered_map<int, unordered_set<uint32_t> *> *map;
+  unordered_map<uint32_t, unordered_set<uint32_t> *> *map;
   Node *current_node, *neighbor_node;
   uint32_t i, current_district;
 
@@ -339,7 +334,7 @@ double Runner::MetropolisHastings() {
     scores_->push_back(scores);
   }
 
-  return old_score - new_score;
+  return new_score - old_score;
 }
 
 double Runner::Redistrict(Node *victim_node, Node *idle_node) {
@@ -358,8 +353,7 @@ double Runner::Redistrict(Node *victim_node, Node *idle_node) {
 
 double Runner::Walk(uint32_t num_steps,
                     double alpha, double beta, double gamma, double eta) {
-  uint32_t sum = 0;
-  uint32_t accepted_steps = 0;
+  uint32_t sum = 0, accepted_steps = 0;
   alpha_ = alpha;
   beta_ = beta;
   gamma_ = gamma;
@@ -404,15 +398,17 @@ bool Runner::IsDistrictSevered(Node *proposed_node, uint32_t new_district) {
   }
 
   graph_->AddNodeToDistrict(proposed_node->id_, new_district);
-  unordered_set<int> *nodes = graph_->GetNodesInDistrict(new_district);
+  unordered_set<uint32_t> *nodes = graph_->GetNodesInDistrict(new_district);
+  unordered_set<uint32_t>::iterator itr = nodes->begin();
+  Node *first, *second;
+
   if (nodes->size() > 1) {
-    unordered_set<int>::iterator itr = nodes->begin();
     while (1) {
-      Node *first = graph_->GetNode(*itr);
+      first = graph_->GetNode(*itr);
       if (itr == nodes->end() || ++itr == nodes->end()) {
         break;
       }
-      Node *second = graph_->GetNode(*itr);
+      second = graph_->GetNode(*itr);
       if (!DoesPathExist(first, second)) {
         proposed_node->district_ = old_district;
         return true;
@@ -502,8 +498,8 @@ bool Runner::IsValidRedistricting(Node *node1, Node *node2) {
 }
 
 bool Runner::IsDistrictConnected(uint32_t district_id) {
-  unordered_set<int> *nodes = graph_->GetNodesInDistrict(district_id);
-  unordered_set<int>::iterator itr = nodes->begin();
+  unordered_set<uint32_t> *nodes = graph_->GetNodesInDistrict(district_id);
+  unordered_set<uint32_t>::iterator itr = nodes->begin();
   Node *node, *neighbor_node;
   
   for (uint32_t i = 0; i < nodes->size() - 1; i++) {
