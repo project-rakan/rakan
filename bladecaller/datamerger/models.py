@@ -58,8 +58,7 @@ class TractBlock(models.Model):
 
     @property
     def connected(self):
-        # TODO: Remove self from this query
-        return TractBlock.objects.filter(geometry__bboverlaps=self.geometry)
+        return TractBlock.objects.filter(geometry__bboverlaps=self.geometry).filter(~Q(id = self.id))
 
     def __str__(self):
         return self.name
