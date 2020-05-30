@@ -77,3 +77,6 @@ class DistrictBlock(models.Model):
     @property
     def connected(self):
         return DistrictBlock.objects.filter(geometry__bboverlaps=self.geometry).filter(~Q(id = self.id))
+
+    def __str__(self):
+        return f"State {self.state.state} District #{self.district_id}"
