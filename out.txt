@@ -1,0 +1,2777 @@
+Running Rakan test_suite:
+[==========] Running 14 tests from 3 test suites.
+[----------] Global test environment set-up.
+[----------] 7 tests from Test_Graph
+[ RUN      ] Test_Graph.TestConstructor
+[       OK ] Test_Graph.TestConstructor (0 ms)
+[ RUN      ] Test_Graph.TestAddSimple
+[       OK ] Test_Graph.TestAddSimple (0 ms)
+[ RUN      ] Test_Graph.TestMultipleContains
+[       OK ] Test_Graph.TestMultipleContains (0 ms)
+[ RUN      ] Test_Graph.TestEdgeSimple
+[       OK ] Test_Graph.TestEdgeSimple (0 ms)
+[ RUN      ] Test_Graph.TestEdgeComplex
+[       OK ] Test_Graph.TestEdgeComplex (0 ms)
+[ RUN      ] Test_Graph.TestDistrictsExists
+[       OK ] Test_Graph.TestDistrictsExists (1 ms)
+[ RUN      ] Test_Graph.TestDistrictRemoval
+[       OK ] Test_Graph.TestDistrictRemoval (0 ms)
+[----------] 7 tests from Test_Graph (9 ms total)
+
+[----------] 3 tests from Test_Node
+[ RUN      ] Test_Node.TestNodeCreation
+[       OK ] Test_Node.TestNodeCreation (0 ms)
+[ RUN      ] Test_Node.TestManyNeighbors
+[       OK ] Test_Node.TestManyNeighbors (1 ms)
+[ RUN      ] Test_Node.TestSetPop
+[       OK ] Test_Node.TestSetPop (0 ms)
+[----------] 3 tests from Test_Node (3 ms total)
+
+[----------] 4 tests from Test_Runner
+[ RUN      ] Test_Runner.TestSeedHMap
+seed node 2
+seed node 4
+seed node 0
+current_node = 2
+popped 2
+pushed = 1 to queue
+current_node = 1
+found 1
+current_node = 4
+popped 4
+pushed = 5 to queue
+current_node = 5
+found 5
+current_node = 0
+popped 0
+
+current_node = 1
+popped 1
+pushed = 3 to queue
+pushed = 2 to queue
+current_node = 3
+found 3
+current_node = 5
+popped 5
+pushed = 4 to queue
+pushed = 6 to queue
+current_node = 4
+popped 4
+current_node = 6
+found 6
+
+[       OK ] Test_Runner.TestSeedHMap (12 ms)
+[ RUN      ] Test_Runner.TestSeed4x4Map
+seed node 1
+seed node 5
+seed node 3
+seed node 2
+current_node = 1
+popped 1
+pushed = 0 to queue
+current_node = 0
+found 0
+current_node = 5
+popped 5
+pushed = 9 to queue
+pushed = 6 to queue
+pushed = 4 to queue
+current_node = 9
+found 9
+current_node = 3
+popped 3
+pushed = 7 to queue
+current_node = 7
+found 7
+current_node = 2
+popped 2
+pushed = 6 to queue
+current_node = 6
+found 6
+current_node = 0
+popped 0
+pushed = 4 to queue
+pushed = 1 to queue
+current_node = 4
+found 4
+current_node = 9
+popped 9
+pushed = 13 to queue
+pushed = 10 to queue
+pushed = 5 to queue
+pushed = 8 to queue
+current_node = 6
+popped 6
+current_node = 4
+popped 4
+current_node = 13
+found 13
+current_node = 7
+popped 7
+pushed = 11 to queue
+pushed = 3 to queue
+current_node = 11
+found 11
+current_node = 6
+popped 6
+pushed = 10 to queue
+pushed = 2 to queue
+current_node = 10
+found 10
+current_node = 4
+popped 4
+pushed = 8 to queue
+pushed = 0 to queue
+current_node = 1
+popped 1
+current_node = 8
+found 8
+current_node = 13
+popped 13
+pushed = 14 to queue
+pushed = 9 to queue
+pushed = 12 to queue
+current_node = 10
+popped 10
+current_node = 5
+popped 5
+current_node = 8
+popped 8
+current_node = 14
+found 14
+current_node = 11
+popped 11
+pushed = 15 to queue
+pushed = 7 to queue
+current_node = 3
+popped 3
+current_node = 15
+found 15
+current_node = 10
+popped 10
+pushed = 6 to queue
+current_node = 2
+popped 2
+current_node = 6
+popped 6
+
+current_node = 8
+popped 8
+pushed = 12 to queue
+pushed = 4 to queue
+current_node = 0
+popped 0
+pushed = 1 to queue
+current_node = 12
+found 12
+current_node = 14
+popped 14
+pushed = 13 to queue
+current_node = 9
+popped 9
+pushed = 5 to queue
+current_node = 12
+popped 12
+current_node = 13
+popped 13
+current_node = 5
+popped 5
+
+current_node = 15
+popped 15
+pushed = 11 to queue
+current_node = 7
+popped 7
+pushed = 3 to queue
+current_node = 11
+popped 11
+current_node = 3
+popped 3
+
+
+[       OK ] Test_Runner.TestSeed4x4Map (41 ms)
+[ RUN      ] Test_Runner.TestSeedIowaMap
+seed node 55
+seed node 25
+seed node 31
+seed node 69
+current_node = 55
+popped 55
+pushed = 28 to queue
+pushed = 43 to queue
+pushed = 88 to queue
+current_node = 28
+found 28
+current_node = 25
+popped 25
+pushed = 50 to queue
+pushed = 89 to queue
+pushed = 67 to queue
+pushed = 88 to queue
+pushed = 3 to queue
+current_node = 50
+found 50
+current_node = 31
+popped 31
+pushed = 29 to queue
+pushed = 20 to queue
+pushed = 73 to queue
+pushed = 54 to queue
+current_node = 29
+found 29
+current_node = 69
+popped 69
+pushed = 51 to queue
+pushed = 81 to queue
+pushed = 15 to queue
+pushed = 57 to queue
+current_node = 51
+found 51
+current_node = 28
+popped 28
+pushed = 57 to queue
+pushed = 55 to queue
+current_node = 43
+found 43
+current_node = 50
+popped 50
+pushed = 25 to queue
+pushed = 53 to queue
+pushed = 91 to queue
+current_node = 89
+found 89
+current_node = 29
+popped 29
+pushed = 71 to queue
+pushed = 70 to queue
+pushed = 31 to queue
+current_node = 20
+found 20
+current_node = 51
+popped 51
+pushed = 5 to queue
+pushed = 56 to queue
+pushed = 91 to queue
+pushed = 69 to queue
+pushed = 47 to queue
+current_node = 81
+found 81
+current_node = 43
+popped 43
+pushed = 28 to queue
+pushed = 91 to queue
+current_node = 88
+found 88
+current_node = 89
+popped 89
+pushed = 50 to queue
+pushed = 61 to queue
+current_node = 67
+found 67
+current_node = 20
+popped 20
+pushed = 29 to queue
+pushed = 10 to queue
+pushed = 75 to queue
+pushed = 17 to queue
+current_node = 73
+found 73
+current_node = 81
+popped 81
+pushed = 22 to queue
+current_node = 15
+found 15
+current_node = 88
+popped 88
+pushed = 43 to queue
+current_node = 57
+found 57
+current_node = 67
+popped 67
+pushed = 89 to queue
+pushed = 62 to queue
+pushed = 58 to queue
+pushed = 92 to queue
+current_node = 88
+popped 88
+current_node = 3
+found 3
+current_node = 73
+popped 73
+pushed = 45 to queue
+pushed = 20 to queue
+current_node = 54
+found 54
+current_node = 15
+popped 15
+pushed = 51 to queue
+pushed = 81 to queue
+pushed = 52 to queue
+current_node = 57
+popped 57
+current_node = 5
+found 5
+current_node = 57
+popped 57
+current_node = 55
+popped 55
+pushed = 88 to queue
+current_node = 28
+popped 28
+current_node = 91
+found 91
+current_node = 3
+popped 3
+pushed = 67 to queue
+current_node = 25
+popped 25
+current_node = 53
+found 53
+current_node = 54
+popped 54
+pushed = 98 to queue
+pushed = 73 to queue
+pushed = 94 to queue
+pushed = 40 to queue
+current_node = 71
+found 71
+current_node = 5
+popped 5
+pushed = 9 to queue
+pushed = 6 to queue
+pushed = 85 to queue
+pushed = 78 to queue
+current_node = 56
+found 56
+current_node = 91
+popped 91
+pushed = 47 to queue
+pushed = 57 to queue
+current_node = 43
+popped 43
+pushed = 55 to queue
+pushed = 28 to queue
+current_node = 88
+popped 88
+current_node = 47
+found 47
+current_node = 53
+popped 53
+pushed = 78 to queue
+current_node = 91
+popped 91
+current_node = 50
+popped 50
+pushed = 25 to queue
+current_node = 61
+found 61
+current_node = 71
+popped 71
+pushed = 59 to queue
+pushed = 83 to queue
+current_node = 70
+found 70
+current_node = 56
+popped 56
+pushed = 27 to queue
+pushed = 5 to queue
+pushed = 15 to queue
+current_node = 91
+popped 91
+current_node = 69
+popped 69
+current_node = 47
+popped 47
+current_node = 22
+found 22
+current_node = 47
+popped 47
+pushed = 91 to queue
+pushed = 78 to queue
+pushed = 85 to queue
+current_node = 57
+popped 57
+pushed = 43 to queue
+current_node = 55
+popped 55
+pushed = 88 to queue
+current_node = 28
+popped 28
+current_node = 91
+popped 91
+current_node = 78
+found 78
+current_node = 61
+popped 61
+pushed = 49 to queue
+pushed = 53 to queue
+current_node = 89
+popped 89
+pushed = 50 to queue
+pushed = 3 to queue
+current_node = 62
+found 62
+current_node = 70
+popped 70
+pushed = 74 to queue
+pushed = 71 to queue
+current_node = 31
+popped 31
+pushed = 54 to queue
+current_node = 29
+popped 29
+current_node = 10
+found 10
+current_node = 22
+popped 22
+pushed = 48 to queue
+current_node = 51
+popped 51
+pushed = 56 to queue
+pushed = 69 to queue
+current_node = 81
+popped 81
+current_node = 52
+found 52
+current_node = 78
+popped 78
+pushed = 47 to queue
+pushed = 49 to queue
+pushed = 63 to queue
+current_node = 85
+found 85
+current_node = 62
+popped 62
+pushed = 90 to queue
+pushed = 76 to queue
+pushed = 61 to queue
+current_node = 58
+found 58
+current_node = 10
+popped 10
+pushed = 12 to queue
+pushed = 46 to queue
+pushed = 80 to queue
+pushed = 70 to queue
+current_node = 75
+found 75
+current_node = 52
+popped 52
+pushed = 30 to queue
+pushed = 22 to queue
+current_node = 9
+found 9
+current_node = 85
+popped 85
+pushed = 78 to queue
+pushed = 6 to queue
+pushed = 37 to queue
+current_node = 43
+popped 43
+pushed = 55 to queue
+pushed = 57 to queue
+pushed = 28 to queue
+pushed = 91 to queue
+current_node = 88
+popped 88
+current_node = 47
+popped 47
+current_node = 49
+found 49
+current_node = 58
+popped 58
+pushed = 19 to queue
+pushed = 26 to queue
+pushed = 62 to queue
+current_node = 92
+found 92
+current_node = 75
+popped 75
+pushed = 10 to queue
+pushed = 93 to queue
+current_node = 17
+found 17
+current_node = 9
+popped 9
+pushed = 32 to queue
+pushed = 21 to queue
+pushed = 8 to queue
+current_node = 6
+found 6
+current_node = 49
+popped 49
+pushed = 90 to queue
+pushed = 85 to queue
+pushed = 84 to queue
+pushed = 76 to queue
+current_node = 63
+found 63
+current_node = 92
+popped 92
+pushed = 58 to queue
+current_node = 67
+popped 67
+pushed = 89 to queue
+current_node = 78
+popped 78
+current_node = 25
+popped 25
+current_node = 49
+popped 49
+pushed = 84 to queue
+current_node = 53
+popped 53
+current_node = 50
+popped 50
+current_node = 3
+popped 3
+current_node = 90
+found 90
+current_node = 17
+popped 17
+pushed = 96 to queue
+current_node = 45
+found 45
+current_node = 6
+popped 6
+pushed = 37 to queue
+pushed = 9 to queue
+pushed = 11 to queue
+current_node = 85
+popped 85
+current_node = 78
+popped 78
+current_node = 27
+found 27
+current_node = 63
+popped 63
+pushed = 41 to queue
+pushed = 49 to queue
+current_node = 78
+popped 78
+pushed = 47 to queue
+current_node = 6
+popped 6
+pushed = 8 to queue
+pushed = 32 to queue
+pushed = 11 to queue
+current_node = 37
+found 37
+current_node = 90
+popped 90
+pushed = 60 to queue
+pushed = 24 to queue
+current_node = 76
+found 76
+current_node = 45
+popped 45
+pushed = 75 to queue
+current_node = 20
+popped 20
+pushed = 29 to queue
+pushed = 17 to queue
+pushed = 31 to queue
+current_node = 98
+found 98
+current_node = 27
+popped 27
+pushed = 52 to queue
+current_node = 5
+popped 5
+pushed = 6 to queue
+pushed = 51 to queue
+current_node = 15
+popped 15
+pushed = 81 to queue
+current_node = 48
+found 48
+current_node = 37
+popped 37
+pushed = 63 to queue
+pushed = 34 to queue
+current_node = 55
+popped 55
+pushed = 43 to queue
+pushed = 88 to queue
+current_node = 57
+popped 57
+current_node = 28
+popped 28
+current_node = 91
+popped 91
+current_node = 90
+popped 90
+pushed = 60 to queue
+pushed = 19 to queue
+pushed = 24 to queue
+current_node = 85
+popped 85
+pushed = 78 to queue
+current_node = 84
+found 84
+current_node = 76
+popped 76
+pushed = 90 to queue
+pushed = 7 to queue
+current_node = 61
+popped 61
+pushed = 67 to queue
+pushed = 53 to queue
+current_node = 19
+found 19
+current_node = 98
+popped 98
+pushed = 39 to queue
+pushed = 45 to queue
+pushed = 34 to queue
+pushed = 41 to queue
+pushed = 16 to queue
+current_node = 73
+popped 73
+pushed = 20 to queue
+current_node = 94
+found 94
+current_node = 48
+popped 48
+current_node = 56
+popped 56
+pushed = 27 to queue
+pushed = 5 to queue
+pushed = 15 to queue
+current_node = 69
+popped 69
+current_node = 30
+found 30
+current_node = 84
+popped 84
+pushed = 39 to queue
+pushed = 7 to queue
+current_node = 76
+popped 76
+current_node = 41
+found 41
+current_node = 19
+popped 19
+pushed = 87 to queue
+pushed = 79 to queue
+pushed = 92 to queue
+current_node = 26
+found 26
+current_node = 94
+popped 94
+pushed = 97 to queue
+current_node = 40
+found 40
+current_node = 30
+popped 30
+pushed = 48 to queue
+current_node = 22
+popped 22
+current_node = 32
+found 32
+current_node = 41
+popped 41
+pushed = 37 to queue
+pushed = 84 to queue
+current_node = 49
+popped 49
+pushed = 85 to queue
+current_node = 47
+popped 47
+pushed = 91 to queue
+current_node = 8
+found 8
+current_node = 26
+popped 26
+pushed = 19 to queue
+current_node = 62
+popped 62
+pushed = 76 to queue
+pushed = 61 to queue
+current_node = 58
+popped 58
+pushed = 3 to queue
+current_node = 89
+popped 89
+pushed = 50 to queue
+pushed = 25 to queue
+current_node = 84
+popped 84
+pushed = 39 to queue
+current_node = 60
+found 60
+current_node = 40
+popped 40
+pushed = 94 to queue
+pushed = 98 to queue
+current_node = 59
+found 59
+current_node = 32
+popped 32
+pushed = 2 to queue
+pushed = 18 to queue
+pushed = 95 to queue
+current_node = 21
+found 21
+current_node = 8
+popped 8
+pushed = 33 to queue
+pushed = 18 to queue
+current_node = 32
+popped 32
+pushed = 2 to queue
+pushed = 95 to queue
+current_node = 11
+found 11
+current_node = 60
+popped 60
+pushed = 38 to queue
+pushed = 0 to queue
+current_node = 24
+found 24
+current_node = 59
+popped 59
+current_node = 83
+found 83
+current_node = 21
+popped 21
+pushed = 32 to queue
+pushed = 30 to queue
+current_node = 8
+popped 8
+pushed = 33 to queue
+current_node = 37
+popped 37
+pushed = 34 to queue
+current_node = 9
+popped 9
+pushed = 56 to queue
+current_node = 11
+popped 11
+pushed = 16 to queue
+current_node = 52
+popped 52
+pushed = 22 to queue
+current_node = 6
+popped 6
+current_node = 51
+popped 51
+pushed = 69 to queue
+current_node = 81
+popped 81
+current_node = 27
+popped 27
+current_node = 5
+popped 5
+current_node = 15
+popped 15
+current_node = 48
+popped 48
+current_node = 2
+found 2
+current_node = 11
+popped 11
+pushed = 8 to queue
+pushed = 41 to queue
+pushed = 16 to queue
+current_node = 63
+popped 63
+pushed = 49 to queue
+current_node = 34
+found 34
+current_node = 24
+popped 24
+pushed = 36 to queue
+pushed = 60 to queue
+current_node = 90
+popped 90
+pushed = 58 to queue
+pushed = 62 to queue
+current_node = 7
+found 7
+current_node = 83
+popped 83
+pushed = 59 to queue
+current_node = 74
+found 74
+current_node = 2
+popped 2
+pushed = 21 to queue
+current_node = 18
+found 18
+current_node = 34
+popped 34
+pushed = 11 to queue
+current_node = 43
+popped 43
+pushed = 55 to queue
+pushed = 57 to queue
+pushed = 28 to queue
+current_node = 88
+popped 88
+current_node = 60
+popped 60
+pushed = 38 to queue
+pushed = 87 to queue
+pushed = 0 to queue
+current_node = 19
+popped 19
+pushed = 79 to queue
+current_node = 24
+popped 24
+pushed = 36 to queue
+current_node = 78
+popped 78
+pushed = 47 to queue
+pushed = 63 to queue
+current_node = 39
+found 39
+current_node = 7
+popped 7
+pushed = 93 to queue
+pushed = 24 to queue
+current_node = 67
+popped 67
+pushed = 89 to queue
+current_node = 53
+popped 53
+current_node = 87
+found 87
+current_node = 74
+popped 74
+pushed = 83 to queue
+current_node = 71
+popped 71
+current_node = 54
+popped 54
+pushed = 73 to queue
+pushed = 40 to queue
+current_node = 12
+found 12
+current_node = 18
+popped 18
+pushed = 65 to queue
+pushed = 44 to queue
+current_node = 95
+found 95
+current_node = 39
+popped 39
+pushed = 93 to queue
+pushed = 34 to queue
+current_node = 7
+popped 7
+current_node = 37
+popped 37
+current_node = 84
+popped 84
+current_node = 85
+popped 85
+pushed = 78 to queue
+current_node = 91
+popped 91
+pushed = 43 to queue
+current_node = 33
+found 33
+current_node = 87
+popped 87
+pushed = 1 to queue
+pushed = 86 to queue
+pushed = 26 to queue
+current_node = 79
+found 79
+current_node = 12
+popped 12
+pushed = 13 to queue
+pushed = 36 to queue
+current_node = 46
+found 46
+current_node = 95
+popped 95
+pushed = 2 to queue
+pushed = 18 to queue
+current_node = 32
+popped 32
+pushed = 9 to queue
+pushed = 6 to queue
+pushed = 27 to queue
+current_node = 30
+popped 30
+pushed = 52 to queue
+pushed = 48 to queue
+current_node = 33
+popped 33
+current_node = 34
+popped 34
+current_node = 56
+popped 56
+pushed = 51 to queue
+pushed = 5 to queue
+pushed = 15 to queue
+current_node = 16
+found 16
+current_node = 33
+popped 33
+pushed = 65 to queue
+pushed = 44 to queue
+current_node = 18
+popped 18
+current_node = 2
+popped 2
+current_node = 95
+popped 95
+current_node = 8
+popped 8
+current_node = 41
+popped 41
+pushed = 37 to queue
+pushed = 39 to queue
+pushed = 84 to queue
+current_node = 16
+popped 16
+pushed = 97 to queue
+current_node = 49
+popped 49
+pushed = 85 to queue
+current_node = 11
+popped 11
+current_node = 55
+popped 55
+pushed = 88 to queue
+current_node = 57
+popped 57
+pushed = 91 to queue
+current_node = 28
+popped 28
+current_node = 38
+found 38
+current_node = 79
+popped 79
+pushed = 87 to queue
+current_node = 92
+popped 92
+pushed = 67 to queue
+current_node = 19
+popped 19
+pushed = 90 to queue
+current_node = 76
+popped 76
+pushed = 7 to queue
+current_node = 61
+popped 61
+pushed = 53 to queue
+current_node = 3
+popped 3
+current_node = 50
+popped 50
+current_node = 25
+popped 25
+current_node = 39
+popped 39
+current_node = 38
+popped 38
+pushed = 4 to queue
+pushed = 13 to queue
+pushed = 14 to queue
+current_node = 0
+found 0
+current_node = 46
+popped 46
+pushed = 23 to queue
+pushed = 66 to queue
+current_node = 80
+found 80
+current_node = 16
+popped 16
+pushed = 97 to queue
+current_node = 22
+popped 22
+pushed = 81 to queue
+current_node = 69
+popped 69
+current_node = 21
+popped 21
+pushed = 95 to queue
+pushed = 32 to queue
+pushed = 30 to queue
+current_node = 65
+found 65
+current_node = 38
+popped 38
+pushed = 4 to queue
+pushed = 13 to queue
+pushed = 14 to queue
+current_node = 87
+popped 87
+pushed = 1 to queue
+pushed = 86 to queue
+current_node = 0
+popped 0
+current_node = 79
+popped 79
+current_node = 36
+found 36
+current_node = 0
+popped 0
+current_node = 36
+popped 36
+current_node = 60
+popped 60
+pushed = 76 to queue
+pushed = 19 to queue
+current_node = 58
+popped 58
+pushed = 92 to queue
+pushed = 3 to queue
+current_node = 62
+popped 62
+pushed = 61 to queue
+current_node = 93
+found 93
+current_node = 80
+popped 80
+pushed = 12 to queue
+pushed = 46 to queue
+current_node = 70
+popped 70
+pushed = 74 to queue
+pushed = 71 to queue
+current_node = 10
+popped 10
+current_node = 93
+popped 93
+current_node = 96
+found 96
+current_node = 65
+popped 65
+pushed = 16 to queue
+current_node = 44
+found 44
+current_node = 36
+popped 36
+pushed = 38 to queue
+current_node = 47
+popped 47
+current_node = 63
+popped 63
+pushed = 41 to queue
+pushed = 49 to queue
+current_node = 93
+popped 93
+current_node = 34
+popped 34
+pushed = 33 to queue
+pushed = 11 to queue
+current_node = 78
+popped 78
+current_node = 43
+popped 43
+pushed = 55 to queue
+pushed = 57 to queue
+pushed = 28 to queue
+current_node = 65
+popped 65
+current_node = 44
+popped 44
+current_node = 37
+popped 37
+current_node = 39
+popped 39
+current_node = 84
+popped 84
+current_node = 97
+found 97
+current_node = 93
+popped 93
+current_node = 24
+popped 24
+pushed = 0 to queue
+pushed = 60 to queue
+current_node = 89
+popped 89
+pushed = 50 to queue
+pushed = 25 to queue
+current_node = 1
+found 1
+current_node = 96
+popped 96
+current_node = 75
+popped 75
+pushed = 54 to queue
+pushed = 10 to queue
+pushed = 80 to queue
+current_node = 29
+popped 29
+pushed = 70 to queue
+current_node = 17
+popped 17
+current_node = 31
+popped 31
+current_node = 39
+popped 39
+current_node = 45
+popped 45
+current_node = 34
+popped 34
+current_node = 41
+popped 41
+current_node = 16
+popped 16
+current_node = 20
+popped 20
+current_node = 97
+popped 97
+current_node = 94
+popped 94
+current_node = 98
+popped 98
+current_node = 59
+popped 59
+current_node = 83
+popped 83
+current_node = 73
+popped 73
+current_node = 40
+popped 40
+current_node = 13
+found 13
+current_node = 44
+popped 44
+pushed = 65 to queue
+current_node = 2
+popped 2
+pushed = 21 to queue
+current_node = 18
+popped 18
+current_node = 9
+popped 9
+pushed = 56 to queue
+current_node = 6
+popped 6
+current_node = 27
+popped 27
+current_node = 52
+popped 52
+pushed = 22 to queue
+current_node = 48
+popped 48
+current_node = 51
+popped 51
+pushed = 69 to queue
+current_node = 5
+popped 5
+current_node = 15
+popped 15
+current_node = 97
+popped 97
+current_node = 81
+popped 81
+current_node = 95
+popped 95
+current_node = 32
+popped 32
+current_node = 30
+popped 30
+current_node = 16
+popped 16
+current_node = 65
+popped 65
+current_node = 21
+popped 21
+current_node = 56
+popped 56
+current_node = 22
+popped 22
+current_node = 69
+popped 69
+
+current_node = 97
+popped 97
+current_node = 85
+popped 85
+pushed = 78 to queue
+pushed = 37 to queue
+pushed = 63 to queue
+pushed = 47 to queue
+current_node = 88
+popped 88
+pushed = 43 to queue
+current_node = 91
+popped 91
+current_node = 4
+found 4
+current_node = 1
+popped 1
+pushed = 79 to queue
+pushed = 68 to queue
+pushed = 72 to queue
+current_node = 86
+found 86
+current_node = 13
+popped 13
+pushed = 82 to queue
+current_node = 36
+popped 36
+current_node = 23
+found 23
+
+current_node = 4
+popped 4
+pushed = 82 to queue
+current_node = 13
+popped 13
+pushed = 36 to queue
+current_node = 14
+found 14
+current_node = 86
+popped 86
+pushed = 1 to queue
+current_node = 26
+popped 26
+pushed = 58 to queue
+current_node = 87
+popped 87
+current_node = 67
+popped 67
+pushed = 89 to queue
+pushed = 62 to queue
+current_node = 90
+popped 90
+pushed = 24 to queue
+current_node = 7
+popped 7
+pushed = 93 to queue
+current_node = 53
+popped 53
+current_node = 4
+popped 4
+pushed = 82 to queue
+current_node = 13
+popped 13
+current_node = 14
+popped 14
+pushed = 77 to queue
+current_node = 76
+popped 76
+current_node = 19
+popped 19
+current_node = 92
+popped 92
+current_node = 3
+popped 3
+current_node = 61
+popped 61
+current_node = 0
+popped 0
+current_node = 60
+popped 60
+current_node = 50
+popped 50
+current_node = 25
+popped 25
+current_node = 79
+popped 79
+current_node = 68
+found 68
+current_node = 23
+popped 23
+pushed = 42 to queue
+pushed = 13 to queue
+pushed = 96 to queue
+current_node = 66
+found 66
+
+current_node = 14
+popped 14
+pushed = 77 to queue
+pushed = 4 to queue
+current_node = 1
+popped 1
+pushed = 72 to queue
+current_node = 86
+popped 86
+current_node = 38
+popped 38
+current_node = 41
+popped 41
+pushed = 34 to queue
+pushed = 39 to queue
+pushed = 84 to queue
+current_node = 49
+popped 49
+pushed = 85 to queue
+current_node = 33
+popped 33
+pushed = 8 to queue
+current_node = 11
+popped 11
+current_node = 55
+popped 55
+pushed = 88 to queue
+current_node = 57
+popped 57
+pushed = 91 to queue
+current_node = 28
+popped 28
+current_node = 78
+popped 78
+current_node = 37
+popped 37
+current_node = 63
+popped 63
+current_node = 47
+popped 47
+current_node = 43
+popped 43
+current_node = 82
+found 82
+current_node = 68
+popped 68
+pushed = 64 to queue
+pushed = 86 to queue
+pushed = 35 to queue
+current_node = 72
+found 72
+current_node = 66
+popped 66
+pushed = 23 to queue
+current_node = 12
+popped 12
+pushed = 75 to queue
+current_node = 46
+popped 46
+pushed = 17 to queue
+current_node = 74
+popped 74
+pushed = 83 to queue
+current_node = 71
+popped 71
+pushed = 29 to queue
+pushed = 59 to queue
+pushed = 20 to queue
+current_node = 54
+popped 54
+pushed = 98 to queue
+pushed = 73 to queue
+pushed = 45 to queue
+pushed = 31 to queue
+pushed = 94 to queue
+pushed = 40 to queue
+current_node = 10
+popped 10
+current_node = 80
+popped 80
+current_node = 70
+popped 70
+current_node = 82
+popped 82
+pushed = 77 to queue
+current_node = 42
+found 42
+
+current_node = 82
+popped 82
+pushed = 14 to queue
+current_node = 36
+popped 36
+pushed = 38 to queue
+current_node = 77
+found 77
+current_node = 72
+popped 72
+pushed = 68 to queue
+current_node = 1
+popped 1
+pushed = 79 to queue
+pushed = 87 to queue
+pushed = 0 to queue
+current_node = 58
+popped 58
+pushed = 92 to queue
+pushed = 19 to queue
+pushed = 26 to queue
+pushed = 67 to queue
+pushed = 90 to queue
+pushed = 3 to queue
+current_node = 89
+popped 89
+pushed = 53 to queue
+pushed = 50 to queue
+pushed = 25 to queue
+pushed = 61 to queue
+current_node = 62
+popped 62
+pushed = 76 to queue
+current_node = 24
+popped 24
+pushed = 7 to queue
+pushed = 60 to queue
+current_node = 93
+popped 93
+current_node = 82
+popped 82
+current_node = 77
+popped 77
+current_node = 64
+found 64
+current_node = 42
+popped 42
+pushed = 66 to queue
+current_node = 13
+popped 13
+pushed = 80 to queue
+pushed = 12 to queue
+current_node = 96
+popped 96
+pushed = 46 to queue
+pushed = 74 to queue
+current_node = 23
+popped 23
+current_node = 75
+popped 75
+pushed = 54 to queue
+pushed = 10 to queue
+current_node = 17
+popped 17
+pushed = 70 to queue
+current_node = 83
+popped 83
+pushed = 71 to queue
+current_node = 29
+popped 29
+current_node = 59
+popped 59
+current_node = 20
+popped 20
+current_node = 98
+popped 98
+current_node = 73
+popped 73
+current_node = 45
+popped 45
+current_node = 31
+popped 31
+current_node = 94
+popped 94
+current_node = 40
+popped 40
+current_node = 77
+popped 77
+current_node = 66
+popped 66
+current_node = 80
+popped 80
+current_node = 12
+popped 12
+current_node = 46
+popped 46
+current_node = 74
+popped 74
+current_node = 54
+popped 54
+current_node = 10
+popped 10
+current_node = 70
+popped 70
+current_node = 71
+popped 71
+
+
+current_node = 77
+popped 77
+pushed = 82 to queue
+current_node = 4
+popped 4
+current_node = 72
+popped 72
+pushed = 35 to queue
+current_node = 34
+popped 34
+pushed = 41 to queue
+pushed = 33 to queue
+pushed = 37 to queue
+pushed = 11 to queue
+current_node = 39
+popped 39
+current_node = 84
+popped 84
+pushed = 63 to queue
+pushed = 49 to queue
+current_node = 85
+popped 85
+pushed = 78 to queue
+pushed = 47 to queue
+current_node = 8
+popped 8
+current_node = 88
+popped 88
+pushed = 43 to queue
+pushed = 55 to queue
+current_node = 91
+popped 91
+pushed = 57 to queue
+current_node = 14
+popped 14
+current_node = 38
+popped 38
+pushed = 36 to queue
+current_node = 82
+popped 82
+current_node = 35
+found 35
+current_node = 64
+popped 64
+pushed = 72 to queue
+current_node = 86
+popped 86
+pushed = 1 to queue
+current_node = 35
+popped 35
+current_node = 68
+popped 68
+current_node = 79
+popped 79
+current_node = 87
+popped 87
+current_node = 0
+popped 0
+pushed = 24 to queue
+current_node = 92
+popped 92
+pushed = 58 to queue
+current_node = 19
+popped 19
+current_node = 26
+popped 26
+current_node = 67
+popped 67
+pushed = 89 to queue
+pushed = 62 to queue
+current_node = 90
+popped 90
+current_node = 3
+popped 3
+current_node = 53
+popped 53
+current_node = 50
+popped 50
+current_node = 25
+popped 25
+current_node = 61
+popped 61
+current_node = 76
+popped 76
+current_node = 7
+popped 7
+pushed = 93 to queue
+current_node = 60
+popped 60
+current_node = 72
+popped 72
+current_node = 1
+popped 1
+current_node = 24
+popped 24
+current_node = 58
+popped 58
+current_node = 89
+popped 89
+current_node = 62
+popped 62
+current_node = 93
+popped 93
+
+
+
+/home/project/rakan/cRakan/tst/test_runner.cc:934: Failure
+Value of: r->IsDistrictConnected(i)
+  Actual: false
+Expected: true
+[  FAILED  ] Test_Runner.TestSeedIowaMap (476 ms)
+[ RUN      ] Test_Runner.TestWalkOneStep
+seed node 1
+seed node 2
+seed node 4
+seed node 15
+current_node = 1
+popped 1
+pushed = 5 to queue
+pushed = 0 to queue
+current_node = 5
+found 5
+current_node = 2
+popped 2
+pushed = 6 to queue
+pushed = 3 to queue
+current_node = 6
+found 6
+current_node = 4
+popped 4
+pushed = 8 to queue
+pushed = 0 to queue
+current_node = 8
+found 8
+current_node = 15
+popped 15
+pushed = 14 to queue
+pushed = 11 to queue
+current_node = 14
+found 14
+current_node = 5
+popped 5
+pushed = 9 to queue
+pushed = 1 to queue
+current_node = 0
+found 0
+current_node = 6
+popped 6
+pushed = 10 to queue
+pushed = 7 to queue
+pushed = 2 to queue
+current_node = 3
+found 3
+current_node = 8
+popped 8
+pushed = 12 to queue
+pushed = 4 to queue
+pushed = 9 to queue
+current_node = 0
+popped 0
+current_node = 12
+found 12
+current_node = 14
+popped 14
+pushed = 15 to queue
+pushed = 10 to queue
+pushed = 13 to queue
+current_node = 11
+found 11
+current_node = 0
+popped 0
+current_node = 9
+found 9
+current_node = 3
+popped 3
+current_node = 10
+found 10
+current_node = 12
+popped 12
+pushed = 13 to queue
+pushed = 8 to queue
+current_node = 4
+popped 4
+current_node = 9
+popped 9
+current_node = 13
+found 13
+current_node = 11
+popped 11
+pushed = 7 to queue
+current_node = 15
+popped 15
+pushed = 14 to queue
+current_node = 10
+popped 10
+current_node = 13
+popped 13
+current_node = 7
+found 7
+seed node 3
+seed node 6
+seed node 0
+current_node = 3
+popped 3
+pushed = 5 to queue
+pushed = 4 to queue
+pushed = 2 to queue
+pushed = 1 to queue
+current_node = 5
+found 5
+current_node = 6
+popped 6
+
+current_node = 0
+popped 0
+pushed = 1 to queue
+current_node = 1
+found 1
+current_node = 5
+popped 5
+pushed = 3 to queue
+current_node = 4
+found 4
+
+current_node = 1
+popped 1
+pushed = 0 to queue
+pushed = 2 to queue
+current_node = 0
+popped 0
+current_node = 2
+found 2
+seed node 25
+seed node 86
+seed node 95
+seed node 46
+current_node = 25
+popped 25
+pushed = 50 to queue
+pushed = 89 to queue
+pushed = 67 to queue
+pushed = 88 to queue
+pushed = 3 to queue
+current_node = 50
+found 50
+current_node = 86
+popped 86
+pushed = 1 to queue
+pushed = 68 to queue
+pushed = 87 to queue
+pushed = 72 to queue
+pushed = 79 to queue
+current_node = 1
+found 1
+current_node = 95
+popped 95
+pushed = 21 to queue
+pushed = 44 to queue
+pushed = 2 to queue
+pushed = 32 to queue
+pushed = 18 to queue
+current_node = 21
+found 21
+current_node = 46
+popped 46
+pushed = 96 to queue
+pushed = 23 to queue
+pushed = 80 to queue
+pushed = 66 to queue
+pushed = 10 to queue
+pushed = 17 to queue
+current_node = 96
+found 96
+current_node = 50
+popped 50
+pushed = 25 to queue
+pushed = 53 to queue
+pushed = 43 to queue
+pushed = 91 to queue
+current_node = 89
+found 89
+current_node = 1
+popped 1
+pushed = 14 to queue
+pushed = 0 to queue
+pushed = 86 to queue
+current_node = 68
+found 68
+current_node = 21
+popped 21
+pushed = 95 to queue
+pushed = 30 to queue
+pushed = 9 to queue
+pushed = 27 to queue
+current_node = 44
+found 44
+current_node = 96
+popped 96
+pushed = 46 to queue
+pushed = 74 to queue
+current_node = 23
+found 23
+current_node = 89
+popped 89
+pushed = 50 to queue
+pushed = 61 to queue
+current_node = 67
+found 67
+current_node = 68
+popped 68
+pushed = 64 to queue
+pushed = 77 to queue
+pushed = 1 to queue
+pushed = 35 to queue
+current_node = 87
+found 87
+current_node = 44
+popped 44
+pushed = 65 to queue
+pushed = 33 to queue
+current_node = 2
+found 2
+current_node = 23
+popped 23
+pushed = 42 to queue
+pushed = 4 to queue
+pushed = 13 to queue
+pushed = 82 to queue
+pushed = 96 to queue
+current_node = 80
+found 80
+current_node = 67
+popped 67
+pushed = 89 to queue
+pushed = 62 to queue
+pushed = 58 to queue
+pushed = 92 to queue
+current_node = 88
+found 88
+current_node = 87
+popped 87
+pushed = 26 to queue
+pushed = 60 to queue
+pushed = 19 to queue
+current_node = 72
+found 72
+current_node = 2
+popped 2
+pushed = 21 to queue
+current_node = 32
+found 32
+current_node = 80
+popped 80
+pushed = 75 to queue
+pushed = 23 to queue
+pushed = 12 to queue
+current_node = 66
+found 66
+current_node = 88
+popped 88
+pushed = 55 to queue
+current_node = 3
+found 3
+current_node = 72
+popped 72
+pushed = 68 to queue
+current_node = 79
+found 79
+current_node = 32
+popped 32
+pushed = 6 to queue
+pushed = 2 to queue
+pushed = 8 to queue
+current_node = 18
+found 18
+current_node = 66
+popped 66
+current_node = 10
+found 10
+current_node = 3
+popped 3
+pushed = 67 to queue
+current_node = 25
+popped 25
+pushed = 88 to queue
+current_node = 53
+found 53
+current_node = 79
+popped 79
+pushed = 87 to queue
+current_node = 14
+found 14
+current_node = 18
+popped 18
+pushed = 11 to queue
+pushed = 44 to queue
+pushed = 32 to queue
+current_node = 95
+popped 95
+current_node = 30
+found 30
+current_node = 10
+popped 10
+pushed = 73 to queue
+pushed = 80 to queue
+pushed = 70 to queue
+pushed = 20 to queue
+current_node = 17
+found 17
+current_node = 53
+popped 53
+pushed = 78 to queue
+pushed = 47 to queue
+current_node = 43
+found 43
+current_node = 14
+popped 14
+pushed = 82 to queue
+pushed = 4 to queue
+pushed = 38 to queue
+current_node = 0
+found 0
+current_node = 30
+popped 30
+pushed = 52 to queue
+pushed = 48 to queue
+current_node = 9
+found 9
+current_node = 17
+popped 17
+pushed = 10 to queue
+pushed = 83 to queue
+current_node = 46
+popped 46
+pushed = 66 to queue
+current_node = 74
+found 74
+current_node = 43
+popped 43
+pushed = 57 to queue
+pushed = 28 to queue
+current_node = 91
+found 91
+current_node = 0
+popped 0
+pushed = 14 to queue
+pushed = 24 to queue
+current_node = 86
+popped 86
+pushed = 72 to queue
+pushed = 79 to queue
+current_node = 64
+found 64
+current_node = 9
+popped 9
+pushed = 56 to queue
+pushed = 5 to queue
+current_node = 27
+found 27
+current_node = 74
+popped 74
+pushed = 17 to queue
+current_node = 42
+found 42
+current_node = 91
+popped 91
+pushed = 51 to queue
+pushed = 43 to queue
+pushed = 53 to queue
+current_node = 50
+popped 50
+pushed = 25 to queue
+current_node = 61
+found 61
+current_node = 64
+popped 64
+current_node = 77
+found 77
+current_node = 27
+popped 27
+pushed = 30 to queue
+pushed = 9 to queue
+current_node = 65
+found 65
+current_node = 42
+popped 42
+current_node = 4
+found 4
+current_node = 61
+popped 61
+pushed = 49 to queue
+current_node = 89
+popped 89
+pushed = 50 to queue
+pushed = 3 to queue
+current_node = 62
+found 62
+current_node = 77
+popped 77
+pushed = 64 to queue
+current_node = 1
+popped 1
+pushed = 0 to queue
+pushed = 86 to queue
+current_node = 35
+found 35
+current_node = 65
+popped 65
+pushed = 97 to queue
+pushed = 18 to queue
+pushed = 16 to queue
+current_node = 33
+found 33
+current_node = 4
+popped 4
+pushed = 38 to queue
+current_node = 13
+found 13
+current_node = 62
+popped 62
+pushed = 90 to queue
+pushed = 76 to queue
+pushed = 61 to queue
+current_node = 58
+found 58
+current_node = 35
+popped 35
+current_node = 26
+found 26
+current_node = 33
+popped 33
+pushed = 34 to queue
+pushed = 65 to queue
+current_node = 21
+popped 21
+pushed = 95 to queue
+pushed = 27 to queue
+current_node = 6
+found 6
+current_node = 13
+popped 13
+pushed = 4 to queue
+pushed = 36 to queue
+current_node = 82
+found 82
+current_node = 58
+popped 58
+pushed = 19 to queue
+pushed = 62 to queue
+current_node = 92
+found 92
+current_node = 26
+popped 26
+current_node = 60
+found 60
+current_node = 6
+popped 6
+pushed = 37 to queue
+pushed = 85 to queue
+current_node = 2
+popped 2
+pushed = 21 to queue
+current_node = 8
+found 8
+current_node = 82
+popped 82
+pushed = 13 to queue
+pushed = 42 to queue
+current_node = 96
+popped 96
+pushed = 46 to queue
+pushed = 74 to queue
+current_node = 75
+found 75
+current_node = 92
+popped 92
+pushed = 58 to queue
+current_node = 55
+found 55
+current_node = 60
+popped 60
+pushed = 90 to queue
+pushed = 76 to queue
+current_node = 19
+found 19
+current_node = 8
+popped 8
+pushed = 6 to queue
+pushed = 33 to queue
+current_node = 11
+found 11
+current_node = 75
+popped 75
+pushed = 54 to queue
+pushed = 45 to queue
+pushed = 93 to queue
+current_node = 23
+popped 23
+pushed = 82 to queue
+pushed = 96 to queue
+current_node = 12
+found 12
+current_node = 55
+popped 55
+current_node = 67
+popped 67
+pushed = 89 to queue
+pushed = 92 to queue
+current_node = 88
+popped 88
+current_node = 78
+found 78
+current_node = 19
+popped 19
+pushed = 60 to queue
+pushed = 26 to queue
+current_node = 68
+popped 68
+pushed = 77 to queue
+pushed = 1 to queue
+pushed = 35 to queue
+current_node = 87
+popped 87
+current_node = 82
+popped 82
+current_node = 4
+popped 4
+current_node = 38
+found 38
+current_node = 11
+popped 11
+pushed = 8 to queue
+pushed = 41 to queue
+current_node = 44
+popped 44
+current_node = 32
+popped 32
+pushed = 2 to queue
+current_node = 52
+found 52
+current_node = 12
+popped 12
+pushed = 75 to queue
+current_node = 73
+found 73
+current_node = 78
+popped 78
+pushed = 85 to queue
+pushed = 5 to queue
+pushed = 63 to queue
+current_node = 47
+found 47
+current_node = 38
+popped 38
+pushed = 36 to queue
+current_node = 14
+popped 14
+pushed = 68 to queue
+current_node = 24
+found 24
+current_node = 52
+popped 52
+pushed = 15 to queue
+pushed = 22 to queue
+current_node = 48
+found 48
+current_node = 73
+popped 73
+pushed = 31 to queue
+pushed = 29 to queue
+current_node = 80
+popped 80
+pushed = 23 to queue
+pushed = 12 to queue
+current_node = 70
+found 70
+current_node = 47
+popped 47
+pushed = 91 to queue
+pushed = 56 to queue
+pushed = 78 to queue
+current_node = 57
+found 57
+current_node = 24
+popped 24
+pushed = 38 to queue
+pushed = 7 to queue
+current_node = 72
+popped 72
+current_node = 79
+popped 79
+pushed = 87 to queue
+pushed = 19 to queue
+current_node = 64
+popped 64
+current_node = 0
+popped 0
+pushed = 14 to queue
+current_node = 86
+popped 86
+current_node = 90
+found 90
+current_node = 48
+popped 48
+pushed = 52 to queue
+current_node = 56
+found 56
+current_node = 70
+popped 70
+pushed = 71 to queue
+pushed = 59 to queue
+current_node = 20
+found 20
+current_node = 57
+popped 57
+pushed = 69 to queue
+current_node = 28
+found 28
+current_node = 90
+popped 90
+pushed = 24 to queue
+pushed = 49 to queue
+current_node = 76
+found 76
+current_node = 56
+popped 56
+pushed = 51 to queue
+current_node = 5
+found 5
+current_node = 20
+popped 20
+pushed = 73 to queue
+pushed = 70 to queue
+current_node = 10
+popped 10
+pushed = 80 to queue
+current_node = 83
+found 83
+current_node = 28
+popped 28
+pushed = 57 to queue
+pushed = 55 to queue
+current_node = 51
+found 51
+current_node = 76
+popped 76
+pushed = 90 to queue
+pushed = 84 to queue
+current_node = 60
+popped 60
+pushed = 0 to queue
+current_node = 26
+popped 26
+pushed = 79 to queue
+current_node = 77
+popped 77
+pushed = 64 to queue
+current_node = 1
+popped 1
+pushed = 86 to queue
+pushed = 72 to queue
+current_node = 35
+popped 35
+current_node = 36
+found 36
+current_node = 5
+popped 5
+pushed = 56 to queue
+current_node = 30
+popped 30
+pushed = 48 to queue
+current_node = 9
+popped 9
+pushed = 32 to queue
+current_node = 97
+found 97
+current_node = 83
+popped 83
+current_node = 66
+popped 66
+current_node = 17
+popped 17
+pushed = 10 to queue
+pushed = 20 to queue
+current_node = 38
+popped 38
+current_node = 4
+popped 4
+current_node = 36
+popped 36
+pushed = 7 to queue
+current_node = 13
+popped 13
+current_node = 42
+popped 42
+current_node = 46
+popped 46
+current_node = 74
+popped 74
+current_node = 54
+found 54
+current_node = 51
+popped 51
+pushed = 15 to queue
+pushed = 47 to queue
+current_node = 43
+popped 43
+pushed = 88 to queue
+pushed = 28 to queue
+current_node = 53
+popped 53
+current_node = 25
+popped 25
+pushed = 67 to queue
+current_node = 49
+found 49
+current_node = 36
+popped 36
+pushed = 93 to queue
+current_node = 68
+popped 68
+pushed = 77 to queue
+pushed = 1 to queue
+pushed = 35 to queue
+current_node = 38
+popped 38
+pushed = 60 to queue
+current_node = 7
+found 7
+current_node = 97
+popped 97
+pushed = 40 to queue
+pushed = 94 to queue
+current_node = 18
+popped 18
+pushed = 11 to queue
+pushed = 44 to queue
+current_node = 16
+found 16
+current_node = 54
+popped 54
+pushed = 98 to queue
+pushed = 94 to queue
+pushed = 40 to queue
+current_node = 45
+found 45
+current_node = 49
+popped 49
+pushed = 84 to queue
+current_node = 50
+popped 50
+pushed = 25 to queue
+pushed = 53 to queue
+pushed = 43 to queue
+current_node = 3
+popped 3
+current_node = 90
+popped 90
+current_node = 76
+popped 76
+current_node = 61
+popped 61
+current_node = 19
+popped 19
+current_node = 62
+popped 62
+current_node = 58
+popped 58
+current_node = 89
+popped 89
+current_node = 92
+popped 92
+current_node = 85
+found 85
+current_node = 7
+popped 7
+pushed = 39 to queue
+pushed = 36 to queue
+pushed = 76 to queue
+current_node = 87
+popped 87
+pushed = 26 to queue
+current_node = 19
+popped 19
+current_node = 14
+popped 14
+pushed = 68 to queue
+pushed = 38 to queue
+current_node = 24
+popped 24
+current_node = 49
+popped 49
+pushed = 63 to queue
+current_node = 90
+popped 90
+current_node = 84
+found 84
+current_node = 16
+popped 16
+pushed = 97 to queue
+pushed = 98 to queue
+current_node = 34
+found 34
+current_node = 45
+popped 45
+pushed = 54 to queue
+current_node = 93
+found 93
+current_node = 85
+popped 85
+pushed = 37 to queue
+pushed = 49 to queue
+current_node = 5
+popped 5
+pushed = 51 to queue
+current_node = 63
+found 63
+current_node = 84
+popped 84
+pushed = 41 to queue
+pushed = 7 to queue
+current_node = 0
+popped 0
+pushed = 14 to queue
+pushed = 87 to queue
+pushed = 24 to queue
+current_node = 79
+popped 79
+pushed = 19 to queue
+current_node = 64
+popped 64
+current_node = 86
+popped 86
+current_node = 72
+popped 72
+current_node = 93
+popped 93
+pushed = 98 to queue
+current_node = 77
+popped 77
+current_node = 1
+popped 1
+current_node = 35
+popped 35
+current_node = 60
+popped 60
+pushed = 90 to queue
+current_node = 39
+found 39
+current_node = 34
+popped 34
+pushed = 16 to queue
+current_node = 65
+popped 65
+pushed = 18 to queue
+current_node = 95
+popped 95
+current_node = 27
+popped 27
+pushed = 30 to queue
+pushed = 9 to queue
+current_node = 37
+found 37
+current_node = 93
+popped 93
+pushed = 45 to queue
+current_node = 82
+popped 82
+pushed = 13 to queue
+pushed = 4 to queue
+pushed = 42 to queue
+current_node = 96
+popped 96
+pushed = 46 to queue
+pushed = 74 to queue
+pushed = 66 to queue
+pushed = 17 to queue
+current_node = 75
+popped 75
+current_node = 31
+found 31
+current_node = 63
+popped 63
+pushed = 41 to queue
+pushed = 85 to queue
+current_node = 91
+popped 91
+pushed = 50 to queue
+current_node = 56
+popped 56
+current_node = 78
+popped 78
+pushed = 61 to queue
+current_node = 69
+found 69
+current_node = 39
+popped 39
+pushed = 84 to queue
+current_node = 36
+popped 36
+current_node = 76
+popped 76
+pushed = 60 to queue
+current_node = 26
+popped 26
+pushed = 79 to queue
+current_node = 68
+popped 68
+pushed = 64 to queue
+pushed = 72 to queue
+pushed = 77 to queue
+pushed = 1 to queue
+pushed = 86 to queue
+pushed = 35 to queue
+current_node = 38
+popped 38
+pushed = 0 to queue
+current_node = 63
+popped 63
+current_node = 41
+found 41
+current_node = 37
+popped 37
+pushed = 34 to queue
+current_node = 85
+popped 85
+pushed = 5 to queue
+current_node = 21
+popped 21
+pushed = 95 to queue
+pushed = 27 to queue
+current_node = 6
+popped 6
+current_node = 33
+popped 33
+pushed = 65 to queue
+current_node = 8
+popped 8
+current_node = 41
+popped 41
+current_node = 2
+popped 2
+current_node = 15
+found 15
+current_node = 31
+popped 31
+current_node = 29
+found 29
+current_node = 69
+popped 69
+pushed = 81 to queue
+current_node = 57
+popped 57
+pushed = 91 to queue
+current_node = 55
+popped 55
+current_node = 15
+popped 15
+pushed = 22 to queue
+current_node = 47
+popped 47
+pushed = 78 to queue
+current_node = 88
+popped 88
+pushed = 89 to queue
+current_node = 28
+popped 28
+current_node = 67
+popped 67
+pushed = 3 to queue
+pushed = 62 to queue
+pushed = 58 to queue
+pushed = 92 to queue
+current_node = 84
+popped 84
+pushed = 63 to queue
+current_node = 25
+popped 25
+current_node = 53
+popped 53
+current_node = 43
+popped 43
+current_node = 37
+popped 37
+current_node = 49
+popped 49
+current_node = 51
+popped 51
+current_node = 41
+popped 41
+pushed = 98 to queue
+current_node = 85
+popped 85
+current_node = 50
+popped 50
+current_node = 61
+popped 61
+current_node = 81
+found 81
+current_node = 41
+popped 41
+pushed = 39 to queue
+current_node = 7
+popped 7
+pushed = 36 to queue
+pushed = 76 to queue
+current_node = 14
+popped 14
+pushed = 68 to queue
+pushed = 38 to queue
+current_node = 87
+popped 87
+pushed = 26 to queue
+current_node = 24
+popped 24
+current_node = 19
+popped 19
+current_node = 98
+found 98
+current_node = 15
+popped 15
+current_node = 22
+found 22
+current_node = 29
+popped 29
+pushed = 31 to queue
+current_node = 23
+popped 23
+pushed = 82 to queue
+pushed = 96 to queue
+current_node = 12
+popped 12
+pushed = 93 to queue
+pushed = 75 to queue
+current_node = 71
+found 71
+current_node = 81
+popped 81
+pushed = 69 to queue
+current_node = 91
+popped 91
+pushed = 47 to queue
+pushed = 51 to queue
+pushed = 57 to queue
+pushed = 50 to queue
+pushed = 43 to queue
+pushed = 53 to queue
+current_node = 22
+popped 22
+current_node = 78
+popped 78
+pushed = 85 to queue
+pushed = 61 to queue
+pushed = 49 to queue
+current_node = 89
+popped 89
+pushed = 67 to queue
+pushed = 25 to queue
+pushed = 88 to queue
+current_node = 3
+popped 3
+current_node = 62
+popped 62
+current_node = 58
+popped 58
+current_node = 92
+popped 92
+current_node = 63
+popped 63
+current_node = 98
+popped 98
+pushed = 40 to queue
+current_node = 69
+popped 69
+current_node = 47
+popped 47
+current_node = 51
+popped 51
+current_node = 57
+popped 57
+pushed = 28 to queue
+current_node = 50
+popped 50
+current_node = 43
+popped 43
+pushed = 55 to queue
+current_node = 53
+popped 53
+current_node = 85
+popped 85
+current_node = 61
+popped 61
+current_node = 49
+popped 49
+current_node = 67
+popped 67
+current_node = 25
+popped 25
+current_node = 88
+popped 88
+current_node = 40
+found 40
+current_node = 98
+popped 98
+pushed = 41 to queue
+current_node = 90
+popped 90
+pushed = 19 to queue
+pushed = 24 to queue
+current_node = 84
+popped 84
+pushed = 7 to queue
+current_node = 60
+popped 60
+pushed = 87 to queue
+current_node = 79
+popped 79
+current_node = 64
+popped 64
+current_node = 72
+popped 72
+current_node = 77
+popped 77
+pushed = 14 to queue
+current_node = 1
+popped 1
+current_node = 86
+popped 86
+current_node = 35
+popped 35
+current_node = 0
+popped 0
+current_node = 39
+popped 39
+current_node = 36
+popped 36
+current_node = 76
+popped 76
+current_node = 68
+popped 68
+current_node = 38
+popped 38
+current_node = 26
+popped 26
+current_node = 41
+popped 41
+current_node = 19
+popped 19
+current_node = 24
+popped 24
+current_node = 7
+popped 7
+current_node = 87
+popped 87
+current_node = 14
+popped 14
+
+current_node = 22
+popped 22
+pushed = 15 to queue
+current_node = 52
+popped 52
+current_node = 51
+popped 51
+current_node = 56
+popped 56
+current_node = 48
+popped 48
+current_node = 32
+popped 32
+pushed = 21 to queue
+pushed = 6 to queue
+pushed = 2 to queue
+pushed = 8 to queue
+current_node = 40
+popped 40
+current_node = 94
+found 94
+current_node = 71
+popped 71
+pushed = 29 to queue
+pushed = 83 to queue
+current_node = 59
+found 59
+/home/project/rakan/cRakan/tst/test_runner.cc:995: Failure
+Value of: r2->IsDistrictConnected(i)
+  Actual: false
+Expected: true
+[  FAILED  ] Test_Runner.TestWalkOneStep (337 ms)
+[----------] 4 tests from Test_Runner (869 ms total)
+
+[----------] Global test environment tear-down
+[==========] 14 tests from 3 test suites ran. (884 ms total)
+[  PASSED  ] 12 tests.
+[  FAILED  ] 2 tests, listed below:
+[  FAILED  ] Test_Runner.TestSeedIowaMap
+[  FAILED  ] Test_Runner.TestWalkOneStep
+
+ 2 FAILED TESTS

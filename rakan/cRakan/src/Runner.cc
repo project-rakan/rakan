@@ -2,6 +2,8 @@
 #define SEED std::chrono::system_clock::now().time_since_epoch().count()
 #endif
 
+#include <iostream>
+
 #include "./Runner.h"
 
 #include <math.h>               // for pow(), log(), fmin()
@@ -121,6 +123,7 @@ unordered_set<Node *>* Runner::GenerateRandomSeeds() {
     if (std::find(random_indexes.begin(),
                   random_indexes.end(),
                   random_index) == random_indexes.end()) {
+      std::cout << "seed node " << random_index << std::endl;
       graph_->AddNodeToDistrict(random_index, i);
       seed_node = graph_->nodes_[random_index];
       seed_nodes->insert(seed_node);
@@ -145,6 +148,7 @@ bool Runner::SpawnDistricts(unordered_set<Node *> *seed_nodes) {
   Node *node, *found_node;
   vector<uint32_t> *changes = nullptr;
   map<string, double> *scores = new map<string, double>;
+  unordered_map<uint32_t, vector<uint32_t> *> queues;
 
   if (!walk_changes_->empty()) {
     changes = (*walk_changes_)[0];
@@ -155,6 +159,9 @@ bool Runner::SpawnDistricts(unordered_set<Node *> *seed_nodes) {
     if (seed_nodes->find(node) != seed_nodes->end()) {
       unused.erase(i);
       last_found[node->district_] = node;
+      vector<uint32_t> *q = new vector<uint32_t>;
+      q->push_back(i);
+      queues[node->district_] = q;
     } else {
       graph_->nodes_[i]->district_ = graph_->num_districts_ + 1;
       unused.insert(i);
@@ -164,7 +171,7 @@ bool Runner::SpawnDistricts(unordered_set<Node *> *seed_nodes) {
   while (unused.size() > 0) {
     uint32_t check = unused.size();
     for (uint32_t i = 0; i < graph_->num_districts_; i++) {
-      found_node = BFS(last_found[i], &unused);
+      found_node = BFS(queues[i], i, &unused);
       if (found_node != nullptr) {
         graph_->AddNodeToDistrict(found_node->id_, i);
         unused.erase(found_node->id_);
@@ -561,30 +568,36 @@ bool Runner::IsDistrictConnected(uint32_t district_id) {
   return true;
 }
 
-Node *Runner::BFS(Node *start, unordered_set<uint32_t> *set) {
+Node *Runner::BFS(vector<uint32_t> *q, uint32_t district, unordered_set<uint32_t> *set) {
+  uint32_t current_node_id;
+  unordered_set<uint32_t> processed;
   Node *current_node;
-  unordered_set<Node *> processed;
-  queue<Node *> q;
-  q.push(start);
 
-  while (!q.empty()) {
-    current_node = q.front();
-    q.pop();
+  while (!q->empty()) {
+    current_node_id = q->front();
+    std::cout << "current_node = " << current_node_id << std::endl;
 
-    if (set->find(current_node->id_) != set->end()) {
-      return current_node;
+    if (set->find(current_node_id) != set->end()) {
+      std::cout << "found " << current_node_id << std::endl;
+      return graph_->GetNode(current_node_id);
     }
 
-    processed.insert(current_node);
-    for (auto neighbor : *current_node->GetNeighbors()) {
-      if (std::find(processed.begin(),
-                    processed.end(),
-                    graph_->GetNode(neighbor)) == processed.end() &&
-          !IsDistrictSevered(graph_->nodes_[neighbor], start->district_)) {
-        q.push(graph_->GetNode(neighbor));
+    current_node = graph_->GetNode(current_node_id);
+    q->erase(std::find(q->begin(), q->end(), current_node_id));
+    std::cout << "popped " << current_node_id << std::endl;
+    processed.insert(current_node_id);
+
+    for (auto neighbor : *graph_->GetNode(current_node_id)->GetNeighbors()) {
+      if (std::find(processed.begin(), processed.end(), neighbor) == processed.end() &&
+          (graph_->nodes_[neighbor]->district_ == district ||
+           graph_->nodes_[neighbor]->district_ == graph_->num_districts_ + 1) &&
+          std::find(q->begin(), q->end(), neighbor) == q->end()) {
+        q->push_back(neighbor);
+        std::cout << "pushed = " << neighbor << " to queue" << std::endl;
       }
     }
   }
+  std::cout << std::endl;
 
   return nullptr;
 }
