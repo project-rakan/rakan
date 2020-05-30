@@ -80,10 +80,22 @@ cdef class Engine:
 
         districts = []
         for node_id in range(self._precincts):
-            district = dereference(graph.GetNode(node_id)).GetDistrict()
+            district = dereference(graph.GetNode(node_id)).GetDistrict() if self._redistricted else -1
             districts.append(district)
 
         return districts
+
+    @property
+    def numDistricts(self):
+        return self._districts
+
+    @property
+    def numPrecincts(self):
+        return self._precincts
+
+    @property
+    def isRedistricted(self):
+        return self._redistricted
 
     def visualize(self, output = "output.jpg"):
         "Creates an image with the file name output"
