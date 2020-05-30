@@ -108,28 +108,6 @@ Graph::~Graph() {
 // Graph mutators
 ///////////////////////////////////////////////////////////////////////////////
 
-bool Graph::AddNode(Node *node) {
-  if (node->id_ > num_nodes_) {
-    return false;
-  }
-  if (added_ids_->find(node->id_) != added_ids_->end()) {
-    return false;
-  }
-  nodes_[node->id_] = node;
-  state_pop_ += node->total_pop_;
-  added_ids_->insert(node->id_);
-  if (districts_in_county_->find(node->county_) ==
-      districts_in_county_->end()) {
-    (*districts_in_county_)[node->county_] = new unordered_set<uint32_t>;
-  }
-  if (node->district_ < num_districts_ && 
-      (*districts_in_county_)[node->county_]->find(node->district_) ==
-      (*districts_in_county_)[node->county_]->end()) {
-    (*districts_in_county_)[node->county_]->insert(node->district_);
-  }
-  return true;
-}
-
 bool Graph::AddNode(const uint32_t id,
                     const uint32_t county,
                     const uint32_t majority_pop,
@@ -175,11 +153,24 @@ bool Graph::AddNodeToDistrict(uint32_t node_id, uint32_t district) {
       nodes_in_district_[district]->end()) {
     return false;
   }
-  nodes_[node_id]->district_ = district;
+  Node *node = nodes_[node_id];
+
+  if ((*districts_in_county_)[node->county_] == nullptr) {
+    (*districts_in_county_)[node->county_] = new unordered_set<uint32_t>;
+  }
+
+  unordered_set<uint32_t> *unique_districts = 
+      (*districts_in_county_)[node->county_];
+  if (unique_districts->find(district) == unique_districts->end()) {
+    unique_districts->insert(district);
+  }
+
+  unique_districts->erase(node->district_);
+  node->district_ = district;
   nodes_in_district_[district]->insert(node_id);
-  pop_of_district_[district] += nodes_[node_id]->GetTotalPop();
-  maj_pop_of_district_[district] += nodes_[node_id]->GetMajorityPop();
-  min_pop_of_district_[district] += nodes_[node_id]->GetMajorityPop();
+  pop_of_district_[district] += node->GetTotalPop();
+  maj_pop_of_district_[district] += node->GetMajorityPop();
+  min_pop_of_district_[district] += node->GetMajorityPop();
   return true;
 }
 
@@ -285,6 +276,9 @@ bool Graph::NodeExistsInDistrict(const uint32_t node_id,
 }
 
 bool Graph::IsPerimNode(const uint32_t node_id) const {
+  if (node_id > num_nodes_ || nodes_[node_id]->district_ > num_districts_) {
+    return false;
+  }
   if (perim_nodes_to_neighbors_[nodes_[node_id]->district_]->find(node_id) ==
       perim_nodes_to_neighbors_[nodes_[node_id]->district_]->end()) {
         return false;

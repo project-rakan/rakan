@@ -81,24 +81,13 @@ class Graph {
   /////////////////////////////////////////////////////////////////////////////
 
   /**
-   * Adds a node to this graph. Also adds the total population of the node
-   * to the population of the graph.
-   * 
-   * @param     node      the node to be added
-   * 
-   * @return true iff node does not exist in the graph; false otherwise
-   */
-  bool AddNode(Node *node);
-
-  /**
-  * Constructs a new node and adds the node to this graph.
-  * Also adds the total population of the node
-  * to the population of the graph.
+  * Constructs a new node and adds the node to this graph. Also adds the total 
+  * population of the node to the population of the graph.
   * 
-  * @param    id
-  * @param    county
-  * @param    majority_pop
-  * @param    minority_pop
+  * @param    id              the ID of the node
+  * @param    county          the county the node belongs in
+  * @param    majority_pop    the majority population of the node
+  * @param    minority_pop    the minority population of the node
   * 
   * @return true iff adding node successful; false otherwise
   */
