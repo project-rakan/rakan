@@ -81,24 +81,13 @@ class Graph {
   /////////////////////////////////////////////////////////////////////////////
 
   /**
-   * Adds a node to this graph. Also adds the total population of the node
-   * to the population of the graph.
-   * 
-   * @param     node      the node to be added
-   * 
-   * @return true iff node does not exist in the graph; false otherwise
-   */
-  bool AddNode(Node *node);
-
-  /**
-  * Constructs a new node and adds the node to this graph.
-  * Also adds the total population of the node
-  * to the population of the graph.
+  * Constructs a new node and adds the node to this graph. Also adds the total 
+  * population of the node to the population of the graph.
   * 
-  * @param    id
-  * @param    county
-  * @param    majority_pop
-  * @param    minority_pop
+  * @param    id              the ID of the node
+  * @param    county          the county the node belongs in
+  * @param    majority_pop    the majority population of the node
+  * @param    minority_pop    the minority population of the node
   * 
   * @return true iff adding node successful; false otherwise
   */
@@ -375,9 +364,11 @@ class Graph {
   // that district.
   unordered_set<uint32_t> **nodes_on_perim_;
 
-  // A map of county ID to a pointer to a set of unique districts in that
-  // county.
-  unordered_map<uint32_t, unordered_set<uint32_t> *> *districts_in_county_;
+  // A map of county ID to a pointer to a set of nodes in that county.
+  unordered_map<uint32_t, unordered_set<uint32_t> *> *nodes_in_county_;
+
+  // A map of county ID to number of unique districts in that county.
+  unordered_map<uint32_t, uint32_t> *num_districts_in_county_;
 
   // A map of an index to an edge that contain two nodes in different districts.
   unordered_set<Edge, EdgeHash> *crossing_edges_;
