@@ -7,7 +7,7 @@ import time
 # Create your tests here.
 
 class EngineTests(APITestCase):
-    fixtures = ['iowa_washington_fixture.json']
+    fixtures = ['iowa_fixture.json']
 
     def setUp(self):
         from api.models import State
@@ -94,27 +94,6 @@ class EngineTests(APITestCase):
         self.assertEqual(response.status_code, 400)
 
     @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
-    def test_post_startMap_fires_signal(self):
-        from api.models import Job
-        guid = '0'
-        response = self.client.post('/startjob', {
-            'id': guid,
-            'state': 'EX',
-            'alpha': 0,
-            'beta': 0,
-            'gamma': 0,
-            'eta': 0
-        }, format='json')
-        self.assertEqual(response.status_code, 201)
-        self.assertEqual(len(Job.objects.all()), 1)
-        self.assertEqual(Job.objects.all()[0].jobId, guid)
-        self.assertEqual(Job.objects.all()[0].state.state, 'EX')
-        self.assertEqual(Job.objects.all()[0].alpha, 0.)
-        self.assertEqual(Job.objects.all()[0].beta, 0.)
-        self.assertEqual(Job.objects.all()[0].gamma, 0.)
-        self.assertEqual(Job.objects.all()[0].eta, 0.)
-
-    @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
     def test_post_startMap_worker_role(self):
         from api.models import Job, GeneratedMap, State
         from api.tasks import performMetropolisHastingsWalk
@@ -123,9 +102,31 @@ class EngineTests(APITestCase):
         performMetropolisHastingsWalk(job.id)
         self.assertEqual(len(Job.objects.all()), 1)
         self.assertEqual(Job.objects.all()[0].jobId, guid)
-        self.assertEqual(Job.objects.all()[0].state.state, 'EX')
+        self.assertEqual(Job.objects.all()[0].state.state, 'IA')
         self.assertEqual(Job.objects.all()[0].alpha, 0.)
         self.assertEqual(Job.objects.all()[0].beta, 0.)
         self.assertEqual(Job.objects.all()[0].gamma, 0.)
         self.assertEqual(Job.objects.all()[0].eta, 0.)
         self.assertTrue(Job.objects.all()[0].finished)
+
+
+    @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
+    def test_post_startMap_fires_signal(self):
+        from api.models import Job
+        guid = '0'
+        response = self.client.post('/startjob', {
+            'id': guid,
+            'state': 'IA',
+            'alpha': 0,
+            'beta': 0,
+            'gamma': 0,
+            'eta': 0
+        }, format='json')
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(len(Job.objects.all()), 1)
+        self.assertEqual(Job.objects.all()[0].jobId, guid)
+        self.assertEqual(Job.objects.all()[0].state.state, 'IA')
+        self.assertEqual(Job.objects.all()[0].alpha, 0.)
+        self.assertEqual(Job.objects.all()[0].beta, 0.)
+        self.assertEqual(Job.objects.all()[0].gamma, 0.)
+        self.assertEqual(Job.objects.all()[0].eta, 0.)
