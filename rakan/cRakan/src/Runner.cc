@@ -80,6 +80,8 @@ bool Runner::add_edge(uint32_t node_one, uint32_t node_two) {
 }
 
 bool Runner::set_districts(vector<uint32_t>& districts) {
+  map<string, double> *scores = new map<string, double>;
+  
   if (districts.size() != graph_->num_nodes_) {
     return false;
   }
@@ -96,6 +98,13 @@ bool Runner::set_districts(vector<uint32_t>& districts) {
   }
 
   populate();
+  (*scores)["total"] = LogScore();
+  (*scores)["compact"] = compactness_score_;
+  (*scores)["distribution"] = distribution_score_;
+  (*scores)["border"] = border_score_;
+  (*scores)["vra"] = vra_score_;
+  scores_->push_back(scores);
+
   return true;
 }
 
