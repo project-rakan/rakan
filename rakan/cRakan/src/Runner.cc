@@ -62,14 +62,10 @@ bool Runner::add_node(uint32_t node_id,
                       uint32_t county,
                       uint32_t majority_population,
                       uint32_t minority_population) {
-  std::cout << "added " << node_id  << std::endl;
   return graph_->AddNode(node_id, county, majority_population, minority_population);
 }
 
 bool Runner::add_edge(uint32_t node_one, uint32_t node_two) {
-  std::cout << "contains " << node_one << "? " << graph_->ContainsNode(node_one) << std::endl;
-  std::cout << "contains " << node_two << "? " << graph_->ContainsNode(node_two) << std::endl;
-
   if (graph_->ContainsNode(node_one) && 
       graph_->ContainsNode(node_two)) {
       graph_->AddEdge(node_one, node_two);
