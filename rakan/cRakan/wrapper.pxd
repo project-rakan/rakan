@@ -27,7 +27,7 @@ cdef extern from "src/Runner.h" namespace "rakan":
     cdef cppclass Runner:
         Runner() except +;
         Runner(uint32_t num_precincts, uint32_t num_districts) except +;
-        cbool add_node(uint32_t node_id,uint32_t county, uint32_t majority_population, uint32_t minority_population) except +;
+        void add_node(uint32_t node_id,uint32_t county, uint32_t majority_population, uint32_t minority_population) except +;
         cbool add_edge(uint32_t node_one, uint32_t node_two) except +;
         cbool set_districts(cvector[uint32_t]& districts) except +;
         cbool seed() except +;
