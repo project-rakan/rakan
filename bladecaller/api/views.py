@@ -206,29 +206,25 @@ def startMapJob(request):
 @api_view(['POST'])
 def updateMapJob(request):
     # Check fields are there
-    for field in ['id', 'state']: # weights ignored because we already have them
+    for field in ['id']: # weights ignored because we already have them
         if field not in request.data:
             return Response({'msg': 'Missing a field', 'missing_field': field}, status=status.HTTP_400_BAD_REQUEST)
 
     jobId = request.data['id']
-    state = request.data['state']
 
-    # Check state is there
-    if len(models.State.objects.filter(state=state)) == 0:
-        return Response({'msg': 'Unable to find state', 'id': jobId, 'state': state}, status=status.HTTP_400_BAD_REQUEST)
-
-    stateModel = models.State.objects.get(state=state)
+    
 
     # Check jobID is valid
-    if len(models.Job.objects.filter(id=jobId, state=stateModel)) == 0:
-        return Response({'msg': 'Unable to find jobId', 'id': jobId, 'state': state}, status=status.HTTP_400_BAD_REQUEST)
+    if len(models.Job.objects.filter(id=jobId)) == 0:
+        return Response({'msg': 'Unable to find jobId', 'id': jobId}, status=status.HTTP_400_BAD_REQUEST)
 
     job = models.Job.objects.get(id=jobId)
+    stateModel = models.State.objects.get(state=job.state)
     finished = job.finished
 
     # Check if maps are available
     if len(job.generatedMaps.all()) == 0:
-        return Response({'msg': 'No maps available yet', 'id': jobId, 'state': state}, status=status.HTTP_204_NO_CONTENT)
+        return Response({'msg': 'No maps available yet', 'id': jobId}, status=status.HTTP_204_NO_CONTENT)
 
     mapFound = job.generatedMaps.all().order_by('-added')[0]
 
