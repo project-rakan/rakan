@@ -411,6 +411,7 @@ bool Runner::IsDistrictSevered(Node *proposed_node, uint32_t new_district) {
       }
       second = graph_->GetNode(*itr);
       if (!DoesPathExist(first, second)) {
+        graph_->RemoveNodeFromDistrict(proposed_node->id_, new_district);
         proposed_node->district_ = old_district;
         return true;
       }
