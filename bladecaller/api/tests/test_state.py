@@ -5,7 +5,7 @@ import pickle
 import io
 
 class StateTests(TestCase):
-    fixtures = ['iowa_washington_fixture.json']
+    fixtures = ['iowa_fixture.json']
 
     def test_generatesPayloadWithKeys(self):
         iowa = State.objects.get(fips=19)
