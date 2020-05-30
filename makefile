@@ -24,6 +24,10 @@ migrations: build
 	cd bladecaller && python3.7 manage.py makemigrations
 	cd bladecaller && python3.7 manage.py migrate
 
+createsuperuser: build
+	cd bladecaller && python3.7 manage.py createsuperuser
+
+
 bladecaller: build
 	cd bladecaller && python3.7 manage.py collectstatic --no-input
 	cd bladecaller && python3.7 manage.py createsuperuser
