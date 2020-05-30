@@ -1330,4 +1330,85 @@ TEST(Test_Runner, TestWalkHundredSteps) {
   ASSERT_EQ(district_nodes[3].size(), g->GetNodesInDistrict(3)->size());
 }
 
+TEST(Test_Runner, TestWalkOneThousandSteps) {
+  Runner *r = Generate4x4Map(false);
+  Graph *g;
+  vector<vector<uint32_t>> all_maps;
+  vector<uint32_t> map;
+  uint32_t i;
+  unordered_map<uint32_t, vector<uint32_t>> district_nodes;
+
+  ASSERT_TRUE(r->seed());
+  ASSERT_TRUE(r->IsDistrictConnected(0));
+  ASSERT_TRUE(r->IsDistrictConnected(1));
+  ASSERT_TRUE(r->IsDistrictConnected(2));
+  ASSERT_TRUE(r->IsDistrictConnected(3));
+  r->Walk(1000, 0, 0, 0, 0);
+  ASSERT_TRUE(r->IsDistrictConnected(0));
+  ASSERT_TRUE(r->IsDistrictConnected(1));
+  ASSERT_TRUE(r->IsDistrictConnected(2));
+  ASSERT_TRUE(r->IsDistrictConnected(3));
+
+  g = r->GetGraph();
+  all_maps = r->getMaps();
+  map = all_maps[all_maps.size() - 1];
+
+  for (i = 0; i < g->GetNumNodes(); i++) {
+      district_nodes[map[i]].push_back(i);
+  }
+
+  ASSERT_EQ(district_nodes[0].size(), g->GetNodesInDistrict(0)->size());
+  ASSERT_EQ(district_nodes[1].size(), g->GetNodesInDistrict(1)->size());
+  ASSERT_EQ(district_nodes[2].size(), g->GetNodesInDistrict(2)->size());
+  ASSERT_EQ(district_nodes[3].size(), g->GetNodesInDistrict(3)->size());
+
+  Runner *r1 = GenerateHourglassMap(false);
+  ASSERT_TRUE(r1->seed());
+  ASSERT_TRUE(r1->IsDistrictConnected(0));
+  ASSERT_TRUE(r1->IsDistrictConnected(1));
+  ASSERT_TRUE(r1->IsDistrictConnected(2));
+  r1->Walk(1000, 0, 0, 0, 0);
+  ASSERT_TRUE(r1->IsDistrictConnected(0));
+  ASSERT_TRUE(r1->IsDistrictConnected(1));
+  ASSERT_TRUE(r1->IsDistrictConnected(2));
+  g = r1->GetGraph();
+  all_maps = r1->getMaps();
+  map = all_maps[all_maps.size() - 1];
+  district_nodes.clear();
+
+  for (i = 0; i < g->GetNumNodes(); i++) {
+      district_nodes[map[i]].push_back(i);
+  }
+
+  ASSERT_EQ(district_nodes[0].size(), g->GetNodesInDistrict(0)->size());
+  ASSERT_EQ(district_nodes[1].size(), g->GetNodesInDistrict(1)->size());
+  ASSERT_EQ(district_nodes[2].size(), g->GetNodesInDistrict(2)->size());
+
+  Runner *r2 = GenerateIowa();
+  ASSERT_TRUE(r2->seed());
+  ASSERT_TRUE(r2->IsDistrictConnected(0));
+  ASSERT_TRUE(r2->IsDistrictConnected(1));
+  ASSERT_TRUE(r2->IsDistrictConnected(2));
+  ASSERT_TRUE(r2->IsDistrictConnected(3));
+  r2->Walk(1000, 0, 0, 0, 0);
+  ASSERT_TRUE(r2->IsDistrictConnected(0));
+  ASSERT_TRUE(r2->IsDistrictConnected(1));
+  ASSERT_TRUE(r2->IsDistrictConnected(2));
+  ASSERT_TRUE(r2->IsDistrictConnected(3));
+
+  g = r2->GetGraph();
+  all_maps = r2->getMaps();
+  map = all_maps[all_maps.size() - 1];
+  district_nodes.clear();
+
+  for (i = 0; i < g->GetNumNodes(); i++) {
+      district_nodes[map[i]].push_back(i);
+  }
+
+  ASSERT_EQ(district_nodes[0].size(), g->GetNodesInDistrict(0)->size());
+  ASSERT_EQ(district_nodes[1].size(), g->GetNodesInDistrict(1)->size());
+  ASSERT_EQ(district_nodes[2].size(), g->GetNodesInDistrict(2)->size());
+  ASSERT_EQ(district_nodes[3].size(), g->GetNodesInDistrict(3)->size());
+}
+
 }     // namespace rakan

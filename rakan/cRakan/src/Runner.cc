@@ -16,6 +16,12 @@
 #include "./Graph.h"            // for class Graph
 #include "./Node.h"             // for class Node
 
+#ifndef TEST_MODE
+#define SEED std::chrono::system_clock::now().time_since_epoch().count()
+#else
+#define SEED 100
+#endif
+
 using std::queue;
 using std::uniform_real_distribution;
 using std::unordered_map;
@@ -96,9 +102,12 @@ unordered_set<Node *>* Runner::GenerateRandomSeeds() {
   uint32_t i, random_index;
   vector<uint32_t> random_indexes;
   vector<uint32_t> *changes = new vector<uint32_t>(graph_->num_nodes_);
+  unsigned seed = SEED;
+  std::default_random_engine generator(seed);
+  uniform_real_distribution<double> index(0, graph_->num_nodes_);
 
   for (i = 0; i < graph_->num_districts_; i++) {
-    random_index = rand() % graph_->num_nodes_;
+    random_index = floor(index(generator));
     if (std::find(random_indexes.begin(),
                   random_indexes.end(),
                   random_index) == random_indexes.end()) {
@@ -272,8 +281,7 @@ double Runner::MetropolisHastings() {
   bool is_valid = false, accepted = false;
 
   // random number generators initialization
-  // unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-  unsigned seed = 100;
+  unsigned seed = SEED;
   std::default_random_engine generator(seed);
   uniform_real_distribution<double> index(0, graph_->crossing_edges_->size());
   uniform_real_distribution<double> number(0, graph_->crossing_edges_->size());
