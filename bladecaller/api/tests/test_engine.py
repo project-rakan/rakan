@@ -113,7 +113,7 @@ class EngineTests(APITestCase):
     @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
     def test_post_startMap_fires_signal(self):
         from api.models import Job
-        guid = '0'
+        guid = '1'
         response = self.client.post('/startjob', {
             'id': guid,
             'state': 'IA',
