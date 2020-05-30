@@ -1,7 +1,5 @@
 #include <inttypes.h>
 
-#include <iostream>
-
 #include "../src/Runner.h"
 #include "../src/Graph.h"
 #include "../src/Node.h"
@@ -406,26 +404,10 @@ Runner* GenerateIowa() {
   r->add_edge(78, 85);
   r->add_edge(43, 88);
   r->add_edge(60, 90);
-  r->seed();
   return r;
 }
 
-TEST(Test_Runner, TestWalkHundredStepsIowa) {
-  Runner *r = GenerateIowa();
-  Graph *g;
-  vector<vector<uint32_t>> all_maps;
-  vector<uint32_t> map;
-  uint32_t i;
-  unordered_map<uint32_t, vector<uint32_t>> district_nodes;
-
-  r->Walk(200, 0, 0, 0, 0);
-  ASSERT_TRUE(r->IsDistrictConnected(0));
-  ASSERT_TRUE(r->IsDistrictConnected(1));
-  ASSERT_TRUE(r->IsDistrictConnected(2));
-  ASSERT_TRUE(r->IsDistrictConnected(3));
-}
-
-Runner* Generate4x4Map() {
+Runner* Generate4x4Map(bool set_districts) {
   Runner *r = new Runner(16, 4);
   for (uint32_t i = 0; i < 17; i++) {
     r->add_node(i, 0, 0, 0);
@@ -455,37 +437,40 @@ Runner* Generate4x4Map() {
   r->add_edge(13, 14);
   r->add_edge(14, 15);
 
-  vector<uint32_t> districts(16);
+  if (set_districts) {
+    vector<uint32_t> districts(16);
 
-  // First quadrant in district 0
-  districts[0] = 0;
-  districts[1] = 0;
-  districts[4] = 0;
-  districts[5] = 0;
+    // First quadrant in district 0
+    districts[0] = 0;
+    districts[1] = 0;
+    districts[4] = 0;
+    districts[5] = 0;
 
-  // Second quadrant in district 1
-  districts[2] = 1;
-  districts[3] = 1;
-  districts[6] = 1;
-  districts[7] = 1;
+    // Second quadrant in district 1
+    districts[2] = 1;
+    districts[3] = 1;
+    districts[6] = 1;
+    districts[7] = 1;
 
-  // Third quadrant in district 2
-  districts[8] = 2;
-  districts[9] = 2;
-  districts[12] = 2;
-  districts[13] = 2;
+    // Third quadrant in district 2
+    districts[8] = 2;
+    districts[9] = 2;
+    districts[12] = 2;
+    districts[13] = 2;
 
-  // Fourth quadrant in district 3
-  districts[10] = 3;
-  districts[11] = 3;
-  districts[14] = 3;
-  districts[15] = 3;
+    // Fourth quadrant in district 3
+    districts[10] = 3;
+    districts[11] = 3;
+    districts[14] = 3;
+    districts[15] = 3;
 
-  r->set_districts(districts);
+    r->set_districts(districts);
+  }
+
   return r;
 }
 
-Runner* GenerateHMap() {
+Runner* GenerateHMap(bool set_districts) {
   Runner *r = new Runner(7, 3);
   for (uint32_t i = 0; i < 7; i++) {
     r->add_node(i, 0, 0, 0);
@@ -497,20 +482,22 @@ Runner* GenerateHMap() {
   r->add_edge(5, 6);
   r->add_edge(3, 5);
 
-  vector<uint32_t> districts(7);
-  districts[0] = 0;
-  districts[1] = 0;
-  districts[2] = 0;
-  districts[3] = 1;
-  districts[4] = 2;
-  districts[5] = 2;
-  districts[6] = 2;
+  if (set_districts) {
+    vector<uint32_t> districts(7);
+    districts[0] = 0;
+    districts[1] = 0;
+    districts[2] = 0;
+    districts[3] = 1;
+    districts[4] = 2;
+    districts[5] = 2;
+    districts[6] = 2;
+    r->set_districts(districts);
+  }
 
-  r->set_districts(districts);
   return r;
 }
 
-Runner* GenerateHourglassMap() {
+Runner* GenerateHourglassMap(bool set_districts) {
   Runner *r = new Runner(7, 3);
   for (uint32_t i = 0; i < 7; i++) {
     r->add_node(i, 0, 0, 0);
@@ -526,237 +513,23 @@ Runner* GenerateHourglassMap() {
   r->add_edge(4, 5);
   r->add_edge(5, 6);
 
-  vector<uint32_t> districts(7);
-  districts[0] = 0;
-  districts[1] = 1;
-  districts[2] = 1;
-  districts[3] = 0;
-  districts[4] = 0;
-  districts[5] = 2;
-  districts[6] = 2;
+  if (set_districts) {
+    vector<uint32_t> districts(7);
+    districts[0] = 0;
+    districts[1] = 1;
+    districts[2] = 1;
+    districts[3] = 0;
+    districts[4] = 0;
+    districts[5] = 2;
+    districts[6] = 2;
+    r->set_districts(districts);
+  }
 
-  r->set_districts(districts);
   return r;
 }
 
-
-TEST(Test_Runner, TestBFSOneEdge) {
-  unordered_set<uint32_t> unused;
-  Graph *g;
-  Node *n0, *n1;
-
-  for (uint32_t i = 1; i <= 4; i++) {
-    unused.insert(i);
-  }
-
-  // r1 has 2 precincts {n0 and n1}.
-  // n0 <-> n1
-  Runner r1(2, 1);
-  r1.add_node(0, 1, 0, 0);
-  r1.add_node(1, 1, 0, 0);
-  r1.add_edge(0, 1);
-  n0 = r1.GetGraph()->GetNode(0);
-  n1 = r1.GetGraph()->GetNode(1);
-
-  // Start BFS at n0, should find n1.
-  unused.erase(0);
-  ASSERT_EQ(r1.BFS(n0, &unused), n1);
-  unused.insert(0);
-
-  // Start BFS at n1, should find n0.
-  unused.erase(1);
-  ASSERT_EQ(r1.BFS(n1, &unused), n0);
-
-  // Erase both nodes from used. BFS should return nullptr.
-  unused.clear();
-  ASSERT_EQ(r1.BFS(n0, &unused), nullptr);
-  ASSERT_EQ(r1.BFS(n1, &unused), nullptr);
-}
-
-TEST(Test_Runner, TestBFSTwoEdges) {
-  unordered_set<uint32_t> unused;
-  Graph *g;
-  Node *n0, *n1, *n2;
-
-  for (uint32_t i = 0; i < 3; i++) {
-    unused.insert(i);
-  }
-
-  // r2 has 3 precincts {n0, n1, n2}.
-  // n0 <-> n1
-  // n1 <-> n2
-  Runner r2(3, 1);
-  r2.add_node(0, 1, 0, 0);
-  r2.add_node(1, 1, 0, 0);
-  r2.add_node(2, 1, 0, 0);
-  r2.add_edge(0, 1);
-  r2.add_edge(1, 2);
-
-  n0 = r2.GetGraph()->GetNode(0);
-  n1 = r2.GetGraph()->GetNode(1);
-  n2 = r2.GetGraph()->GetNode(2);
-  
-  // Start BFS at n1, should find n2, then n0.
-  unused.erase(1);
-  ASSERT_EQ(r2.BFS(n1, &unused), n2);
-  unused.erase(2);
-  ASSERT_EQ(r2.BFS(n1, &unused), n0);
-}
-
-TEST(Test_Runner, TestBFSThreeEdges) {
-  unordered_set<uint32_t> unused;
-  Graph *g;
-  Node *n0, *n1, *n2, *n3;
-
-  for (uint32_t i = 0; i < 4; i++) {
-    unused.insert(i);
-  }
-
-  // r3 has 4 precincts {n0, n1, n2, n3}.
-  // n0 <-> n1
-  // n0 <-> n3
-  // n1 <-> n2
-  // n1 <-> n3
-  Runner r3(4, 1);
-  r3.add_node(0, 1, 0, 0);
-  r3.add_node(1, 1, 0, 0);
-  r3.add_node(2, 1, 0, 0);
-  r3.add_node(3, 1, 0, 0);
-  r3.add_edge(0, 1);
-  r3.add_edge(0, 3);
-  r3.add_edge(1, 2);
-  r3.add_edge(1, 3);
-
-  n0 = r3.GetGraph()->GetNode(0);
-  n1 = r3.GetGraph()->GetNode(1);
-  n2 = r3.GetGraph()->GetNode(2);
-  n3 = r3.GetGraph()->GetNode(3);
-  
-  // Start BFS at n0, should find n3, then n1, then n2.
-  unused.erase(0);
-  ASSERT_EQ(r3.BFS(n0, &unused), n3);
-  unused.erase(3);
-  ASSERT_EQ(r3.BFS(n0, &unused), n1);
-  unused.erase(1);
-  ASSERT_EQ(r3.BFS(n0, &unused), n2);
-  
-  unused.clear();
-  for (uint32_t i = 0; i < 4; i++) {
-    unused.insert(i);
-  }
-
-  // Start BFS at n1, should find n3, then n0, then n2.
-  unused.erase(1);
-  ASSERT_EQ(r3.BFS(n1, &unused), n3);
-  unused.erase(3);
-  ASSERT_EQ(r3.BFS(n1, &unused), n0);
-  unused.erase(0);
-  ASSERT_EQ(r3.BFS(n1, &unused), n2);
-
-  unused.clear();
-  for (uint32_t i = 0; i < 4; i++) {
-    unused.insert(i);
-  }
-
-  // Start BFS at n3, should find n1, then n0, then n2, then nullptr.
-  unused.erase(3);
-  ASSERT_EQ(r3.BFS(n3, &unused), n1);
-  unused.erase(1);
-  ASSERT_EQ(r3.BFS(n3, &unused), n0);
-  unused.erase(0);
-  ASSERT_EQ(r3.BFS(n3, &unused), n2);
-  unused.erase(2);
-  ASSERT_EQ(r3.BFS(n3, &unused), nullptr);
-}
-
-TEST(Test_Runner, TestBFSDisconnectedEdges) {
-  unordered_set<uint32_t> unused;
-  Graph *g;
-  Node *n0, *n1, *n2, *n3;
-
-  for (uint32_t i = 0; i < 4; i++) {
-    unused.insert(i);
-  }
-
-  // r4 has 4 precincts {n0, n1, n2, n3}.
-  // n0 <-> n1
-  // n2 <-> n3
-  Runner r4(4, 1);
-  r4.add_node(0, 1, 0, 0);
-  r4.add_node(1, 1, 0, 0);
-  r4.add_node(2, 1, 0, 0);
-  r4.add_node(3, 1, 0, 0);
-  r4.add_edge(0, 1);
-  r4.add_edge(2, 3);
-
-  n0 = r4.GetGraph()->GetNode(0);
-  n1 = r4.GetGraph()->GetNode(1);
-  n2 = r4.GetGraph()->GetNode(2);
-  n3 = r4.GetGraph()->GetNode(3);
-  
-  // Start BFS at n0, should find n1, then nullptr.
-  unused.erase(0);
-  ASSERT_EQ(r4.BFS(n0, &unused), n1);
-  unused.erase(1);
-  ASSERT_EQ(r4.BFS(n0, &unused), nullptr);
-  unused.insert(0);
-
-  // Start BFS at n1, should find n0, then nullptr.
-  ASSERT_EQ(r4.BFS(n1, &unused), n0);
-  unused.erase(0);
-  ASSERT_EQ(r4.BFS(n1, &unused), nullptr);
-
-  // Start BFS at n2, should find n3, then nullptr.
-  unused.erase(2);
-  ASSERT_EQ(r4.BFS(n2, &unused), n3);
-  unused.erase(3);
-  ASSERT_EQ(r4.BFS(n2, &unused), nullptr);
-  unused.insert(2);
-
-  // Start BFS at n3, should find n2, then nullptr.
-  ASSERT_EQ(r4.BFS(n3, &unused), n2);
-  unused.erase(2);
-  ASSERT_EQ(r4.BFS(n3, &unused), nullptr);
-}
-
-TEST(Test_Runner, TestBFSNoEdges) {
-  unordered_set<uint32_t> unused;
-  Graph *g;
-  Node *n0, *n1, *n2, *n3;
-
-  for (uint32_t i = 0; i < 4; i++) {
-    unused.insert(i);
-  }
-
-  Runner r5(4, 1);
-  r5.add_node(0, 1, 0, 0);
-  r5.add_node(1, 1, 0, 0);
-  r5.add_node(2, 1, 0, 0);
-  r5.add_node(3, 1, 0, 0);
-
-  n0 = r5.GetGraph()->GetNode(0);
-  n1 = r5.GetGraph()->GetNode(1);
-  n2 = r5.GetGraph()->GetNode(2);
-  n3 = r5.GetGraph()->GetNode(3);
-
-  unused.erase(0);
-  ASSERT_EQ(r5.BFS(n0, &unused), nullptr);
-  unused.insert(0);
-
-  unused.erase(1);
-  ASSERT_EQ(r5.BFS(n1, &unused), nullptr);
-  unused.insert(1);
-
-  unused.erase(2);
-  ASSERT_EQ(r5.BFS(n2, &unused), nullptr);
-  unused.insert(2);
-
-  unused.erase(3);
-  ASSERT_EQ(r5.BFS(n3, &unused), nullptr);
-}
-
 TEST(Test_Runner, TestRedistrict4x4Map) {
-  Runner *r = Generate4x4Map();
+  Runner *r = Generate4x4Map(true);
   Graph *g = r->GetGraph();
   Node *victim_node, *idle_node;
   unordered_set<Edge, EdgeHash> *crossing_edges;
@@ -915,7 +688,7 @@ TEST(Test_Runner, TestRedistrict4x4Map) {
 }
 
 TEST(Test_Runner, TestRedistrictHourglassMap) {
-  Runner *r = GenerateHourglassMap();
+  Runner *r = GenerateHourglassMap(true);
   Graph *g = r->GetGraph();
   Node *victim_node, *idle_node;
   unordered_set<Edge, EdgeHash> *crossing_edges;
@@ -1020,7 +793,7 @@ TEST(Test_Runner, TestRedistrictHourglassMap) {
 TEST(Test_Runner, TestSeveredDistrictSimple) {
   // r has 7 precincts, 3 districts
   // draws out an H shape
-  Runner *r = GenerateHMap();
+  Runner *r = GenerateHMap(true);
   ASSERT_TRUE(r->IsDistrictSevered(r->GetGraph()->GetNode(0), 1));
   ASSERT_TRUE(r->IsDistrictSevered(r->GetGraph()->GetNode(1), 1));
   ASSERT_TRUE(r->IsDistrictSevered(r->GetGraph()->GetNode(2), 1));
@@ -1034,7 +807,7 @@ TEST(Test_Runner, TestSeveredDistrictSimple) {
 TEST(Test_Runner, TestIsValidRedistricting) {
   // r has 16 precincts, 4 districts
   // draws out a 4x4 square with 4 quadrants
-  Runner *r = Generate4x4Map();
+  Runner *r = Generate4x4Map(true);
   Graph *g = r->GetGraph();
 
   // Redistricting to self
@@ -1079,6 +852,7 @@ TEST(Test_Runner, TestSeedSimple) {
   r.add_edge(0, 1);
   r.seed();
 
+  ASSERT_TRUE(r.IsDistrictConnected(0));
   Graph *g = r.GetGraph();
   ASSERT_EQ(g->GetNodesInDistrict(0)->size(), 2);
   ASSERT_EQ(g->GetNode(0)->GetDistrict(), 0);
@@ -1111,6 +885,11 @@ TEST(Test_Runner, TestSeedMedium) {
   g->AddNodeToDistrict(4, 2);
 
   r.SpawnDistricts(&seed_nodes);
+
+  ASSERT_TRUE(r.IsDistrictConnected(0));
+  ASSERT_TRUE(r.IsDistrictConnected(1));
+  ASSERT_TRUE(r.IsDistrictConnected(2));
+
   ASSERT_EQ(g->GetNodesInDistrict(0)->size(), 2);
   ASSERT_EQ(g->GetNodesInDistrict(1)->size(), 2);
   ASSERT_EQ(g->GetNodesInDistrict(2)->size(), 2);
@@ -1120,23 +899,54 @@ TEST(Test_Runner, TestSeedMedium) {
   ASSERT_EQ(g->GetNode(4)->GetDistrict(), g->GetNode(5)->GetDistrict());
 }
 
+TEST(Test_Runner, TestSeedHMap) {
+  Runner *r = GenerateHMap(false);
+  ASSERT_TRUE(r->seed());
+  ASSERT_TRUE(r->IsDistrictConnected(0));
+  ASSERT_TRUE(r->IsDistrictConnected(1));
+  ASSERT_TRUE(r->IsDistrictConnected(2));
+}
+
+TEST(Test_Runner, TestSeed4x4Map) {
+  Runner *r = Generate4x4Map(false);
+  ASSERT_TRUE(r->seed());
+  ASSERT_TRUE(r->IsDistrictConnected(0));
+  ASSERT_TRUE(r->IsDistrictConnected(1));
+  ASSERT_TRUE(r->IsDistrictConnected(2));
+  ASSERT_TRUE(r->IsDistrictConnected(3));
+}
+
+TEST(Test_Runner, TestSeedIowaMap) {
+  Runner *r = GenerateIowa();
+  ASSERT_TRUE(r->seed());
+  ASSERT_TRUE(r->IsDistrictConnected(0));
+  ASSERT_TRUE(r->IsDistrictConnected(1));
+  ASSERT_TRUE(r->IsDistrictConnected(2));
+  ASSERT_TRUE(r->IsDistrictConnected(3));
+}
+
 TEST(Test_Runner, TestWalkOneStep) {
-  Runner *r = Generate4x4Map();
+  Runner *r = Generate4x4Map(false);
   Graph *g;
   vector<vector<uint32_t>> all_maps;
   vector<uint32_t> map;
   uint32_t i;
   unordered_map<uint32_t, vector<uint32_t>> district_nodes;
 
-  r->Walk(1, 0, 0, 0, 0);
-  g = r->GetGraph();
-  all_maps = r->getMaps();
-  map = all_maps[all_maps.size() - 1];
-
+  ASSERT_TRUE(r->seed());
   ASSERT_TRUE(r->IsDistrictConnected(0));
   ASSERT_TRUE(r->IsDistrictConnected(1));
   ASSERT_TRUE(r->IsDistrictConnected(2));
   ASSERT_TRUE(r->IsDistrictConnected(3));
+  r->Walk(1, 0, 0, 0, 0);
+  ASSERT_TRUE(r->IsDistrictConnected(0));
+  ASSERT_TRUE(r->IsDistrictConnected(1));
+  ASSERT_TRUE(r->IsDistrictConnected(2));
+  ASSERT_TRUE(r->IsDistrictConnected(3));
+
+  g = r->GetGraph();
+  all_maps = r->getMaps();
+  map = all_maps[all_maps.size() - 1];
 
   for (i = 0; i < g->GetNumNodes(); i++) {
       district_nodes[map[i]].push_back(i);
@@ -1147,16 +957,19 @@ TEST(Test_Runner, TestWalkOneStep) {
   ASSERT_EQ(district_nodes[2].size(), g->GetNodesInDistrict(2)->size());
   ASSERT_EQ(district_nodes[3].size(), g->GetNodesInDistrict(3)->size());
 
-  Runner *r1 = GenerateHourglassMap();
+  Runner *r1 = GenerateHourglassMap(false);
+  ASSERT_TRUE(r1->seed());
+  ASSERT_TRUE(r1->IsDistrictConnected(0));
+  ASSERT_TRUE(r1->IsDistrictConnected(1));
+  ASSERT_TRUE(r1->IsDistrictConnected(2));
   r1->Walk(1, 0, 0, 0, 0);
+  ASSERT_TRUE(r1->IsDistrictConnected(0));
+  ASSERT_TRUE(r1->IsDistrictConnected(1));
+  ASSERT_TRUE(r1->IsDistrictConnected(2));
   g = r1->GetGraph();
   all_maps = r1->getMaps();
   map = all_maps[all_maps.size() - 1];
   district_nodes.clear();
-
-  ASSERT_TRUE(r1->IsDistrictConnected(0));
-  ASSERT_TRUE(r1->IsDistrictConnected(1));
-  ASSERT_TRUE(r1->IsDistrictConnected(2));
 
   for (i = 0; i < g->GetNumNodes(); i++) {
       district_nodes[map[i]].push_back(i);
@@ -1165,25 +978,56 @@ TEST(Test_Runner, TestWalkOneStep) {
   ASSERT_EQ(district_nodes[0].size(), g->GetNodesInDistrict(0)->size());
   ASSERT_EQ(district_nodes[1].size(), g->GetNodesInDistrict(1)->size());
   ASSERT_EQ(district_nodes[2].size(), g->GetNodesInDistrict(2)->size());
+
+  Runner *r2 = GenerateIowa();
+  ASSERT_TRUE(r2->seed());
+  ASSERT_TRUE(r2->IsDistrictConnected(0));
+  ASSERT_TRUE(r2->IsDistrictConnected(1));
+  ASSERT_TRUE(r2->IsDistrictConnected(2));
+  ASSERT_TRUE(r2->IsDistrictConnected(3));
+  r2->Walk(1, 0, 0, 0, 0);
+  ASSERT_TRUE(r2->IsDistrictConnected(0));
+  ASSERT_TRUE(r2->IsDistrictConnected(1));
+  ASSERT_TRUE(r2->IsDistrictConnected(2));
+  ASSERT_TRUE(r2->IsDistrictConnected(3));
+
+  g = r2->GetGraph();
+  all_maps = r2->getMaps();
+  map = all_maps[all_maps.size() - 1];
+  district_nodes.clear();
+
+  for (i = 0; i < g->GetNumNodes(); i++) {
+      district_nodes[map[i]].push_back(i);
+  }
+
+  ASSERT_EQ(district_nodes[0].size(), g->GetNodesInDistrict(0)->size());
+  ASSERT_EQ(district_nodes[1].size(), g->GetNodesInDistrict(1)->size());
+  ASSERT_EQ(district_nodes[2].size(), g->GetNodesInDistrict(2)->size());
+  ASSERT_EQ(district_nodes[3].size(), g->GetNodesInDistrict(3)->size());
 }
 
 TEST(Test_Runner, TestWalkTwoSteps) {
-  Runner *r = Generate4x4Map();
+  Runner *r = Generate4x4Map(false);
   Graph *g;
   vector<vector<uint32_t>> all_maps;
   vector<uint32_t> map;
   uint32_t i;
   unordered_map<uint32_t, vector<uint32_t>> district_nodes;
 
-  r->Walk(2, 0, 0, 0, 0);
-  g = r->GetGraph();
-  all_maps = r->getMaps();
-  map = all_maps[all_maps.size() - 1];
-
+  ASSERT_TRUE(r->seed());
   ASSERT_TRUE(r->IsDistrictConnected(0));
   ASSERT_TRUE(r->IsDistrictConnected(1));
   ASSERT_TRUE(r->IsDistrictConnected(2));
   ASSERT_TRUE(r->IsDistrictConnected(3));
+  r->Walk(2, 0, 0, 0, 0);
+  ASSERT_TRUE(r->IsDistrictConnected(0));
+  ASSERT_TRUE(r->IsDistrictConnected(1));
+  ASSERT_TRUE(r->IsDistrictConnected(2));
+  ASSERT_TRUE(r->IsDistrictConnected(3));
+
+  g = r->GetGraph();
+  all_maps = r->getMaps();
+  map = all_maps[all_maps.size() - 1];
 
   for (i = 0; i < g->GetNumNodes(); i++) {
       district_nodes[map[i]].push_back(i);
@@ -1194,16 +1038,19 @@ TEST(Test_Runner, TestWalkTwoSteps) {
   ASSERT_EQ(district_nodes[2].size(), g->GetNodesInDistrict(2)->size());
   ASSERT_EQ(district_nodes[3].size(), g->GetNodesInDistrict(3)->size());
 
-  Runner *r1 = GenerateHourglassMap();
+  Runner *r1 = GenerateHourglassMap(false);
+  ASSERT_TRUE(r1->seed());
+  ASSERT_TRUE(r1->IsDistrictConnected(0));
+  ASSERT_TRUE(r1->IsDistrictConnected(1));
+  ASSERT_TRUE(r1->IsDistrictConnected(2));
   r1->Walk(2, 0, 0, 0, 0);
+  ASSERT_TRUE(r1->IsDistrictConnected(0));
+  ASSERT_TRUE(r1->IsDistrictConnected(1));
+  ASSERT_TRUE(r1->IsDistrictConnected(2));
   g = r1->GetGraph();
   all_maps = r1->getMaps();
   map = all_maps[all_maps.size() - 1];
   district_nodes.clear();
-
-  ASSERT_TRUE(r1->IsDistrictConnected(0));
-  ASSERT_TRUE(r1->IsDistrictConnected(1));
-  ASSERT_TRUE(r1->IsDistrictConnected(2));
 
   for (i = 0; i < g->GetNumNodes(); i++) {
       district_nodes[map[i]].push_back(i);
@@ -1212,25 +1059,56 @@ TEST(Test_Runner, TestWalkTwoSteps) {
   ASSERT_EQ(district_nodes[0].size(), g->GetNodesInDistrict(0)->size());
   ASSERT_EQ(district_nodes[1].size(), g->GetNodesInDistrict(1)->size());
   ASSERT_EQ(district_nodes[2].size(), g->GetNodesInDistrict(2)->size());
+
+  Runner *r2 = GenerateIowa();
+  ASSERT_TRUE(r2->seed());
+  ASSERT_TRUE(r2->IsDistrictConnected(0));
+  ASSERT_TRUE(r2->IsDistrictConnected(1));
+  ASSERT_TRUE(r2->IsDistrictConnected(2));
+  ASSERT_TRUE(r2->IsDistrictConnected(3));
+  r2->Walk(2, 0, 0, 0, 0);
+  ASSERT_TRUE(r2->IsDistrictConnected(0));
+  ASSERT_TRUE(r2->IsDistrictConnected(1));
+  ASSERT_TRUE(r2->IsDistrictConnected(2));
+  ASSERT_TRUE(r2->IsDistrictConnected(3));
+
+  g = r2->GetGraph();
+  all_maps = r2->getMaps();
+  map = all_maps[all_maps.size() - 1];
+  district_nodes.clear();
+
+  for (i = 0; i < g->GetNumNodes(); i++) {
+      district_nodes[map[i]].push_back(i);
+  }
+
+  ASSERT_EQ(district_nodes[0].size(), g->GetNodesInDistrict(0)->size());
+  ASSERT_EQ(district_nodes[1].size(), g->GetNodesInDistrict(1)->size());
+  ASSERT_EQ(district_nodes[2].size(), g->GetNodesInDistrict(2)->size());
+  ASSERT_EQ(district_nodes[3].size(), g->GetNodesInDistrict(3)->size());
 }
 
 TEST(Test_Runner, TestWalkThreeSteps) {
-  Runner *r = Generate4x4Map();
+  Runner *r = Generate4x4Map(false);
   Graph *g;
   vector<vector<uint32_t>> all_maps;
   vector<uint32_t> map;
   uint32_t i;
   unordered_map<uint32_t, vector<uint32_t>> district_nodes;
 
-  r->Walk(3, 0, 0, 0, 0);
-  g = r->GetGraph();
-  all_maps = r->getMaps();
-  map = all_maps[all_maps.size() - 1];
-
+  ASSERT_TRUE(r->seed());
   ASSERT_TRUE(r->IsDistrictConnected(0));
   ASSERT_TRUE(r->IsDistrictConnected(1));
   ASSERT_TRUE(r->IsDistrictConnected(2));
   ASSERT_TRUE(r->IsDistrictConnected(3));
+  r->Walk(3, 0, 0, 0, 0);
+  ASSERT_TRUE(r->IsDistrictConnected(0));
+  ASSERT_TRUE(r->IsDistrictConnected(1));
+  ASSERT_TRUE(r->IsDistrictConnected(2));
+  ASSERT_TRUE(r->IsDistrictConnected(3));
+
+  g = r->GetGraph();
+  all_maps = r->getMaps();
+  map = all_maps[all_maps.size() - 1];
 
   for (i = 0; i < g->GetNumNodes(); i++) {
       district_nodes[map[i]].push_back(i);
@@ -1241,16 +1119,19 @@ TEST(Test_Runner, TestWalkThreeSteps) {
   ASSERT_EQ(district_nodes[2].size(), g->GetNodesInDistrict(2)->size());
   ASSERT_EQ(district_nodes[3].size(), g->GetNodesInDistrict(3)->size());
 
-  Runner *r1 = GenerateHourglassMap();
+  Runner *r1 = GenerateHourglassMap(false);
+  ASSERT_TRUE(r1->seed());
+  ASSERT_TRUE(r1->IsDistrictConnected(0));
+  ASSERT_TRUE(r1->IsDistrictConnected(1));
+  ASSERT_TRUE(r1->IsDistrictConnected(2));
   r1->Walk(3, 0, 0, 0, 0);
+  ASSERT_TRUE(r1->IsDistrictConnected(0));
+  ASSERT_TRUE(r1->IsDistrictConnected(1));
+  ASSERT_TRUE(r1->IsDistrictConnected(2));
   g = r1->GetGraph();
   all_maps = r1->getMaps();
   map = all_maps[all_maps.size() - 1];
   district_nodes.clear();
-
-  ASSERT_TRUE(r1->IsDistrictConnected(0));
-  ASSERT_TRUE(r1->IsDistrictConnected(1));
-  ASSERT_TRUE(r1->IsDistrictConnected(2));
 
   for (i = 0; i < g->GetNumNodes(); i++) {
       district_nodes[map[i]].push_back(i);
@@ -1259,25 +1140,56 @@ TEST(Test_Runner, TestWalkThreeSteps) {
   ASSERT_EQ(district_nodes[0].size(), g->GetNodesInDistrict(0)->size());
   ASSERT_EQ(district_nodes[1].size(), g->GetNodesInDistrict(1)->size());
   ASSERT_EQ(district_nodes[2].size(), g->GetNodesInDistrict(2)->size());
+
+  Runner *r2 = GenerateIowa();
+  ASSERT_TRUE(r2->seed());
+  ASSERT_TRUE(r2->IsDistrictConnected(0));
+  ASSERT_TRUE(r2->IsDistrictConnected(1));
+  ASSERT_TRUE(r2->IsDistrictConnected(2));
+  ASSERT_TRUE(r2->IsDistrictConnected(3));
+  r2->Walk(3, 0, 0, 0, 0);
+  ASSERT_TRUE(r2->IsDistrictConnected(0));
+  ASSERT_TRUE(r2->IsDistrictConnected(1));
+  ASSERT_TRUE(r2->IsDistrictConnected(2));
+  ASSERT_TRUE(r2->IsDistrictConnected(3));
+
+  g = r2->GetGraph();
+  all_maps = r2->getMaps();
+  map = all_maps[all_maps.size() - 1];
+  district_nodes.clear();
+
+  for (i = 0; i < g->GetNumNodes(); i++) {
+      district_nodes[map[i]].push_back(i);
+  }
+
+  ASSERT_EQ(district_nodes[0].size(), g->GetNodesInDistrict(0)->size());
+  ASSERT_EQ(district_nodes[1].size(), g->GetNodesInDistrict(1)->size());
+  ASSERT_EQ(district_nodes[2].size(), g->GetNodesInDistrict(2)->size());
+  ASSERT_EQ(district_nodes[3].size(), g->GetNodesInDistrict(3)->size());
 }
 
 TEST(Test_Runner, TestWalkTenSteps) {
-  Runner *r = Generate4x4Map();
+  Runner *r = Generate4x4Map(false);
   Graph *g;
   vector<vector<uint32_t>> all_maps;
   vector<uint32_t> map;
   uint32_t i;
   unordered_map<uint32_t, vector<uint32_t>> district_nodes;
 
-  r->Walk(10, 0, 0, 0, 0);
-  g = r->GetGraph();
-  all_maps = r->getMaps();
-  map = all_maps[all_maps.size() - 1];
-
+  ASSERT_TRUE(r->seed());
   ASSERT_TRUE(r->IsDistrictConnected(0));
   ASSERT_TRUE(r->IsDistrictConnected(1));
   ASSERT_TRUE(r->IsDistrictConnected(2));
   ASSERT_TRUE(r->IsDistrictConnected(3));
+  r->Walk(10, 0, 0, 0, 0);
+  ASSERT_TRUE(r->IsDistrictConnected(0));
+  ASSERT_TRUE(r->IsDistrictConnected(1));
+  ASSERT_TRUE(r->IsDistrictConnected(2));
+  ASSERT_TRUE(r->IsDistrictConnected(3));
+
+  g = r->GetGraph();
+  all_maps = r->getMaps();
+  map = all_maps[all_maps.size() - 1];
 
   for (i = 0; i < g->GetNumNodes(); i++) {
       district_nodes[map[i]].push_back(i);
@@ -1288,16 +1200,19 @@ TEST(Test_Runner, TestWalkTenSteps) {
   ASSERT_EQ(district_nodes[2].size(), g->GetNodesInDistrict(2)->size());
   ASSERT_EQ(district_nodes[3].size(), g->GetNodesInDistrict(3)->size());
 
-  Runner *r1 = GenerateHourglassMap();
+  Runner *r1 = GenerateHourglassMap(false);
+  ASSERT_TRUE(r1->seed());
+  ASSERT_TRUE(r1->IsDistrictConnected(0));
+  ASSERT_TRUE(r1->IsDistrictConnected(1));
+  ASSERT_TRUE(r1->IsDistrictConnected(2));
   r1->Walk(10, 0, 0, 0, 0);
+  ASSERT_TRUE(r1->IsDistrictConnected(0));
+  ASSERT_TRUE(r1->IsDistrictConnected(1));
+  ASSERT_TRUE(r1->IsDistrictConnected(2));
   g = r1->GetGraph();
   all_maps = r1->getMaps();
   map = all_maps[all_maps.size() - 1];
   district_nodes.clear();
-
-  ASSERT_TRUE(r1->IsDistrictConnected(0));
-  ASSERT_TRUE(r1->IsDistrictConnected(1));
-  ASSERT_TRUE(r1->IsDistrictConnected(2));
 
   for (i = 0; i < g->GetNumNodes(); i++) {
       district_nodes[map[i]].push_back(i);
@@ -1306,25 +1221,56 @@ TEST(Test_Runner, TestWalkTenSteps) {
   ASSERT_EQ(district_nodes[0].size(), g->GetNodesInDistrict(0)->size());
   ASSERT_EQ(district_nodes[1].size(), g->GetNodesInDistrict(1)->size());
   ASSERT_EQ(district_nodes[2].size(), g->GetNodesInDistrict(2)->size());
+
+  Runner *r2 = GenerateIowa();
+  ASSERT_TRUE(r2->seed());
+  ASSERT_TRUE(r2->IsDistrictConnected(0));
+  ASSERT_TRUE(r2->IsDistrictConnected(1));
+  ASSERT_TRUE(r2->IsDistrictConnected(2));
+  ASSERT_TRUE(r2->IsDistrictConnected(3));
+  r2->Walk(10, 0, 0, 0, 0);
+  ASSERT_TRUE(r2->IsDistrictConnected(0));
+  ASSERT_TRUE(r2->IsDistrictConnected(1));
+  ASSERT_TRUE(r2->IsDistrictConnected(2));
+  ASSERT_TRUE(r2->IsDistrictConnected(3));
+
+  g = r2->GetGraph();
+  all_maps = r2->getMaps();
+  map = all_maps[all_maps.size() - 1];
+  district_nodes.clear();
+
+  for (i = 0; i < g->GetNumNodes(); i++) {
+      district_nodes[map[i]].push_back(i);
+  }
+
+  ASSERT_EQ(district_nodes[0].size(), g->GetNodesInDistrict(0)->size());
+  ASSERT_EQ(district_nodes[1].size(), g->GetNodesInDistrict(1)->size());
+  ASSERT_EQ(district_nodes[2].size(), g->GetNodesInDistrict(2)->size());
+  ASSERT_EQ(district_nodes[3].size(), g->GetNodesInDistrict(3)->size());
 }
 
 TEST(Test_Runner, TestWalkHundredSteps) {
-  Runner *r = Generate4x4Map();
+  Runner *r = Generate4x4Map(false);
   Graph *g;
   vector<vector<uint32_t>> all_maps;
   vector<uint32_t> map;
   uint32_t i;
   unordered_map<uint32_t, vector<uint32_t>> district_nodes;
 
-  r->Walk(100, 0, 0, 0, 0);
-  g = r->GetGraph();
-  all_maps = r->getMaps();
-  map = all_maps[all_maps.size() - 1];
-
+  ASSERT_TRUE(r->seed());
   ASSERT_TRUE(r->IsDistrictConnected(0));
   ASSERT_TRUE(r->IsDistrictConnected(1));
   ASSERT_TRUE(r->IsDistrictConnected(2));
   ASSERT_TRUE(r->IsDistrictConnected(3));
+  r->Walk(100, 0, 0, 0, 0);
+  ASSERT_TRUE(r->IsDistrictConnected(0));
+  ASSERT_TRUE(r->IsDistrictConnected(1));
+  ASSERT_TRUE(r->IsDistrictConnected(2));
+  ASSERT_TRUE(r->IsDistrictConnected(3));
+
+  g = r->GetGraph();
+  all_maps = r->getMaps();
+  map = all_maps[all_maps.size() - 1];
 
   for (i = 0; i < g->GetNumNodes(); i++) {
       district_nodes[map[i]].push_back(i);
@@ -1335,16 +1281,19 @@ TEST(Test_Runner, TestWalkHundredSteps) {
   ASSERT_EQ(district_nodes[2].size(), g->GetNodesInDistrict(2)->size());
   ASSERT_EQ(district_nodes[3].size(), g->GetNodesInDistrict(3)->size());
 
-  Runner *r1 = GenerateHourglassMap();
+  Runner *r1 = GenerateHourglassMap(false);
+  ASSERT_TRUE(r1->seed());
+  ASSERT_TRUE(r1->IsDistrictConnected(0));
+  ASSERT_TRUE(r1->IsDistrictConnected(1));
+  ASSERT_TRUE(r1->IsDistrictConnected(2));
   r1->Walk(100, 0, 0, 0, 0);
+  ASSERT_TRUE(r1->IsDistrictConnected(0));
+  ASSERT_TRUE(r1->IsDistrictConnected(1));
+  ASSERT_TRUE(r1->IsDistrictConnected(2));
   g = r1->GetGraph();
   all_maps = r1->getMaps();
   map = all_maps[all_maps.size() - 1];
   district_nodes.clear();
-
-  ASSERT_TRUE(r1->IsDistrictConnected(0));
-  ASSERT_TRUE(r1->IsDistrictConnected(1));
-  ASSERT_TRUE(r1->IsDistrictConnected(2));
 
   for (i = 0; i < g->GetNumNodes(); i++) {
       district_nodes[map[i]].push_back(i);
@@ -1353,6 +1302,32 @@ TEST(Test_Runner, TestWalkHundredSteps) {
   ASSERT_EQ(district_nodes[0].size(), g->GetNodesInDistrict(0)->size());
   ASSERT_EQ(district_nodes[1].size(), g->GetNodesInDistrict(1)->size());
   ASSERT_EQ(district_nodes[2].size(), g->GetNodesInDistrict(2)->size());
+
+  Runner *r2 = GenerateIowa();
+  ASSERT_TRUE(r2->seed());
+  ASSERT_TRUE(r2->IsDistrictConnected(0));
+  ASSERT_TRUE(r2->IsDistrictConnected(1));
+  ASSERT_TRUE(r2->IsDistrictConnected(2));
+  ASSERT_TRUE(r2->IsDistrictConnected(3));
+  r2->Walk(100, 0, 0, 0, 0);
+  ASSERT_TRUE(r2->IsDistrictConnected(0));
+  ASSERT_TRUE(r2->IsDistrictConnected(1));
+  ASSERT_TRUE(r2->IsDistrictConnected(2));
+  ASSERT_TRUE(r2->IsDistrictConnected(3));
+
+  g = r2->GetGraph();
+  all_maps = r2->getMaps();
+  map = all_maps[all_maps.size() - 1];
+  district_nodes.clear();
+
+  for (i = 0; i < g->GetNumNodes(); i++) {
+      district_nodes[map[i]].push_back(i);
+  }
+
+  ASSERT_EQ(district_nodes[0].size(), g->GetNodesInDistrict(0)->size());
+  ASSERT_EQ(district_nodes[1].size(), g->GetNodesInDistrict(1)->size());
+  ASSERT_EQ(district_nodes[2].size(), g->GetNodesInDistrict(2)->size());
+  ASSERT_EQ(district_nodes[3].size(), g->GetNodesInDistrict(3)->size());
 }
 
-}
+}     // namespace rakan
