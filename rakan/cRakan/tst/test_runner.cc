@@ -67,7 +67,6 @@ Runner* Generate4x4Map() {
   districts[15] = 3;
 
   r->set_districts(districts);
-  r->populate();
   return r;
 }
 
@@ -93,7 +92,6 @@ Runner* GenerateHMap() {
   districts[6] = 2;
 
   r->set_districts(districts);
-  r->populate();
   return r;
 }
 
@@ -123,7 +121,6 @@ Runner* GenerateHourglassMap() {
   districts[6] = 2;
 
   r->set_districts(districts);
-  r->populate();
   return r;
 }
 
@@ -763,7 +760,6 @@ TEST(Test_Runner, TestWalkTwoSteps) {
   uint32_t i;
   unordered_map<uint32_t, vector<uint32_t>> district_nodes;
 
-  r->populate();
   r->Walk(2, 0, 0, 0, 0);
   g = r->GetGraph();
   all_maps = r->getMaps();
@@ -811,7 +807,6 @@ TEST(Test_Runner, TestWalkThreeSteps) {
   uint32_t i;
   unordered_map<uint32_t, vector<uint32_t>> district_nodes;
 
-  r->populate();
   r->Walk(3, 0, 0, 0, 0);
   g = r->GetGraph();
   all_maps = r->getMaps();
@@ -859,7 +854,6 @@ TEST(Test_Runner, TestWalkTenSteps) {
   uint32_t i;
   unordered_map<uint32_t, vector<uint32_t>> district_nodes;
 
-  r->populate();
   r->Walk(10, 0, 0, 0, 0);
   g = r->GetGraph();
   all_maps = r->getMaps();
@@ -907,7 +901,6 @@ TEST(Test_Runner, TestWalkHundredSteps) {
   uint32_t i;
   unordered_map<uint32_t, vector<uint32_t>> district_nodes;
 
-  r->populate();
   r->Walk(100, 0, 0, 0, 0);
   g = r->GetGraph();
   all_maps = r->getMaps();

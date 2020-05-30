@@ -90,6 +90,7 @@ bool Runner::set_districts(vector<uint32_t>& districts) {
     graph_->AddNodeToDistrict(node->id_, districts[i]);
   }
 
+  populate();
   return true;
 }
 
@@ -164,7 +165,11 @@ bool Runner::SpawnDistricts(unordered_set<Node *> *seed_nodes) {
 }
 
 bool Runner::seed() {
-  return SpawnDistricts(GenerateRandomSeeds());
+  if (SpawnDistricts(GenerateRandomSeeds())) {
+    populate();
+    return true;
+  }
+  return false;
 }
 
 void Runner::populate() {
