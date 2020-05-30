@@ -125,6 +125,7 @@ bool Runner::SpawnDistricts(unordered_set<Node *> *seed_nodes) {
   unordered_map<int, Node *> last_found;
   Node *found_node;
   vector<uint32_t> *changes = nullptr;
+  map<string, double> *scores = new map<string, double>;
 
   if (!walk_changes_->empty()) {
     changes = (*walk_changes_)[0];
@@ -156,6 +157,14 @@ bool Runner::SpawnDistricts(unordered_set<Node *> *seed_nodes) {
       return false;
     }
   }
+
+  (*scores)["total"] = LogScore();
+  (*scores)["compact"] = compactness_score_;
+  (*scores)["distribution"] = distribution_score_;
+  (*scores)["border"] = border_score_;
+  (*scores)["vra"] = vra_score_;
+  scores_->push_back(scores);
+
   return true;
 }
 

@@ -327,13 +327,14 @@ class Runner {
   // The graph that is loaded and evaluated by this Runner.
   Graph *graph_;
 
-  // A vector containing multiple vectors of uint32_t where each vector
-  // represents the state of the map after a single step in the walk.
+  // A vector containing vectors of uint32_t where each inner vector represents
+  // the state of the map after a single step in the walk.
   vector<vector<uint32_t> *> *walk_changes_;
 
-  // A map containing all of the scores for each of the maps generated
-  // in the walk, where each index here in the outer vector corresponds
-  // to the map in the same index in walk_changes_
+  // A vector containing maps of scores. Each vector index represents the step
+  // number. In each index is a map that maps from the score name to the actual
+  // score value. Names of scores include: "total", "compact", "distribution",
+  // "border", and "vra".
   vector<map<string, double> *> *scores_;
 
   // Variables to keep track of the scores of the current map.
