@@ -1,6 +1,11 @@
 #ifndef TEST_SUITE_H_
 #define TEST_SUITE_H_
 
+#ifndef TEST_MODE
+#define TEST_MODE
+#define SEED 100
+#endif
+
 #include <iostream>
 
 #include "gtest/gtest.h"
