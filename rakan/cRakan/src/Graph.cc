@@ -27,7 +27,8 @@ Graph::Graph(const uint32_t num_nodes,
       state_pop_(0) {
   uint32_t i;
   nodes_ = new Node*[num_nodes_];
-  districts_in_county_ = new unordered_map<uint32_t, unordered_set<uint32_t> *>;
+  nodes_in_county_ = new unordered_map<uint32_t, unordered_set<uint32_t> *>;
+  num_districts_in_county_ = new unordered_map<uint32_t, uint32_t>;
 
   nodes_in_district_ = new unordered_set<uint32_t>*[num_districts_];
   for (i = 0; i < num_districts_; i++) {
@@ -66,6 +67,7 @@ Graph::~Graph() {
   // Delete non-arrays.
   delete crossing_edges_;
   delete added_ids_;
+  delete num_districts_in_county_;
 
   // Delete non-pointer arrays.
   delete[] pop_of_district_;
@@ -85,10 +87,10 @@ Graph::~Graph() {
   delete[] nodes_in_district_;
 
   // Delete all sets in districts_in_county_.
-  for (i = 0; i < districts_in_county_->size(); i++) {
-    delete (*districts_in_county_)[i];
+  for (i = 0; i < nodes_in_county_->size(); i++) {
+    delete (*nodes_in_county_)[i];
   }
-  delete districts_in_county_;
+  delete nodes_in_county_;
 
   // Delete all set pointers in nodes_on_perim_.
   for (i = 0; i < num_districts_; i++) {
@@ -121,8 +123,9 @@ bool Graph::AddNode(const uint32_t id,
   added_ids_->insert(id);
   state_pop_ += majority_pop + minority_pop;
   nodes_[id] = new Node(id, county, majority_pop, minority_pop);
-  if (districts_in_county_->find(county) == districts_in_county_->end()) {
-    (*districts_in_county_)[county] = new unordered_set<uint32_t>;
+  if (nodes_in_county_->find(county) == nodes_in_county_->end()) {
+    (*nodes_in_county_)[county] = new unordered_set<uint32_t>;
+    (*nodes_in_county_)[county]->insert(id);
   }
   return true;
 }
@@ -153,24 +156,21 @@ bool Graph::AddNodeToDistrict(uint32_t node_id, uint32_t district) {
       nodes_in_district_[district]->end()) {
     return false;
   }
-  Node *node = nodes_[node_id];
 
-  if ((*districts_in_county_)[node->county_] == nullptr) {
-    (*districts_in_county_)[node->county_] = new unordered_set<uint32_t>;
-  }
-
-  unordered_set<uint32_t> *unique_districts = 
-      (*districts_in_county_)[node->county_];
-  if (unique_districts->find(district) == unique_districts->end()) {
-    unique_districts->insert(district);
-  }
-
-  unique_districts->erase(node->district_);
-  node->district_ = district;
+  nodes_[node_id]->district_ = district;
   nodes_in_district_[district]->insert(node_id);
-  pop_of_district_[district] += node->GetTotalPop();
-  maj_pop_of_district_[district] += node->GetMajorityPop();
-  min_pop_of_district_[district] += node->GetMajorityPop();
+  pop_of_district_[district] += nodes_[node_id]->GetTotalPop();
+  maj_pop_of_district_[district] += nodes_[node_id]->GetMajorityPop();
+  min_pop_of_district_[district] += nodes_[node_id]->GetMajorityPop();
+
+  unordered_set<uint32_t> *nodes = (*nodes_in_county_)[nodes_[node_id]->county_];
+  unordered_set<uint32_t> temp;
+  nodes->insert(node_id);
+  for (auto id : *nodes) {
+    temp.insert(nodes_[id]->district_);
+  }
+  (*num_districts_in_county_)[nodes_[node_id]->county_] = temp.size();
+
   return true;
 }
 
@@ -183,7 +183,16 @@ bool Graph::RemoveNodeFromDistrict(uint32_t node_id, uint32_t district) {
   pop_of_district_[district] -= nodes_[node_id]->GetTotalPop();
   maj_pop_of_district_[district] -= nodes_[node_id]->GetMajorityPop();
   min_pop_of_district_[district] -= nodes_[node_id]->GetMinorityPop();
+
+  unordered_set<uint32_t> *nodes = (*nodes_in_county_)[nodes_[node_id]->county_];
+  unordered_set<uint32_t> temp;
+  nodes->erase(node_id);
+  for (auto id : *nodes) {
+    temp.insert(nodes_[id]->district_);
+  }
+  (*num_districts_in_county_)[nodes_[node_id]->county_] = temp.size();
   nodes_[node_id]->district_ = num_districts_ + 1;
+
   return true;
 }
 

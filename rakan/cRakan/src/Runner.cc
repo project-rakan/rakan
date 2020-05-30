@@ -1,3 +1,7 @@
+#ifndef TEST_MODE
+#define SEED std::chrono::system_clock::now().time_since_epoch().count()
+#endif
+
 #include "./Runner.h"
 
 #include <math.h>               // for pow(), log(), fmin()
@@ -17,6 +21,7 @@
 #include "./Node.h"             // for class Node
 
 using std::queue;
+using std::uniform_int_distribution;
 using std::uniform_real_distribution;
 using std::unordered_map;
 using std::unordered_set;
@@ -32,12 +37,16 @@ Runner::Runner() {
   graph_ = new Graph;
   walk_changes_ = new vector<vector <uint32_t> *>;
   scores_ = new vector<map <string, double> *>;
+  generator_ = new std::default_random_engine;
+  generator_->seed(SEED);
 }
 
 Runner::Runner(uint32_t num_precincts, uint32_t num_districts) {
   graph_ = new Graph(num_precincts, num_districts);
   walk_changes_ = new vector<vector <uint32_t> *>;
   scores_ = new vector<map <string, double> *>;
+  generator_ = new std::default_random_engine;
+  generator_->seed(SEED);
 }
 
 Runner::~Runner() {
@@ -96,9 +105,10 @@ unordered_set<Node *>* Runner::GenerateRandomSeeds() {
   uint32_t i, random_index;
   vector<uint32_t> random_indexes;
   vector<uint32_t> *changes = new vector<uint32_t>(graph_->num_nodes_);
+  uniform_int_distribution<uint32_t> index(0, graph_->num_nodes_ - 1);
 
   for (i = 0; i < graph_->num_districts_; i++) {
-    random_index = rand() % graph_->num_nodes_;
+    random_index = index(*generator_);
     if (std::find(random_indexes.begin(),
                   random_indexes.end(),
                   random_index) == random_indexes.end()) {
@@ -123,7 +133,7 @@ unordered_set<Node *>* Runner::GenerateRandomSeeds() {
 bool Runner::SpawnDistricts(unordered_set<Node *> *seed_nodes) {
   unordered_set<uint32_t> unused;
   unordered_map<int, Node *> last_found;
-  Node *found_node;
+  Node *node, *found_node;
   vector<uint32_t> *changes = nullptr;
   map<string, double> *scores = new map<string, double>;
 
@@ -132,12 +142,14 @@ bool Runner::SpawnDistricts(unordered_set<Node *> *seed_nodes) {
   }
 
   for (uint32_t i = 0; i < graph_->num_nodes_; i++) {
-    unused.insert(i);
-  }
-
-  for (auto &node : *seed_nodes) {
-    unused.erase(node->id_);
-    last_found[node->district_] = node;
+    node = graph_->nodes_[i];
+    if (seed_nodes->find(node) != seed_nodes->end()) {
+      unused.erase(i);
+      last_found[node->district_] = node;
+    } else {
+      graph_->nodes_[i]->district_ = graph_->num_districts_ + 1;
+      unused.insert(i);
+    }
   }
 
   while (unused.size() > 0) {
@@ -158,6 +170,7 @@ bool Runner::SpawnDistricts(unordered_set<Node *> *seed_nodes) {
     }
   }
 
+  populate();
   (*scores)["total"] = LogScore();
   (*scores)["compact"] = compactness_score_;
   (*scores)["distribution"] = distribution_score_;
@@ -169,11 +182,7 @@ bool Runner::SpawnDistricts(unordered_set<Node *> *seed_nodes) {
 }
 
 bool Runner::seed() {
-  if (SpawnDistricts(GenerateRandomSeeds())) {
-    populate();
-    return true;
-  }
-  return false;
+  return SpawnDistricts(GenerateRandomSeeds());
 }
 
 void Runner::populate() {
@@ -184,7 +193,6 @@ void Runner::populate() {
   for (i = 0; i < graph_->num_nodes_; i++) {
     current_node = graph_->nodes_[i];
     current_district = current_node->district_;
-    graph_->AddNodeToDistrict(current_node->id_, current_district);
 
     for (auto &neighbor_id : *current_node->neighbors_) {
       neighbor_node = graph_->nodes_[neighbor_id];
@@ -240,7 +248,14 @@ double Runner::ScorePopulationDistribution() {
 }
 
 double Runner::ScoreExistingBorders() {
-  border_score_ = 0;
+  uint32_t i;
+  double sum = 0;
+
+  for (auto pair : *graph_->num_districts_in_county_) {
+    sum += pow(pair.second - 1, 2);
+  }
+
+  border_score_ = sum;
   return border_score_;
 }
 
@@ -283,24 +298,22 @@ double Runner::MetropolisHastings() {
   bool is_valid = false, accepted = false;
 
   // random number generators initialization
-  unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-  std::default_random_engine generator(seed);
-  uniform_real_distribution<double> index(0, graph_->crossing_edges_->size());
-  uniform_real_distribution<double> number(0, graph_->crossing_edges_->size());
+  uniform_int_distribution<uint32_t> index(0, graph_->crossing_edges_->size() - 1);
+  uniform_int_distribution<uint32_t> number(0, graph_->crossing_edges_->size() - 1);
   uniform_real_distribution<double> decimal_number(0, 1);
 
   while (!is_valid) {
-    random_index = floor(index(generator));
+    random_index = index(*generator_);
     i = 0;
     unordered_set<Edge, EdgeHash>::iterator itr =
-                                              graph_->crossing_edges_->begin();
+        graph_->crossing_edges_->begin();
     while (i < random_index) {
       itr++;
       i++;
     }
     edge = *itr;
 
-    random_number = floor(number(generator));
+    random_number = floor(number(*generator_));
     if (random_number > graph_->crossing_edges_->size() / 2) {
       victim_node = graph_->nodes_[edge.node1];
       idle_node = graph_->nodes_[edge.node2];
@@ -317,7 +330,7 @@ double Runner::MetropolisHastings() {
   new_score = Redistrict(victim_node, idle_node);
 
   if (new_score > old_score) {
-    ratio = decimal_number(generator);
+    ratio = decimal_number(*generator_);
     if (ratio <= (old_score / new_score)) {
       victim_node->district_ = old_district;
       Redistrict(victim_node, victim_node);
@@ -391,11 +404,20 @@ bool Runner::IsEmptyDistrict(int old_district) {
 bool Runner::IsDistrictSevered(Node *proposed_node, uint32_t new_district) {
   unordered_map<int, vector<Node *>> map;
   int old_district = proposed_node->district_;
+  int neighbor_district;
+
+  if (proposed_node->district_ == new_district) {
+    return false;
+  }
+
   proposed_node->district_ = graph_->num_districts_ + 1;
 
   for (auto &neighbor : *proposed_node->neighbors_) {
-    map[graph_->nodes_[neighbor]->district_].
-                                      push_back(graph_->nodes_[neighbor]);
+    neighbor_district = graph_->nodes_[neighbor]->district_;
+    if (neighbor_district != graph_->num_districts_ + 1) {
+      map[graph_->nodes_[neighbor]->district_].
+            push_back(graph_->nodes_[neighbor]);
+    }
   }
 
   for (auto &pair : map) {
@@ -420,6 +442,7 @@ bool Runner::IsDistrictSevered(Node *proposed_node, uint32_t new_district) {
       }
       second = graph_->GetNode(*itr);
       if (!DoesPathExist(first, second)) {
+        graph_->RemoveNodeFromDistrict(proposed_node->id_, new_district);
         proposed_node->district_ = old_district;
         return true;
       }
@@ -548,7 +571,8 @@ Node *Runner::BFS(Node *start, unordered_set<uint32_t> *set) {
     for (auto neighbor : *current_node->GetNeighbors()) {
       if (std::find(processed.begin(),
                     processed.end(),
-                    graph_->GetNode(neighbor)) == processed.end()) {
+                    graph_->GetNode(neighbor)) == processed.end() &&
+          !IsDistrictSevered(graph_->nodes_[neighbor], start->district_)) {
         q.push(graph_->GetNode(neighbor));
       }
     }

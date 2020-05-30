@@ -364,9 +364,11 @@ class Graph {
   // that district.
   unordered_set<uint32_t> **nodes_on_perim_;
 
-  // A map of county ID to a pointer to a set of unique districts in that
-  // county.
-  unordered_map<uint32_t, unordered_set<uint32_t> *> *districts_in_county_;
+  // A map of county ID to a pointer to a set of nodes in that county.
+  unordered_map<uint32_t, unordered_set<uint32_t> *> *nodes_in_county_;
+
+  // A map of county ID to number of unique districts in that county.
+  unordered_map<uint32_t, uint32_t> *num_districts_in_county_;
 
   // A map of an index to an edge that contain two nodes in different districts.
   unordered_set<Edge, EdgeHash> *crossing_edges_;
