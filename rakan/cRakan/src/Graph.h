@@ -358,49 +358,49 @@ class Graph {
   // The total state population of this graph.
   uint32_t state_pop_;
 
+  // To keep track of all of the nodes that have been added.
+  unordered_set<uint32_t> *added_ids_; 
+
   // An array of all the nodes on this graph. The index of the array is
   // the node ID. Some of the indices may be empty until client adds all
   // nodes
   Node **nodes_;
 
-  // An array of pointers to sets. The index of the array
-  // is the district ID, and the pointer at the index points
-  // to a set of nodes in that district.
+  // An array of pointers to sets. The index of the array is the district ID, 
+  // and the pointer at the index points to a set of nodes in that district.
   unordered_set<uint32_t> **nodes_in_district_;
 
-  // An array of pointers to sets. The index of the array
-  // is the district ID, and the pointer at the index points
-  // to a set of nodes on the perimeter of that district.
+  // An array of pointers to sets. The index of the array is the district ID,
+  // and the pointer at the index points to a set of nodes on the perimeter of
+  // that district.
   unordered_set<uint32_t> **nodes_on_perim_;
 
-  // A map of an index to an edge that contain two nodes in different
-  // districts.
-  unordered_set<Edge, EdgeHash> *crossing_edges_;
-  
-  // To keep track of all of the nodes that have been added.
-  unordered_set<uint32_t> *added_ids_; 
+  // A map of county ID to a pointer to a set of unique districts in that
+  // county.
+  unordered_map<uint32_t, unordered_set<uint32_t> *> *districts_in_county_;
 
-  // An array of maps. The index of the map is the district
-  // ID. Each district map stores node IDs as keys, and each
-  // node must be on the perimeter of the district. Corresponding
-  // to each key contains a set of node IDs that are neighbors
-  // to the perimeter node.
+  // A map of an index to an edge that contain two nodes in different districts.
+  unordered_set<Edge, EdgeHash> *crossing_edges_;
+
+  // An array of maps. The index of the map is the district ID. Each district 
+  // map stores node IDs as keys, and each node must be on the perimeter of the
+  // district. Corresponding to each key contains a set of node IDs that are
+  // neighbors to the perimeter node.
   unordered_map<uint32_t, unordered_set<uint32_t> *> 
       **perim_nodes_to_neighbors_;
 
-  // An array of populations. The index of the array is the district
-  // ID. The value at that index corresponds to the population in
-  // that district.
+  // An array of populations. The index of the array is the district ID. The 
+  // value at that index corresponds to the population in that district.
   uint32_t *pop_of_district_;
 
-  // An array of majority populations. The index of the array is
-  // the district ID. The value at that index corresponds to the
-  // majority population in that district.
+  // An array of majority populations. The index of the array is the district
+  // ID. The value at that index corresponds to the majority population in that
+  // district.
   uint32_t *maj_pop_of_district_;
 
-  // An array of minority populations. The index of the array is
-  // the district ID. The value at that index corresponds to the
-  // minority population in that district.
+  // An array of minority populations. The index of the array is the district
+  // ID. The value at that index corresponds to the minority population in that
+  // district.
   uint32_t *min_pop_of_district_;
 
   // Needed for populating data structures in graph from file.

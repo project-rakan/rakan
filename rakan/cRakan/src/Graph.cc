@@ -27,6 +27,7 @@ Graph::Graph(const uint32_t num_nodes,
       state_pop_(0) {
   uint32_t i;
   nodes_ = new Node*[num_nodes_];
+  districts_in_county_ = new unordered_map<uint32_t, unordered_set<uint32_t> *>;
 
   nodes_in_district_ = new unordered_set<uint32_t>*[num_districts_];
   for (i = 0; i < num_districts_; i++) {
@@ -62,7 +63,9 @@ Graph::Graph(const uint32_t num_nodes,
 Graph::~Graph() {
   uint32_t i;
 
+  // Delete non-arrays.
   delete crossing_edges_;
+  delete added_ids_;
 
   // Delete non-pointer arrays.
   delete[] pop_of_district_;
@@ -81,6 +84,12 @@ Graph::~Graph() {
   }
   delete[] nodes_in_district_;
 
+  // Delete all sets in districts_in_county_.
+  for (i = 0; i < districts_in_county_->size(); i++) {
+    delete (*districts_in_county_)[i];
+  }
+  delete districts_in_county_;
+
   // Delete all set pointers in nodes_on_perim_.
   for (i = 0; i < num_districts_; i++) {
     delete nodes_on_perim_[i];
@@ -91,10 +100,7 @@ Graph::~Graph() {
   for (i = 0; i < num_districts_; i++) {
     delete perim_nodes_to_neighbors_[i];
   }
-
   delete[] perim_nodes_to_neighbors_;
-
-  delete added_ids_;
 }
 
 
@@ -112,6 +118,15 @@ bool Graph::AddNode(Node *node) {
   nodes_[node->id_] = node;
   state_pop_ += node->total_pop_;
   added_ids_->insert(node->id_);
+  if (districts_in_county_->find(node->county_) ==
+      districts_in_county_->end()) {
+    (*districts_in_county_)[node->county_] = new unordered_set<uint32_t>;
+  }
+  if (node->district_ < num_districts_ && 
+      (*districts_in_county_)[node->county_]->find(node->district_) ==
+      (*districts_in_county_)[node->county_]->end()) {
+    (*districts_in_county_)[node->county_]->insert(node->district_);
+  }
   return true;
 }
 
@@ -128,6 +143,9 @@ bool Graph::AddNode(const uint32_t id,
   added_ids_->insert(id);
   state_pop_ += majority_pop + minority_pop;
   nodes_[id] = new Node(id, county, majority_pop, minority_pop);
+  if (districts_in_county_->find(county) == districts_in_county_->end()) {
+    (*districts_in_county_)[county] = new unordered_set<uint32_t>;
+  }
   return true;
 }
 
