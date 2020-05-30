@@ -34,16 +34,12 @@ namespace rakan {
 
 Runner::Runner() {
   graph_ = new Graph;
-  changes_ = new unordered_map<int, int>;
-  // each subsequent sub-vector will be initialized in the walk method.
   walk_changes_ = new vector<vector <uint32_t> *>;
   scores_ = new vector<map <string, double> *>;
 }
 
 Runner::Runner(uint32_t num_precincts, uint32_t num_districts) {
   graph_ = new Graph(num_precincts, num_districts);
-  changes_ = new unordered_map<int, int>;
-  // each subsequent sub-vector will be initialized in the walk method.
   walk_changes_ = new vector<vector <uint32_t> *>;
   scores_ = new vector<map <string, double> *>;
 }
@@ -52,9 +48,13 @@ Runner::~Runner() {
   if (graph_ != nullptr) {
     delete graph_;
   }
-  delete changes_;
-  // TODO: delete inner vectors if heap allocated
+  for (uint32_t i = 0; i < walk_changes_->size(); i++) {
+    delete (*walk_changes_)[i];
+  }
   delete walk_changes_;
+  for (uint32_t i = 0; i < scores_->size(); i++) {
+    delete (*scores_)[i];
+  }
   delete scores_;
 }
 
@@ -79,7 +79,7 @@ bool Runner::set_districts(vector<uint32_t>& districts) {
     return false;
   }
 
-  for (int i = 0; i < districts.size(); i++) {
+  for (uint32_t i = 0; i < districts.size(); i++) {
     if (districts[i] >= graph_->num_districts_) {
       return false;
     }
@@ -90,16 +90,18 @@ bool Runner::set_districts(vector<uint32_t>& districts) {
     graph_->AddNodeToDistrict(node->id_, districts[i]);
   }
 
+  populate();
   return true;
 }
 
 unordered_set<Node *>* Runner::GenerateRandomSeeds() {
   unordered_set<Node *> *seed_nodes = new unordered_set<Node *>;
   Node *seed_node;
-  int32_t prev_random_index, random_index;
+  uint32_t i, random_index;
   vector<uint32_t> random_indexes;
+  vector<uint32_t> *changes = new vector<uint32_t>(graph_->num_nodes_);
 
-  for (uint32_t i = 0; i < graph_->num_districts_; i++) {
+  for (i = 0; i < graph_->num_districts_; i++) {
     random_index = rand() % graph_->num_nodes_;
     if (std::find(random_indexes.begin(),
                   random_indexes.end(),
@@ -108,11 +110,16 @@ unordered_set<Node *>* Runner::GenerateRandomSeeds() {
       seed_node = graph_->nodes_[random_index];
       seed_nodes->insert(seed_node);
       random_indexes.push_back(random_index);
-      changes_->insert({seed_node->id_, i});
+      (*changes)[random_index] = i;
     } else {
       i--;
     }
   }
+
+  if (!walk_changes_->empty()) {
+    walk_changes_->clear();
+  }
+  walk_changes_->push_back(changes);
 
   return seed_nodes;
 }
@@ -120,7 +127,12 @@ unordered_set<Node *>* Runner::GenerateRandomSeeds() {
 bool Runner::SpawnDistricts(unordered_set<Node *> *seed_nodes) {
   unordered_set<uint32_t> unused;
   unordered_map<int, Node *> last_found;
-  Node *found_node, *seed_node;
+  Node *found_node;
+  vector<uint32_t> *changes = nullptr;
+
+  if (!walk_changes_->empty()) {
+    changes = (*walk_changes_)[0];
+  }
 
   for (uint32_t i = 0; i < graph_->num_nodes_; i++) {
     unused.insert(i);
@@ -139,7 +151,9 @@ bool Runner::SpawnDistricts(unordered_set<Node *> *seed_nodes) {
         graph_->AddNodeToDistrict(found_node->id_, i);
         unused.erase(found_node->id_);
         last_found[i] = found_node;
-        changes_->insert({found_node->id_, i});
+        if (changes != nullptr) {
+          (*changes)[found_node->id_] = i;
+        }
       }
     }
     if (unused.size() == check) {
@@ -150,7 +164,11 @@ bool Runner::SpawnDistricts(unordered_set<Node *> *seed_nodes) {
 }
 
 bool Runner::seed() {
-  return SpawnDistricts(GenerateRandomSeeds());
+  if (SpawnDistricts(GenerateRandomSeeds())) {
+    populate();
+    return true;
+  }
+  return false;
 }
 
 void Runner::populate() {
@@ -252,9 +270,11 @@ double Runner::LogScore() {
 
 double Runner::MetropolisHastings() {
   double old_score, new_score, ratio;
-  uint32_t i, random_index, random_number, old_district, new_district;
+  uint32_t i, random_index, random_number, old_district;
   Edge edge;
   Node *victim_node, *idle_node;
+  vector<uint32_t> *changes = new vector<uint32_t>;
+  map<string, double> *scores = new map<string, double>;
   bool is_valid = false, accepted = false;
 
   // random number generators initialization
@@ -267,7 +287,8 @@ double Runner::MetropolisHastings() {
   while (!is_valid) {
     random_index = floor(index(generator));
     i = 0;
-    unordered_set<Edge, EdgeHash>::iterator itr = graph_->crossing_edges_->begin();
+    unordered_set<Edge, EdgeHash>::iterator itr =
+                                              graph_->crossing_edges_->begin();
     while (i < random_index) {
       itr++;
       i++;
@@ -305,10 +326,19 @@ double Runner::MetropolisHastings() {
     accepted = true;
   }
   
-  (*changes_)[victim_node->id_] = victim_node->district_;
-  num_steps_++;
+  if (accepted) {
+    for (i = 0; i < graph_->num_nodes_; i++) {
+      changes->push_back(graph_->nodes_[i]->district_);
+    }
+    walk_changes_->push_back(changes);
+    (*scores)["total"] = score_;
+    (*scores)["compact"] = compactness_score_;
+    (*scores)["border"] = border_score_;
+    (*scores)["vra"] = vra_score_;
+    scores_->push_back(scores);
+  }
 
-  return old_score - new_score;
+  return new_score - old_score;
 }
 
 double Runner::Redistrict(Node *victim_node, Node *idle_node) {
@@ -325,8 +355,10 @@ double Runner::Redistrict(Node *victim_node, Node *idle_node) {
   return LogScore();
 }
 
-double Runner::Walk(uint32_t num_steps, double alpha, double beta, double gamma, double eta) {
+double Runner::Walk(uint32_t num_steps,
+                    double alpha, double beta, double gamma, double eta) {
   uint32_t sum = 0;
+  uint32_t accepted_steps = 0;
   alpha_ = alpha;
   beta_ = beta;
   gamma_ = gamma;
@@ -334,6 +366,9 @@ double Runner::Walk(uint32_t num_steps, double alpha, double beta, double gamma,
 
   for (uint32_t i = 0; i < num_steps; i++) {
     sum += MetropolisHastings();
+    if (walk_changes_->size() <= accepted_steps) {
+      i--;
+    }
   }
 
   return sum;
@@ -350,7 +385,6 @@ bool Runner::IsEmptyDistrict(int old_district) {
 
 bool Runner::IsDistrictSevered(Node *proposed_node, uint32_t new_district) {
   unordered_map<int, vector<Node *>> map;
-  Node *start;
   int old_district = proposed_node->district_;
   proposed_node->district_ = graph_->num_districts_ + 1;
 
@@ -360,7 +394,7 @@ bool Runner::IsDistrictSevered(Node *proposed_node, uint32_t new_district) {
   }
 
   for (auto &pair : map) {
-    for (int i = 0; i < map[pair.first].size() - 1; i++) {
+    for (uint32_t i = 0; i < map[pair.first].size() - 1; i++) {
       if (!DoesPathExist(map[pair.first][i], map[pair.first][i+1])) {
         proposed_node->district_ = old_district;
         return true;
@@ -420,7 +454,7 @@ bool Runner::DoesPathExist(Node *start, Node *target) {
 
 vector<vector<uint32_t>> Runner::getMaps() {
   vector<vector<uint32_t>> outer_vector;
-  for (int i = 0; i < walk_changes_->size(); i++) {
+  for (uint32_t i = 0; i < walk_changes_->size(); i++) {
     vector<uint32_t> inner_vector = *((*walk_changes_)[i]);
     outer_vector.push_back(inner_vector);
   }
@@ -429,7 +463,7 @@ vector<vector<uint32_t>> Runner::getMaps() {
 
 vector<map<string, double>> Runner::getScores() {
   vector<map<string, double>> outer_vector;
-  for (int i = 0; i < scores_->size(); i++) {
+  for (uint32_t i = 0; i < scores_->size(); i++) {
     map<string, double> inner_map = *((*scores_)[i]);
     outer_vector.push_back(inner_map);
   }
@@ -463,6 +497,29 @@ bool Runner::IsValidRedistricting(Node *node1, Node *node2) {
   if (IsDistrictSevered(node1, node2->district_)) {
     return false;
   }
+  return true;
+}
+
+bool Runner::IsDistrictConnected(uint32_t district_id) {
+  unordered_set<int> *nodes = graph_->GetNodesInDistrict(district_id);
+  unordered_set<int>::iterator itr = nodes->begin();
+  Node *node, *neighbor_node;
+  
+  for (uint32_t i = 0; i < nodes->size() - 1; i++) {
+    if (itr == nodes->end()) {
+      break;
+    }
+    node = graph_->nodes_[*itr];
+    itr++;
+    if (itr == nodes->end()) {
+      break;
+    }
+    neighbor_node = graph_->nodes_[*itr];
+    if (!DoesPathExist(node, neighbor_node)) {
+      return false;
+    }
+  }
+
   return true;
 }
 

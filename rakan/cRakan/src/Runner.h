@@ -297,6 +297,21 @@ class Runner {
   bool IsValidRedistricting(Node *node1, Node *node2);
 
   /**
+   * Checks if a district is connected.
+   * 
+   * Compared to IsDistrictSevered, this method takes in a district ID instead
+   * of a node. This method ONLY checks if the given district is connected,
+   * whereas IsDistrictSevered checks if all the neighbor districts of the
+   * given node is connected.
+   * 
+   * @param       district_id     the district ID to check
+   * 
+   * @return true iff all nodes in the district have a path to each other;
+   *         false otherwise
+   */
+  bool IsDistrictConnected(uint32_t district_id);
+
+  /**
   * A helper function that implements BFS on the graph. Searches for any node
   * that exists in the given set from start.
   *
@@ -312,22 +327,14 @@ class Runner {
   // The graph that is loaded and evaluated by this Runner.
   Graph *graph_;
 
-  // A map of the changes that have been made since the last walk.
-  // Maps from a node ID to a district ID and assumes that this change
-  // is new.
-  unordered_map<int, int> *changes_;
-
-  // The number of steps to take per walk.
-  int num_steps_;
-
   // A vector containing multiple vectors of uint32_t where each vector
   // represents the state of the map after a single step in the walk.
-  vector<vector <uint32_t> *> *walk_changes_;
+  vector<vector<uint32_t> *> *walk_changes_;
 
   // A map containing all of the scores for each of the maps generated
   // in the walk, where each index here in the outer vector corresponds
   // to the map in the same index in walk_changes_
-  vector<map <string, double> *> *scores_;
+  vector<map<string, double> *> *scores_;
 
   // Variables to keep track of the scores of the current map.
   double score_;

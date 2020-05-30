@@ -25,21 +25,22 @@ Graph::Graph(const uint32_t num_nodes,
     : num_nodes_(num_nodes),
       num_districts_(num_districts),
       state_pop_(0) {
+  uint32_t i;
   nodes_ = new Node*[num_nodes_];
 
   nodes_in_district_ = new unordered_set<int>*[num_districts_];
-  for (int i = 0; i < num_districts_; i++) {
+  for (i = 0; i < num_districts_; i++) {
     nodes_in_district_[i] = new unordered_set<int>;
   }
 
   nodes_on_perim_ = new unordered_set<int>*[num_districts_];
-  for (int i = 0; i < num_districts_; i++) {
+  for (i = 0; i < num_districts_; i++) {
     nodes_on_perim_[i] = new unordered_set<int>;
   }
 
   perim_nodes_to_neighbors_ =
                 new unordered_map<int, unordered_set<uint32_t> *>*[num_districts_];
-  for (int i = 0; i < num_districts_; i++) {
+  for (i = 0; i < num_districts_; i++) {
     perim_nodes_to_neighbors_[i] = new unordered_map<int, unordered_set<uint32_t> *>;
   }
 
@@ -48,7 +49,7 @@ Graph::Graph(const uint32_t num_nodes,
   min_pop_of_district_ = new uint32_t[num_districts_];
   maj_pop_of_district_ = new uint32_t[num_districts_];
 
-  for (int i = 0; i < num_districts_; i++) {
+  for (i = 0; i < num_districts_; i++) {
     pop_of_district_[i] = 0;
     min_pop_of_district_[i] = 0;
     maj_pop_of_district_[i] = 0;
@@ -231,6 +232,7 @@ bool Graph::UpdatePerimNode(Node *node) {
       }
     } else if (crossing_edges_->find(e) != crossing_edges_->end()) {
       crossing_edges_->erase(e);
+      UpdatePerimNode(nodes_[neighbor]);
     }
   }
   if (crossing_neighbors.empty()) {
@@ -251,8 +253,6 @@ bool Graph::ContainsNode(const uint32_t id) const {
 bool Graph::ContainsEdge(const uint32_t node1_id,
                          const uint32_t node2_id) const {
   Node *node1 = nodes_[node1_id];
-  Node *node2 = nodes_[node2_id];
-
   return (node1->neighbors_->find(node2_id) != node1->neighbors_->end());
 }
 
@@ -318,7 +318,7 @@ unordered_set<uint32_t>*
     Graph::GetPerimNodeNeighbors(const uint32_t district,
                                  const uint32_t node) const {
   if (district > num_districts_ || node > num_nodes_ ||
-      !NodeExistsInDistrict(node, district)) {
+      !NodeExistsInDistrict(node, district) || !IsPerimNode(node)) {
     return nullptr;
   }
   return (*perim_nodes_to_neighbors_[district]->find(node)).second;
