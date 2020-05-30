@@ -32,7 +32,7 @@ DEFAULT_WALK_SIZE = 200
 SECRET_KEY = os.getenv('DJANGO_SECRET', 'blj9_2iel2esgjtpn-p=_^k&33w1ym#5f@p40843kv5&x8^((r*guz1f7k12gr(')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG_MODE', False)
+DEBUG = os.getenv('DEBUG_MODE', 'true') == 'true'
 
 ALLOWED_HOSTS = [
     '127.0.0.1',
