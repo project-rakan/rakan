@@ -19,12 +19,12 @@ class EngineTests(APITestCase):
             map.delete()
 
     def test_get_startMap(self):
-        response = self.client.get('/startjob', format='json')
+        response = self.client.get('/create-job/', format='json')
         self.assertEqual(response.status_code, 405)
 
 
     def test_post_startMap_missing_id(self):
-        response = self.client.post('/startjob', {}, format='json')
+        response = self.client.post('/create-job/', {}, format='json')
         self.assertEqual(response.status_code, 400)
         self.assertTrue('msg' in response.data.keys())
         self.assertTrue('missing_field' in response.data.keys())
@@ -33,7 +33,7 @@ class EngineTests(APITestCase):
 
     def test_post_startMap_missing_state(self):
         guid = '0'
-        response = self.client.post('/startjob', {'id': guid}, format='json')
+        response = self.client.post('/create-job/', {'id': guid}, format='json')
         self.assertEqual(response.status_code, 400)
         self.assertTrue('msg' in response.data.keys())
         self.assertTrue('missing_field' in response.data.keys())
@@ -42,7 +42,7 @@ class EngineTests(APITestCase):
 
     def test_post_startMap_missing_weights(self):
         guid = '0'
-        response = self.client.post('/startjob', {'id': guid, 'state': 'EX'}, format='json')
+        response = self.client.post('/create-job/', {'id': guid, 'state': 'EX'}, format='json')
         self.assertEqual(response.status_code, 400)
         self.assertTrue('msg' in response.data.keys())
         self.assertTrue('missing_field' in response.data.keys())
@@ -55,7 +55,7 @@ class EngineTests(APITestCase):
         guid = '0'
         job = Job.objects.create(jobId=guid, state=self.ex_state, steps=1, alpha=0.0, beta=0.0, gamma=0.0, eta=0.0)
 
-        response = self.client.post('/startjob', {
+        response = self.client.post('/create-job/', {
             'id': guid,
             'state': 'EX',
             'alpha': 0,
@@ -69,7 +69,7 @@ class EngineTests(APITestCase):
         from api.models import Job
         guid = '0'
 
-        response = self.client.post('/startjob', {
+        response = self.client.post('/create-job/', {
             'id': guid,
             'state': 'NOT A STATE :o',
             'alpha': 0,
@@ -83,7 +83,7 @@ class EngineTests(APITestCase):
         from api.models import Job
         guid = '0'
 
-        response = self.client.post('/startjob', {
+        response = self.client.post('/create-job/', {
             'id': guid,
             'state': 'EX',
             'alpha': 'a',
@@ -114,7 +114,7 @@ class EngineTests(APITestCase):
     def test_post_startMap_fires_signal(self):
         from api.models import Job
         guid = '1'
-        response = self.client.post('/startjob', {
+        response = self.client.post('/create-job/', {
             'id': guid,
             'state': 'IA',
             'alpha': 0,
