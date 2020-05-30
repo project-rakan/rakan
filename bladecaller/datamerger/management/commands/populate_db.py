@@ -44,13 +44,12 @@ class Command(BaseCommand):
         for state in states:
             path = os.path.join(MAP_ROOT, f'{state.state}.pkl')
             if ignore_cache or not os.path.isfile(path):
-                precinct_id_map = {vtd: i for i, vtd in enumerate(state.vtds.all())}
                 precincts = []
                 edges = set()
 
-                for vtd in state.vtds.all():
+                for vtd in state.vtds.all().order_by('id'):
                     precincts.append({
-                        "nodeID": vtd.vtd_state_id,
+                        "nodeID": vtd.engine_id,
                         "curDistrict": vtd.district.district_id,
                         "county": vtd.county,
                         "area": vtd.land,
@@ -59,7 +58,7 @@ class Command(BaseCommand):
                     })
 
                     for neighbor in vtd.connected:
-                        edges.add(tuple(sorted([neighbor.vtd_state_id, vtd.vtd_state_id])))
+                        edges.add(tuple(sorted([neighbor.engine_id, vtd.engine_id])))
 
                 payload = {
                     'stCode': state.state,
@@ -220,7 +219,7 @@ class Command(BaseCommand):
                     'name': row['NAME10'],
                     'land': row['ALAND10'],
                     'water': row['AWATER10'],
-                    'vtd_state_id': i,
+                    'engine_id': i,
                 }))
 
         bar.next()
@@ -398,7 +397,7 @@ class Command(BaseCommand):
             new_vtds.append(VTDBlock(**{
                 'state': state,
                 'geometry': GEOSGeometry(county['geometry'].to_wkt()),
-                'vtd_state_id': i,
+                'engine_id': i,
                 'geoid': county['geoid'],
                 'county': i,
                 'name': f'County {i + 1}',
@@ -433,7 +432,13 @@ class Command(BaseCommand):
         for state in states:
             # adjust for granularity
             self.dissolveGranularity(state)
-            state.precincts = state.vtds.all().count()
+            vtds = state.vtds.all().order_by('engine_id')
+            state.precincts = vtds.count()
+
+            for i, vtd in enumerate(vtds):
+                vtd.engine_id = i
+                vtd.save()
+
             state.save()
 
             bar.next()
