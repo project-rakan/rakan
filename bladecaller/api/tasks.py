@@ -2,16 +2,33 @@ from celery import shared_task
 from api.models import Job, GeneratedMap
 from rakan import Engine
 
+import os
+import matplotlib.pyplot as plt
+from bladecaller.settings import RAKAN_STATE_VISUALIZATIONS
+
 @shared_task
 def performMetropolisHastingsWalk(jobId: int):
     job = Job.objects.get(id=jobId)
     engine = Engine(job.state.stateEngineData)
-    engine.walk(job.steps, job.alpha, job.beta, job.gamma, job.eta)
+    engine.seed()
 
     maps = engine.getMaps()
     scores = engine.getScores()
 
-    # Create geopandas of the state
+    # Generate the seed
+    GeneratedMap.objects.create(
+        state=job.state,
+        mapContents=maps[0],
+        compactness=scores[0][b'compact'],
+        vra=scores[0][b'vra'],
+        distribution=scores[0][b'distribution'],
+        borderRespect=scores[0][b'border'],
+    )
+
+    engine.walk(job.steps, job.alpha, job.beta, job.gamma, job.eta)
+
+    maps = engine.getMaps()[1:]
+    scores = engine.getScores()[1:]
 
     for map_, score_ in zip(maps, scores):
         # Visualize the redistricting
@@ -27,3 +44,15 @@ def performMetropolisHastingsWalk(jobId: int):
 
     job.finished = True
     job.save()
+
+@shared_task
+def visualizeMap(generatedMapId: int):
+    generatedMap = GeneratedMap.objects.get(id=generatedMapId)
+    df = generatedMap.df
+    df.boundary.plot()
+    df.plot(column='district')
+    plt.legend('district')
+    filepath = os.path.join(RAKAN_STATE_VISUALIZATIONS, f"{generatedMap.id}.png")
+    plt.savefig(filepath)
+    generatedMap.visualization = f"/images/{generatedMap.id}.png"
+    generatedMap.save()
