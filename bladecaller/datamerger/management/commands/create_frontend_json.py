@@ -51,10 +51,7 @@ class Command(BaseCommand):
 
         for prec in vtds:
             precName = prec.name
-            try:
-                vertices = [{"lat": lat, "lng": lng} for lng, lat in coordLists[prec.engine_id]]
-            except Exception:
-                import pdb; pdb.set_trace()
+            vertices = [{"lat": lat, "lng": lng} for lng, lat in coordLists[prec.engine_id]]
 
             precinctEntry = {
                 "name": precName,
