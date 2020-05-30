@@ -81,7 +81,7 @@ bool Runner::add_edge(uint32_t node_one, uint32_t node_two) {
 
 bool Runner::set_districts(vector<uint32_t>& districts) {
   map<string, double> *scores = new map<string, double>;
-  
+
   if (districts.size() != graph_->num_nodes_) {
     return false;
   }
@@ -257,7 +257,6 @@ double Runner::ScorePopulationDistribution() {
 }
 
 double Runner::ScoreExistingBorders() {
-  uint32_t i;
   double sum = 0;
 
   for (auto pair : *graph_->num_districts_in_county_) {
@@ -412,8 +411,8 @@ bool Runner::IsEmptyDistrict(int old_district) {
 
 bool Runner::IsDistrictSevered(Node *proposed_node, uint32_t new_district) {
   unordered_map<int, vector<Node *>> map;
-  int old_district = proposed_node->district_;
-  int neighbor_district;
+  uint32_t old_district = proposed_node->district_;
+  uint32_t neighbor_district, i;
 
   if (proposed_node->district_ == new_district) {
     return false;
@@ -430,7 +429,7 @@ bool Runner::IsDistrictSevered(Node *proposed_node, uint32_t new_district) {
   }
 
   for (auto &pair : map) {
-    for (uint32_t i = 0; i < map[pair.first].size() - 1; i++) {
+    for (i = 0; i < map[pair.first].size() - 1; i++) {
       if (!DoesPathExist(map[pair.first][i], map[pair.first][i+1])) {
         proposed_node->district_ = old_district;
         return true;
