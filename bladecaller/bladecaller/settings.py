@@ -37,6 +37,7 @@ DEBUG = os.getenv('DEBUG_MODE', 'true') == 'true'
 ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
+    'dfbbc4eb0ee6.ngrok.io',
 ]
 
 # Application definition
@@ -53,15 +54,21 @@ INSTALLED_APPS = [
     # Django plugins
     'rest_framework',
     'django_celery_results',
+    'corsheaders',
 ] + [
     # My apps
     'api',
     'datamerger',
 ]
 
+# Utilize CORS
+# https://github.com/adamchainz/django-cors-headers
+CORS_ORIGIN_ALLOW_ALL = True
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
