@@ -25,6 +25,9 @@ cdef class Engine:
         with io.open(binLocation, 'rb') as handle:
             data = pickle.loads(handle.read())
 
+        self._precincts = data['numPrecincts']
+        self._districts = data['numDistricts']
+
         self._runner = new cRunner(self._precincts, self._districts)
 
         # first pass to add all nodes
@@ -67,9 +70,9 @@ cdef class Engine:
         return dereference(self._runner).seed()
 
     def walk(self, int stepsToTake, double alpha, double beta, double gamma, double eta):
-        if self._redistricted:
-            return dereference(self._runner).Walk(stepsToTake, alpha, beta, gamma, eta)
-        raise Exception("Map is not redistricted")
+        if not self._redistricted:
+            self.seed()
+        return dereference(self._runner).Walk(stepsToTake, alpha, beta, gamma, eta)
 
     @property
     def districts(self):
