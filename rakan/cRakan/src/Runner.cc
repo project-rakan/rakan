@@ -80,6 +80,8 @@ bool Runner::add_edge(uint32_t node_one, uint32_t node_two) {
 }
 
 bool Runner::set_districts(vector<uint32_t>& districts) {
+  map<string, double> *scores = new map<string, double>;
+  
   if (districts.size() != graph_->num_nodes_) {
     return false;
   }
@@ -96,6 +98,13 @@ bool Runner::set_districts(vector<uint32_t>& districts) {
   }
 
   populate();
+  (*scores)["total"] = LogScore();
+  (*scores)["compact"] = compactness_score_;
+  (*scores)["distribution"] = distribution_score_;
+  (*scores)["border"] = border_score_;
+  (*scores)["vra"] = vra_score_;
+  scores_->push_back(scores);
+
   return true;
 }
 
@@ -135,6 +144,7 @@ bool Runner::SpawnDistricts(unordered_set<Node *> *seed_nodes) {
   unordered_map<int, Node *> last_found;
   Node *node, *found_node;
   vector<uint32_t> *changes = nullptr;
+  map<string, double> *scores = new map<string, double>;
 
   if (!walk_changes_->empty()) {
     changes = (*walk_changes_)[0];
@@ -168,7 +178,15 @@ bool Runner::SpawnDistricts(unordered_set<Node *> *seed_nodes) {
       return false;
     }
   }
+
   populate();
+  (*scores)["total"] = LogScore();
+  (*scores)["compact"] = compactness_score_;
+  (*scores)["distribution"] = distribution_score_;
+  (*scores)["border"] = border_score_;
+  (*scores)["vra"] = vra_score_;
+  scores_->push_back(scores);
+
   return true;
 }
 
@@ -239,7 +257,14 @@ double Runner::ScorePopulationDistribution() {
 }
 
 double Runner::ScoreExistingBorders() {
-  border_score_ = 0;
+  uint32_t i;
+  double sum = 0;
+
+  for (auto pair : *graph_->num_districts_in_county_) {
+    sum += pow(pair.second - 1, 2);
+  }
+
+  border_score_ = sum;
   return border_score_;
 }
 
@@ -287,10 +312,10 @@ double Runner::MetropolisHastings() {
   uniform_real_distribution<double> decimal_number(0, 1);
 
   while (!is_valid) {
-    random_index = floor(index(*generator_));
+    random_index = index(*generator_);
     i = 0;
     unordered_set<Edge, EdgeHash>::iterator itr =
-                                              graph_->crossing_edges_->begin();
+        graph_->crossing_edges_->begin();
     while (i < random_index) {
       itr++;
       i++;
