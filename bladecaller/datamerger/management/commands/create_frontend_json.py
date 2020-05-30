@@ -70,7 +70,7 @@ class Command(BaseCommand):
         json_loc = OUTPUT_JSON_LOCATION.format(code=stCode)+'.json'
 
         with open(json_loc, "w") as outfile:
-            outfile.write(json.dumps(dictionary, indent = 4))
+            outfile.write(json.dumps(dictionary))
 
         self.toJSONDict(df, stCode)
 
