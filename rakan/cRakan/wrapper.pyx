@@ -97,10 +97,5 @@ cdef class Engine:
     def isRedistricted(self):
         return self._redistricted
 
-    def visualize(self, output = "output.jpg"):
-        "Creates an image with the file name output"
-        
-
-
 
 # dereference(self._runner)
