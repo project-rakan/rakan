@@ -27,6 +27,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         ignore_cache = options['ignore_cache']
 
+        print("Deleting all previous artifacts.")
+        State.objects.all().delete()
+
         self.loadStates()                       # Create the states w/ only fips/name/max districts
         self.download116Congress(ignore_cache)  # Download the congressional districts
         self.install116Congress()               # Install the congressional districts into the db
