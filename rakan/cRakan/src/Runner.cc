@@ -329,6 +329,7 @@ double Runner::MetropolisHastings() {
     walk_changes_->push_back(changes);
     (*scores)["total"] = score_;
     (*scores)["compact"] = compactness_score_;
+    (*scores)["distribution"] = distribution_score_;
     (*scores)["border"] = border_score_;
     (*scores)["vra"] = vra_score_;
     scores_->push_back(scores);
@@ -468,9 +469,9 @@ vector<map<string, double>> Runner::getScores() {
 }
 
 
- //////////////////////////////////////////////////////////////////////////////
- // Helpers
- //////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+// Helpers
+//////////////////////////////////////////////////////////////////////////////
 
 bool Runner::IsValidRedistricting(Node *node1, Node *node2) {
   // Nodes must be different and in different districts.
