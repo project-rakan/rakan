@@ -79,7 +79,7 @@ bool Runner::set_districts(vector<uint32_t>& districts) {
     return false;
   }
 
-  for (int i = 0; i < districts.size(); i++) {
+  for (uint32_t i = 0; i < districts.size(); i++) {
     if (districts[i] >= graph_->num_districts_) {
       return false;
     }
@@ -97,7 +97,7 @@ unordered_set<Node *>* Runner::GenerateRandomSeeds() {
   unordered_set<Node *> *seed_nodes = new unordered_set<Node *>;
   Node *seed_node;
   uint32_t i;
-  int32_t prev_random_index, random_index;
+  int32_t random_index;
   vector<uint32_t> random_indexes;
   vector<uint32_t> *changes = new vector<uint32_t>(graph_->num_nodes_);
 
@@ -127,7 +127,7 @@ unordered_set<Node *>* Runner::GenerateRandomSeeds() {
 bool Runner::SpawnDistricts(unordered_set<Node *> *seed_nodes) {
   unordered_set<uint32_t> unused;
   unordered_map<int, Node *> last_found;
-  Node *found_node, *seed_node;
+  Node *found_node;
   vector<uint32_t> *changes = nullptr;
 
   if (!walk_changes_->empty()) {
@@ -266,7 +266,7 @@ double Runner::LogScore() {
 
 double Runner::MetropolisHastings() {
   double old_score, new_score, ratio;
-  uint32_t i, random_index, random_number, old_district, new_district;
+  uint32_t i, random_index, random_number, old_district;
   Edge edge;
   Node *victim_node, *idle_node;
   vector<uint32_t> *changes = new vector<uint32_t>;
@@ -381,7 +381,6 @@ bool Runner::IsEmptyDistrict(int old_district) {
 
 bool Runner::IsDistrictSevered(Node *proposed_node, uint32_t new_district) {
   unordered_map<int, vector<Node *>> map;
-  Node *start;
   int old_district = proposed_node->district_;
   proposed_node->district_ = graph_->num_districts_ + 1;
 
@@ -391,7 +390,7 @@ bool Runner::IsDistrictSevered(Node *proposed_node, uint32_t new_district) {
   }
 
   for (auto &pair : map) {
-    for (int i = 0; i < map[pair.first].size() - 1; i++) {
+    for (uint32_t i = 0; i < map[pair.first].size() - 1; i++) {
       if (!DoesPathExist(map[pair.first][i], map[pair.first][i+1])) {
         proposed_node->district_ = old_district;
         return true;
@@ -451,7 +450,7 @@ bool Runner::DoesPathExist(Node *start, Node *target) {
 
 vector<vector<uint32_t>> Runner::getMaps() {
   vector<vector<uint32_t>> outer_vector;
-  for (int i = 0; i < walk_changes_->size(); i++) {
+  for (uint32_t i = 0; i < walk_changes_->size(); i++) {
     vector<uint32_t> inner_vector = *((*walk_changes_)[i]);
     outer_vector.push_back(inner_vector);
   }
@@ -460,7 +459,7 @@ vector<vector<uint32_t>> Runner::getMaps() {
 
 vector<map<string, double>> Runner::getScores() {
   vector<map<string, double>> outer_vector;
-  for (int i = 0; i < scores_->size(); i++) {
+  for (uint32_t i = 0; i < scores_->size(); i++) {
     map<string, double> inner_map = *((*scores_)[i]);
     outer_vector.push_back(inner_map);
   }
