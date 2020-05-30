@@ -3,6 +3,7 @@
 
 #ifndef TEST_MODE
 #define TEST_MODE
+#define SEED 100
 #endif
 
 #include <iostream>

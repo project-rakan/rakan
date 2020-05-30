@@ -1,8 +1,9 @@
 #ifndef SRC_RUNNER_H_
 #define SRC_RUNNER_H_
- 
+
 #include <inttypes.h>         // for uint32_t, uint16_t, etc.
 
+#include <random>             // for std::default_random_engine
 #include <string>             // for std::string
 #include <unordered_map>      // for std::unordered_map
 #include <unordered_set>      // for std::unordered_set
@@ -348,6 +349,9 @@ class Runner {
   double beta_;
   double gamma_;
   double eta_;
+
+  // For random number generation.
+  std::default_random_engine *generator_;
 };        // class Runner
 
 }         // namespace rakan

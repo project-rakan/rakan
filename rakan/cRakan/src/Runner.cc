@@ -1,3 +1,7 @@
+#ifndef TEST_MODE
+#define SEED std::chrono::system_clock::now().time_since_epoch().count()
+#endif
+
 #include "./Runner.h"
 
 #include <math.h>               // for pow(), log(), fmin()
@@ -16,13 +20,8 @@
 #include "./Graph.h"            // for class Graph
 #include "./Node.h"             // for class Node
 
-#ifndef TEST_MODE
-#define SEED std::chrono::system_clock::now().time_since_epoch().count()
-#else
-#define SEED 100
-#endif
-
 using std::queue;
+using std::uniform_int_distribution;
 using std::uniform_real_distribution;
 using std::unordered_map;
 using std::unordered_set;
@@ -38,12 +37,16 @@ Runner::Runner() {
   graph_ = new Graph;
   walk_changes_ = new vector<vector <uint32_t> *>;
   scores_ = new vector<map <string, double> *>;
+  generator_ = new std::default_random_engine;
+  generator_->seed(SEED);
 }
 
 Runner::Runner(uint32_t num_precincts, uint32_t num_districts) {
   graph_ = new Graph(num_precincts, num_districts);
   walk_changes_ = new vector<vector <uint32_t> *>;
   scores_ = new vector<map <string, double> *>;
+  generator_ = new std::default_random_engine;
+  generator_->seed(SEED);
 }
 
 Runner::~Runner() {
@@ -102,12 +105,10 @@ unordered_set<Node *>* Runner::GenerateRandomSeeds() {
   uint32_t i, random_index;
   vector<uint32_t> random_indexes;
   vector<uint32_t> *changes = new vector<uint32_t>(graph_->num_nodes_);
-  unsigned seed = SEED;
-  std::default_random_engine generator(seed);
-  uniform_real_distribution<double> index(0, graph_->num_nodes_);
+  uniform_int_distribution<uint32_t> index(0, graph_->num_nodes_ - 1);
 
   for (i = 0; i < graph_->num_districts_; i++) {
-    random_index = floor(index(generator));
+    random_index = index(*generator_);
     if (std::find(random_indexes.begin(),
                   random_indexes.end(),
                   random_index) == random_indexes.end()) {
@@ -281,14 +282,12 @@ double Runner::MetropolisHastings() {
   bool is_valid = false, accepted = false;
 
   // random number generators initialization
-  unsigned seed = SEED;
-  std::default_random_engine generator(seed);
-  uniform_real_distribution<double> index(0, graph_->crossing_edges_->size());
-  uniform_real_distribution<double> number(0, graph_->crossing_edges_->size());
+  uniform_int_distribution<uint32_t> index(0, graph_->crossing_edges_->size() - 1);
+  uniform_int_distribution<uint32_t> number(0, graph_->crossing_edges_->size() - 1);
   uniform_real_distribution<double> decimal_number(0, 1);
 
   while (!is_valid) {
-    random_index = floor(index(generator));
+    random_index = floor(index(*generator_));
     i = 0;
     unordered_set<Edge, EdgeHash>::iterator itr =
                                               graph_->crossing_edges_->begin();
@@ -298,7 +297,7 @@ double Runner::MetropolisHastings() {
     }
     edge = *itr;
 
-    random_number = floor(number(generator));
+    random_number = floor(number(*generator_));
     if (random_number > graph_->crossing_edges_->size() / 2) {
       victim_node = graph_->nodes_[edge.node1];
       idle_node = graph_->nodes_[edge.node2];
@@ -315,7 +314,7 @@ double Runner::MetropolisHastings() {
   new_score = Redistrict(victim_node, idle_node);
 
   if (new_score > old_score) {
-    ratio = decimal_number(generator);
+    ratio = decimal_number(*generator_);
     if (ratio <= (old_score / new_score)) {
       victim_node->district_ = old_district;
       Redistrict(victim_node, victim_node);
