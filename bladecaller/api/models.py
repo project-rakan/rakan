@@ -95,7 +95,7 @@ def create_visualization(sender, **kwargs):
     generatedMap = kwargs.get('instance')
 
     if kwargs['created']:
-        tasks.visualizeMap.delay(generatedMap.id)
+        tasks.visualizeMap(generatedMap.id)
 
 @receiver(post_save, sender=Job)
 def queue_new_job(sender, **kwargs):
