@@ -19,7 +19,7 @@ test: build cmake
 	cd rakan && cp ./*.so tests/
 	cd rakan/cRakan/build && ./tst/rakan_tst 
 	cd rakan/tests && python3.7 -m unittest
-	cd bladecaller && coverage run --source='.' manage.py test && coverage html
+	cd bladecaller && coverage run --source='.' manage.py test -v3 && coverage html
 
 migrations: build
 	cd bladecaller && python3.7 manage.py makemigrations
