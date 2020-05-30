@@ -4,7 +4,7 @@ from cython.operator import dereference, preincrement, address
 
 from libcpp.vector cimport vector as cvector
 from libcpp.string cimport string as cstring
-from libc.stdint cimport uint32_t as cuint32_t
+from libc.stdint cimport uint32_t
 from libcpp cimport bool as cbool
 
 from wrapper cimport Runner as cRunner
@@ -51,7 +51,7 @@ cdef class Engine:
         if not dereference(self._runner).add_edge(id1, id2):
             raise ValueError(f"Incorrect ids: {id1} {id2}")
 
-    def setDistricts(self, cvector[cuint32_t] districts):
+    def setDistricts(self, cvector[uint32_t] districts):
         if not dereference(self._runner).set_districts(districts):
             raise ValueError()
 
@@ -69,7 +69,7 @@ cdef class Engine:
         self._redistricted = True
         return dereference(self._runner).seed()
 
-    def walk(self, int stepsToTake, double alpha, double beta, double gamma, double eta):
+    def walk(self, uint32_t stepsToTake, double alpha, double beta, double gamma, double eta):
         if not self._redistricted:
             self.seed()
         return dereference(self._runner).Walk(stepsToTake, alpha, beta, gamma, eta)
