@@ -28,20 +28,21 @@ Graph::Graph(const uint32_t num_nodes,
   uint32_t i;
   nodes_ = new Node*[num_nodes_];
 
-  nodes_in_district_ = new unordered_set<int>*[num_districts_];
+  nodes_in_district_ = new unordered_set<uint32_t>*[num_districts_];
   for (i = 0; i < num_districts_; i++) {
-    nodes_in_district_[i] = new unordered_set<int>;
+    nodes_in_district_[i] = new unordered_set<uint32_t>;
   }
 
-  nodes_on_perim_ = new unordered_set<int>*[num_districts_];
+  nodes_on_perim_ = new unordered_set<uint32_t>*[num_districts_];
   for (i = 0; i < num_districts_; i++) {
-    nodes_on_perim_[i] = new unordered_set<int>;
+    nodes_on_perim_[i] = new unordered_set<uint32_t>;
   }
 
   perim_nodes_to_neighbors_ =
-                new unordered_map<int, unordered_set<uint32_t> *>*[num_districts_];
+        new unordered_map<uint32_t, unordered_set<uint32_t> *>*[num_districts_];
   for (i = 0; i < num_districts_; i++) {
-    perim_nodes_to_neighbors_[i] = new unordered_map<int, unordered_set<uint32_t> *>;
+    perim_nodes_to_neighbors_[i] = 
+        new unordered_map<uint32_t, unordered_set<uint32_t> *>;
   }
 
   crossing_edges_ = new unordered_set<Edge, EdgeHash>;
@@ -185,7 +186,7 @@ bool Graph::AddNodeToDistrictPerim(uint32_t node_id, uint32_t district) {
   }
   nodes_on_perim_[node->district_]->insert(node->id_);
 
-  unordered_map<int, unordered_set<uint32_t> *> *map;
+  unordered_map<uint32_t, unordered_set<uint32_t> *> *map;
   map = perim_nodes_to_neighbors_[district];
   if (map->find(node->id_) != map->end()) {
     return false;
@@ -202,7 +203,7 @@ bool Graph::RemoveNodeFromDistrictPerim(uint32_t node_id, uint32_t district) {
   }
   nodes_on_perim_[district]->erase(node->id_);
 
-  unordered_map<int, unordered_set<uint32_t> *> *map;
+  unordered_map<uint32_t, unordered_set<uint32_t> *> *map;
   map = perim_nodes_to_neighbors_[district];
   if (map->find(node->id_) == map->end()) {
     return false;
@@ -300,14 +301,15 @@ uint32_t Graph::GetStatePop() const {
   return state_pop_;
 }
 
-unordered_set<int>* Graph::GetNodesInDistrict(const uint32_t district) const {
+unordered_set<uint32_t>*
+    Graph::GetNodesInDistrict(const uint32_t district) const {
   if (district > num_districts_ || district < 0) {
     return nullptr;
   }
   return nodes_in_district_[district];
 }
 
-unordered_set<int>* Graph::GetPerimNodes(uint32_t district) const {
+unordered_set<uint32_t>* Graph::GetPerimNodes(uint32_t district) const {
   if (district > num_districts_ || district < 0) {
     return nullptr;
   }
