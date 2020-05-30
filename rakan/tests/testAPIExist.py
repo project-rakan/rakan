@@ -19,7 +19,7 @@ class testAPIExist(unittest.TestCase):
 
     def test_canLoad(self):
         "Test that this class can be instantiated"
-        self.engineClass("/var/www/html/stateinfo/IA.runner.json")
+        self.engineClass("/var/www/html/stateinfo/IA.pkl")
 
 """
     def setUp(self):

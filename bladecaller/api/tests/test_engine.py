@@ -7,15 +7,11 @@ import time
 # Create your tests here.
 
 class EngineTests(APITestCase):
-    
+    fixtures = ['iowa_washington_fixture.json']
+
     def setUp(self):
         from api.models import State
-        self.ex_state = State.objects.create(
-            state='EX',
-            maxDistricts=2,
-            fips=0,
-            precincts=4
-        )
+        self.ex_state = State.objects.get(fips=19)
 
     def tearDown(self):
         from api.models import GeneratedMap
