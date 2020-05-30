@@ -10,10 +10,9 @@ build: cmake
 clean:
 	cd rakan && rm -rf *.so  cRakan/wrapper.cpp tests/*.so build
 	cd bladecaller && rm -rf htmlcov .coverage
-	cd logs && rm -rf *.log
+	cd logs && rm -rf *.log bladecaller/db.sqlite3
 	rm -rf bladecaller/api/__pycache__ bladecaller/api/tests/__pycache__ bladecaller/api/migrations/__pycache__
 	rm -rf bladecaller/bladecaller/__pycache__ rakan/__pycache__ rakan/tests/__pycache__
-	rm bladecaller/db.sqlite3
 
 test: build cmake
 	cd rakan && cp ./*.so tests/
