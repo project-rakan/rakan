@@ -41,7 +41,8 @@ cdef class Engine:
         del self._runner
 
     def _addNode(self, int id, int county, int minorityPopulation, int majorityPoplation):
-        dereference(self._runner).add_node(id, county, minorityPopulation, majorityPoplation);
+        if not dereference(self._runner).add_node(id, county, minorityPopulation, majorityPoplation):
+            raise ValueError("Unable to add Node")
 
     def _addEdge(self, int id1, int id2):
         if not dereference(self._runner).add_edge(id1, id2):

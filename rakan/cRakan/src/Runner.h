@@ -51,8 +51,10 @@ class Runner {
    * @param   county                the county the to be added node resides in
    * @param   majority_population   the majority population in the node
    * @param   minority_population   the minority population in the node
+   * 
+   * @return true iff node was added to the graph; false otherwise
    */
-  void add_node(uint32_t node_id,
+  bool add_node(uint32_t node_id,
                 uint32_t county,
                 uint32_t majority_population,
                 uint32_t minority_population);
