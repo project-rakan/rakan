@@ -30,5 +30,4 @@ createsuperuser: build
 
 bladecaller: build
 	cd bladecaller && python3.7 manage.py collectstatic --no-input
-	cd bladecaller && python3.7 manage.py createsuperuser
 	cd bladecaller && python3.7 manage.py runserver
