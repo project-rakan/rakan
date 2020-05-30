@@ -1,7 +1,5 @@
 #include "./Graph.h"
 
-#include <iostream>
-
 #include <inttypes.h>       // for uint32_t
 #include <stdio.h>          // for FILE *, stderr
 #include <string>           // for std::string

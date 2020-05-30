@@ -418,28 +418,6 @@ TEST(Test_Runner, TestWalkHundredStepsIowa) {
   uint32_t i;
   unordered_map<uint32_t, vector<uint32_t>> district_nodes;
 
-  // std::cout << "starting walk" << std::endl;
-  // std::cout << "district 0: [";
-  // for (auto node : *r->GetGraph()->GetNodesInDistrict(0)) {
-  //   std::cout << node << ",";
-  // }
-  // std::cout << "]" << std::endl;
-  // std::cout << "district 1: [";
-  // for (auto node : *r->GetGraph()->GetNodesInDistrict(1)) {
-  //   std::cout << node << ",";
-  // }
-  // std::cout << "]" << std::endl;
-  // std::cout << "district 2: [";
-  // for (auto node : *r->GetGraph()->GetNodesInDistrict(2)) {
-  //   std::cout << node << ",";
-  // }
-  // std::cout << "]" << std::endl;
-  // std::cout << "district 3: [";
-  // for (auto node : *r->GetGraph()->GetNodesInDistrict(3)) {
-  //   std::cout << node << ",";
-  // }
-  // std::cout << "]" << std::endl;
-
   r->Walk(200, 0, 0, 0, 0);
   ASSERT_TRUE(r->IsDistrictConnected(0));
   ASSERT_TRUE(r->IsDistrictConnected(1));
