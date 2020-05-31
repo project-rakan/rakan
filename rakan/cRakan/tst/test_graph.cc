@@ -186,6 +186,7 @@ TEST(Test_Graph, TestPerimNodesSimple) {
     for (uint32_t i = 0; i < g->GetNumNodes(); i++) {
         ASSERT_TRUE(g->IsPerimNode(i));
     }
+    delete g;
 }
 
 TEST(Test_Graph, TestPerimNodesComplex) {
@@ -210,6 +211,94 @@ TEST(Test_Graph, TestPerimNodesComplex) {
             }
         }
     }
+    delete g;
+}
+
+TEST(Test_Graph, TestEdgeMarkComplex) {
+    Graph* g = GraphNxN(100);
+    unordered_set<Edge, EdgeHash>* Crossing_Edges = g->GetCrossingEdges();
+    // Every node should have two neighbors on the edge and 
+    // four neighbors within the square
+    unordered_set<Edge, EdgeHash>::iterator iter;
+    for (uint32_t i = 0; i < g->GetNumNodes(); i++) {
+        Node* n = g->GetNode(i);
+        std::unordered_set<uint32_t> * neighbors = n->GetNeighbors();
+        // Go through all of the neighbors and see if there is a neighbor with
+        // a different district number. This means that there should be a crossing
+        // edge marked between them.
+        std::unordered_set<uint32_t>::iterator itr = neighbors->begin();
+        for (; itr != neighbors->end(); itr++) {
+            if (g->GetNode(*itr)->GetDistrict() != n->GetDistrict()) {
+                bool check = false;
+                for (iter = Crossing_Edges->begin(); iter != Crossing_Edges->end(); iter++) {
+                    if ((iter->node1 == *itr && iter->node2 == i) || 
+                        (iter->node2 == *itr && iter->node1 == i)) {
+                            check = true;
+                        }
+                }
+                ASSERT_TRUE(check);
+            }
+        }
+    }
+    delete g;
+}
+
+TEST(Test_Graph, TestEdgeMarkSimple) {
+    Graph* g = GraphNxN(4);
+    unordered_set<Edge, EdgeHash>* Crossing_Edges = g->GetCrossingEdges();
+    // Every node should have two neighbors on the edge and 
+    // four neighbors within the square
+    unordered_set<Edge, EdgeHash>::iterator iter;
+    for (uint32_t i = 0; i < g->GetNumNodes(); i++) {
+        Node* n = g->GetNode(i);
+        std::unordered_set<uint32_t> * neighbors = n->GetNeighbors();
+        // Go through all of the neighbors and see if there is a neighbor with
+        // a different district number. This means that there should be a crossing
+        // edge marked between them.
+        std::unordered_set<uint32_t>::iterator itr = neighbors->begin();
+        for (; itr != neighbors->end(); itr++) {
+            if (g->GetNode(*itr)->GetDistrict() != n->GetDistrict()) {
+                bool check = false;
+                for (iter = Crossing_Edges->begin(); iter != Crossing_Edges->end(); iter++) {
+                    if ((iter->node1 == *itr && iter->node2 == i) || 
+                        (iter->node2 == *itr && iter->node1 == i)) {
+                            check = true;
+                        }
+                }
+                ASSERT_TRUE(check);
+            }
+        }
+    }
+    delete g;
+}
+
+TEST(Test_Graph, TestEdgeMarkMassive) {
+    Graph* g = GraphNxN(200);
+    unordered_set<Edge, EdgeHash>* Crossing_Edges = g->GetCrossingEdges();
+    // Every node should have two neighbors on the edge and 
+    // four neighbors within the square
+    unordered_set<Edge, EdgeHash>::iterator iter;
+    for (uint32_t i = 0; i < g->GetNumNodes(); i++) {
+        Node* n = g->GetNode(i);
+        std::unordered_set<uint32_t> * neighbors = n->GetNeighbors();
+        // Go through all of the neighbors and see if there is a neighbor with
+        // a different district number. This means that there should be a crossing
+        // edge marked between them.
+        std::unordered_set<uint32_t>::iterator itr = neighbors->begin();
+        for (; itr != neighbors->end(); itr++) {
+            if (g->GetNode(*itr)->GetDistrict() != n->GetDistrict()) {
+                bool check = false;
+                for (iter = Crossing_Edges->begin(); iter != Crossing_Edges->end(); iter++) {
+                    if ((iter->node1 == *itr && iter->node2 == i) || 
+                        (iter->node2 == *itr && iter->node1 == i)) {
+                            check = true;
+                        }
+                }
+                ASSERT_TRUE(check);
+            }
+        }
+    }
+    delete g;
 }
 
 // helper method to create a simple graph, 
