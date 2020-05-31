@@ -1,7 +1,5 @@
 #include "./Runner.h"
 
-#include <iostream>
-
 #include <math.h>               // for pow(), log(), fmin()
 #include <inttypes.h>           // for uint32_t, etc.
 #include <stdlib.h>             // for rand()
@@ -117,8 +115,6 @@ unordered_set<Node *>* Runner::GenerateRandomSeeds() {
   vector<uint32_t> random_indexes;
   vector<uint32_t> *changes = new vector<uint32_t>(graph_->num_nodes_);
   uniform_int_distribution<uint32_t> index(0, graph_->num_nodes_ - 1);
-
-  std::cout << "seed = " << SEED <<std::endl;
 
   for (i = 0; i < graph_->num_districts_; i++) {
     random_index = index(*generator_);

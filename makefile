@@ -7,6 +7,9 @@ build: rakan/cRakan
 cmake: rakan/cRakan
 	cd rakan/cRakan/build && cmake .. -DCMAKE_BUILD_TYPE=Debug -G "Unix Makefiles" && make all
 
+cpptests: rakan/cRakan
+	cd rakan/cRakan/build && cmake .. -DCMAKE_CXX_FLAGS="-DTEST_MODE -DSEED=100" -DCMAKE_BUILD_TYPE=Debug -G "Unix Makefiles" && make all
+
 clean:
 	cd rakan && rm -rf *.so  cRakan/wrapper.cpp tests/*.so build
 
