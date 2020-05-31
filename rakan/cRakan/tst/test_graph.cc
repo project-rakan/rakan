@@ -178,21 +178,15 @@ TEST(Test_Graph, TestDistrictPopulationHuge) {
     ASSERT_TRUE(g->GetMinorityPop(3) == 12500);
     delete g;
 }
-/*
-TEST(Test_Graph, TestDistric) {
+
+TEST(Test_Graph, TestPerimNodesSimple) {
     Graph* g = GraphNxN(4);
-    ASSERT_TRUE(g->GetDistrictPop(0) == 40);
-    ASSERT_TRUE(g->GetDistrictPop(1) == 40);
-    ASSERT_TRUE(g->GetDistrictPop(2) == 40);
-    ASSERT_TRUE(g->GetDistrictPop(3) == 40);
-}
-TEST(Test_Graph, TestEdgeMark) {
-    Graph* g = Graph4x4();
     // Every node should have two neighbors on the edge and 
     // four neighbors within the square
-    for (uint32_t i = 0; i < g->)
+    for (uint32_t i = 0; i < g->GetNumNodes(); i++) {
+        ASSERT_TRUE(g->IsPerimNode(i));
+    }
 }
-*/
 
 // helper method to create a simple graph, 
 // must destruct graph when finished
@@ -287,6 +281,28 @@ static Graph* GraphNxN(uint32_t n) {
                 g->AddNodeToDistrictPerim(second, n2->GetDistrict());
             }
         }
+    }
+    // Add all outmost edge nodes as Perim nodes
+
+    // Add all along top row
+    for (uint32_t i = 0; i < n; i++) {
+        Node *n1 = g->GetNode(i);
+        g->AddNodeToDistrictPerim(i, n1->GetDistrict());
+    }
+    // Add all along bottom row
+    for (uint32_t i = (n*n) - n; i < n*n; i++) {
+        Node *n1 = g->GetNode(i);
+        g->AddNodeToDistrictPerim(i, n1->GetDistrict());
+    }
+    // Add all along leftmost column
+    for (uint32_t i = 0; i <= (n*n) - n; i += n) {
+        Node *n1 = g->GetNode(i);
+        g->AddNodeToDistrictPerim(i, n1->GetDistrict());
+    }
+    // Add all along rightmost column
+    for (uint32_t i = (n - 1); i < (n*n); i += n) {
+        Node *n1 = g->GetNode(i);
+        g->AddNodeToDistrictPerim(i, n1->GetDistrict());
     }
     // Say that n = 4, then the graph would be
     // organized as the following:
