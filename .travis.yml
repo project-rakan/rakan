@@ -1,0 +1,8 @@
+services:
+    - docker
+
+before_install:
+    - "docker build . -t rakan -f ./github-dockerfile"
+
+script:
+    - "docker run rakan:test"
