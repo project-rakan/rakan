@@ -143,7 +143,6 @@ unordered_set<Node *>* Runner::GenerateRandomSeeds() {
 
 bool Runner::SpawnDistricts(unordered_set<Node *> *seed_nodes) {
   unordered_set<uint32_t> unused;
-  unordered_map<int, Node *> last_found;
   Node *node, *found_node;
   vector<uint32_t> *changes = nullptr;
   map<string, double> *scores = new map<string, double>;
@@ -159,7 +158,6 @@ bool Runner::SpawnDistricts(unordered_set<Node *> *seed_nodes) {
     node = graph_->nodes_[i];
     if (seed_nodes->find(node) != seed_nodes->end()) {
       unused.erase(i);
-      last_found[node->district_] = node;
       queues[node->district_] = new vector<uint32_t>;
       queues[node->district_]->push_back(i);
     } else {
@@ -175,7 +173,6 @@ bool Runner::SpawnDistricts(unordered_set<Node *> *seed_nodes) {
       if (found_node != nullptr) {
         graph_->AddNodeToDistrict(found_node->id_, i);
         unused.erase(found_node->id_);
-        last_found[i] = found_node;
         if (changes != nullptr) {
           (*changes)[found_node->id_] = i;
         }
