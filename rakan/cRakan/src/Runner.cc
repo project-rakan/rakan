@@ -27,6 +27,8 @@ using std::unordered_map;
 using std::unordered_set;
 using std::vector;
 
+static bool IsValidBFSNode(rakan::Graph *g, uint32_t node_id, uint32_t district);
+
 namespace rakan {
 
 //////////////////////////////////////////////////////////////////////////////
@@ -584,12 +586,10 @@ Node *Runner::BFS(vector<uint32_t> *q,
     q->erase(std::find(q->begin(), q->end(), current_node_id));
     processed->insert(current_node_id);
 
-    if (graph_->nodes_[current_node_id]->district_ == district || 
-        graph_->nodes_[current_node_id]->district_ == graph_->num_districts_ + 1) {
+    if (IsValidBFSNode(graph_, current_node_id, district)) {
       for (auto neighbor : *graph_->GetNode(current_node_id)->GetNeighbors()) {
         if (std::find(processed->begin(), processed->end(), neighbor) == processed->end() &&
-            (graph_->nodes_[neighbor]->district_ == district ||
-            graph_->nodes_[neighbor]->district_ == graph_->num_districts_ + 1) &&
+            IsValidBFSNode(graph_, neighbor, district) &&
             std::find(q->begin(), q->end(), neighbor) == q->end()) {
           q->push_back(neighbor);
         }
@@ -601,3 +601,10 @@ Node *Runner::BFS(vector<uint32_t> *q,
 }
 
 }   // namespace rakan
+
+static bool IsValidBFSNode(rakan::Graph *g,
+                             uint32_t node_id,
+                             uint32_t district) {
+  return (g->GetNode(node_id)->GetDistrict() == district ||
+          g->GetNode(node_id)->GetDistrict() == g->GetNumDistricts() + 1);
+}
