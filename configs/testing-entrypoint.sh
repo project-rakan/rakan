@@ -19,8 +19,6 @@ su - postgres -c "psql -c \"ALTER USER $DATABASE_USER WITH SUPERUSER;\""
 # Start a build for the celery worker
 make build
 
-ls
-
 if [ $? -eq 0 ]
 then
   echo "Building Successful."
