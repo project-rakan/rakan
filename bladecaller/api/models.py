@@ -95,7 +95,7 @@ def create_visualization(sender, **kwargs):
     generatedMap = kwargs.get('instance')
 
     if kwargs['created']:
-        tasks.visualizeMap(generatedMap.id)
+        tasks.visualizeMap.delay(generatedMap.id)
 
 @receiver(post_save, sender=Job)
 def queue_new_job(sender, **kwargs):
@@ -105,5 +105,5 @@ def queue_new_job(sender, **kwargs):
     # start an engine in a different process
 
     if kwargs['created'] and not job.finished:
-        tasks.performMetropolisHastingsWalk(job.id)
+        tasks.performMetropolisHastingsWalk.delay(job.id)
         
