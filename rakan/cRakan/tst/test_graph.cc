@@ -300,6 +300,10 @@ static Graph* GraphNxN(uint32_t n) {
     // 
     // Where the graph nodes are fully formed and marked such that
     // district perimeters, crossing edges are all marked accordingly.
+    //
+    // Note that no matter the size, district number remains static at 4.
+    // Thus, the district pattern will remain consistent as a window style
+    // like shown above.
     return g;
 }
 }   // namespace rakan
