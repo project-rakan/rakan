@@ -188,6 +188,30 @@ TEST(Test_Graph, TestPerimNodesSimple) {
     }
 }
 
+TEST(Test_Graph, TestPerimNodesComplex) {
+    Graph* g = GraphNxN(100);
+    // Every node should have two neighbors on the edge and 
+    // four neighbors within the square
+    for (uint32_t i = 0; i < g->GetNumNodes(); i++) {
+        Node* n = g->GetNode(i);
+        std::unordered_set<uint32_t> * neighbors = n->GetNeighbors();
+        uint32_t Num_Neighbors = neighbors->size();
+        if (Num_Neighbors == 3 || Num_Neighbors == 2) {
+            // These are on the edges of the grid and should be
+            // perim nodes
+            ASSERT_TRUE(g->IsPerimNode(i));
+        }
+        // Go through all of the neighbors and see if there is a neighbor with
+        // a different district number. if so, this is a perim node.
+        std::unordered_set<uint32_t>::iterator itr = neighbors->begin();
+        for (; itr != neighbors->end(); itr++) {
+            if (g->GetNode(*itr)->GetDistrict() != n->GetDistrict()) {
+                ASSERT_TRUE(g->IsPerimNode(i));
+            }
+        }
+    }
+}
+
 // helper method to create a simple graph, 
 // must destruct graph when finished
 static Graph *createSimpleGraph() {
