@@ -323,7 +323,10 @@ class Runner {
   *
   * @return the pointer to the first node found in set; nullptr if not found
   */
-  Node* BFS(vector<uint32_t> *q, unordered_set<uint32_t> *processed, uint32_t district, unordered_set<uint32_t> *set);
+  Node* BFS(vector<uint32_t> *q,
+            unordered_set<uint32_t> *processed,
+            uint32_t district,
+            unordered_set<uint32_t> *set);
 
 
  private:

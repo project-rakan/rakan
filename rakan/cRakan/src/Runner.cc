@@ -1,8 +1,6 @@
-#ifndef TEST_MODE
-#define SEED std::chrono::system_clock::now().time_since_epoch().count()
-#endif
-
 #include "./Runner.h"
+
+#include <iostream>
 
 #include <math.h>               // for pow(), log(), fmin()
 #include <inttypes.h>           // for uint32_t, etc.
@@ -19,6 +17,10 @@
 #include "./ReturnCodes.h"      // for SUCCESS, READ_FAIL, SEEK_FAIL, etc.
 #include "./Graph.h"            // for class Graph
 #include "./Node.h"             // for class Node
+
+#ifndef TEST_MODE
+#define SEED std::chrono::system_clock::now().time_since_epoch().count()
+#endif
 
 using std::queue;
 using std::uniform_int_distribution;
@@ -116,6 +118,8 @@ unordered_set<Node *>* Runner::GenerateRandomSeeds() {
   vector<uint32_t> *changes = new vector<uint32_t>(graph_->num_nodes_);
   uniform_int_distribution<uint32_t> index(0, graph_->num_nodes_ - 1);
 
+  std::cout << "seed = " << SEED <<std::endl;
+
   for (i = 0; i < graph_->num_districts_; i++) {
     random_index = index(*generator_);
     if (std::find(random_indexes.begin(),
@@ -146,22 +150,20 @@ bool Runner::SpawnDistricts(unordered_set<Node *> *seed_nodes) {
   vector<uint32_t> *changes = nullptr;
   map<string, double> *scores = new map<string, double>;
   unordered_map<uint32_t, vector<uint32_t> *> queues;
-  unordered_map<uint32_t, unordered_set<uint32_t> *> processed;
+  unordered_set<uint32_t> *processed = new unordered_set<uint32_t>;
+  uint32_t i, check;
 
   if (!walk_changes_->empty()) {
     changes = (*walk_changes_)[0];
   }
 
-  for (uint32_t i = 0; i < graph_->num_nodes_; i++) {
+  for (i = 0; i < graph_->num_nodes_; i++) {
     node = graph_->nodes_[i];
     if (seed_nodes->find(node) != seed_nodes->end()) {
       unused.erase(i);
       last_found[node->district_] = node;
-      vector<uint32_t> *q = new vector<uint32_t>;
-      unordered_set<uint32_t> *p = new unordered_set<uint32_t>;
-      q->push_back(i);
-      queues[node->district_] = q;
-      processed[node->district_] = p;
+      queues[node->district_] = new vector<uint32_t>;
+      queues[node->district_]->push_back(i);
     } else {
       graph_->nodes_[i]->district_ = graph_->num_districts_ + 1;
       unused.insert(i);
@@ -169,10 +171,10 @@ bool Runner::SpawnDistricts(unordered_set<Node *> *seed_nodes) {
   }
 
   while (unused.size() > 0) {
-    uint32_t check = unused.size();
-    for (uint32_t i = 0; i < graph_->num_districts_; i++) {
-      found_node = BFS(queues[i], processed[i], i, &unused);
-      if (found_node != nullptr && !IsDistrictSevered(found_node, i)) {
+    check = unused.size();
+    for (i = 0; i < graph_->num_districts_; i++) {
+      found_node = BFS(queues[i], processed, i, &unused);
+      if (found_node != nullptr) {
         graph_->AddNodeToDistrict(found_node->id_, i);
         unused.erase(found_node->id_);
         last_found[i] = found_node;
@@ -568,7 +570,10 @@ bool Runner::IsDistrictConnected(uint32_t district_id) {
   return true;
 }
 
-Node *Runner::BFS(vector<uint32_t> *q, unordered_set<uint32_t> *processed, uint32_t district, unordered_set<uint32_t> *set) {
+Node *Runner::BFS(vector<uint32_t> *q,
+                  unordered_set<uint32_t> *processed,
+                  uint32_t district,
+                  unordered_set<uint32_t> *set) {
   uint32_t current_node_id;
   Node *current_node;
 
@@ -583,12 +588,15 @@ Node *Runner::BFS(vector<uint32_t> *q, unordered_set<uint32_t> *processed, uint3
     q->erase(std::find(q->begin(), q->end(), current_node_id));
     processed->insert(current_node_id);
 
-    for (auto neighbor : *graph_->GetNode(current_node_id)->GetNeighbors()) {
-      if (std::find(processed->begin(), processed->end(), neighbor) == processed->end() &&
-          (graph_->nodes_[neighbor]->district_ == district ||
-           graph_->nodes_[neighbor]->district_ == graph_->num_districts_ + 1) &&
-          std::find(q->begin(), q->end(), neighbor) == q->end()) {
-        q->push_back(neighbor);
+    if (graph_->nodes_[current_node_id]->district_ == district || 
+        graph_->nodes_[current_node_id]->district_ == graph_->num_districts_ + 1) {
+      for (auto neighbor : *graph_->GetNode(current_node_id)->GetNeighbors()) {
+        if (std::find(processed->begin(), processed->end(), neighbor) == processed->end() &&
+            (graph_->nodes_[neighbor]->district_ == district ||
+            graph_->nodes_[neighbor]->district_ == graph_->num_districts_ + 1) &&
+            std::find(q->begin(), q->end(), neighbor) == q->end()) {
+          q->push_back(neighbor);
+        }
       }
     }
   }

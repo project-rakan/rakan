@@ -1,7 +1,5 @@
 #include <inttypes.h>
 
-#include <iostream>
-
 #include "../src/Runner.h"
 #include "../src/Graph.h"
 #include "../src/Node.h"
@@ -921,26 +919,6 @@ TEST(Test_Runner, TestSeedHMap) {
 TEST(Test_Runner, TestSeed4x4Map) {
   Runner *r = Generate4x4Map(false);
   ASSERT_TRUE(r->seed());
-  // std::cout << "district 0 = [";
-  // for (auto id : *r->GetGraph()->GetNodesInDistrict(0)) {
-  //   std::cout << id << ",";
-  // }
-  // std::cout << "]" << std::endl;
-  // std::cout << "district 1 = [";
-  // for (auto id : *r->GetGraph()->GetNodesInDistrict(1)) {
-  //   std::cout << id << ",";
-  // }
-  // std::cout << "]" << std::endl;
-  // std::cout << "district 2 = [";
-  // for (auto id : *r->GetGraph()->GetNodesInDistrict(2)) {
-  //   std::cout << id << ",";
-  // }
-  // std::cout << "]" << std::endl;
-  // std::cout << "district 3 = [";
-  // for (auto id : *r->GetGraph()->GetNodesInDistrict(3)) {
-  //   std::cout << id << ",";
-  // }
-  // std::cout << "]" << std::endl;
   for (uint32_t i = 0; i < r->GetGraph()->GetNumDistricts(); i++) {
     ASSERT_TRUE(r->IsDistrictConnected(i));
   }
@@ -953,26 +931,6 @@ TEST(Test_Runner, TestSeed4x4Map) {
 TEST(Test_Runner, TestSeedIowaMap) {
   Runner *r = GenerateIowa();
   ASSERT_TRUE(r->seed());
-  // std::cout << "district 0 = [";
-  // for (auto id : *r->GetGraph()->GetNodesInDistrict(0)) {
-  //   std::cout << id << ",";
-  // }
-  // std::cout << "]" << std::endl;
-  // std::cout << "district 1 = [";
-  // for (auto id : *r->GetGraph()->GetNodesInDistrict(1)) {
-  //   std::cout << id << ",";
-  // }
-  // std::cout << "]" << std::endl;
-  // std::cout << "district 2 = [";
-  // for (auto id : *r->GetGraph()->GetNodesInDistrict(2)) {
-  //   std::cout << id << ",";
-  // }
-  // std::cout << "]" << std::endl;
-  // std::cout << "district 3 = [";
-  // for (auto id : *r->GetGraph()->GetNodesInDistrict(3)) {
-  //   std::cout << id << ",";
-  // }
-  // std::cout << "]" << std::endl;
   for (uint32_t i = 0; i < r->GetGraph()->GetNumDistricts(); i++) {
     ASSERT_TRUE(r->IsDistrictConnected(i));
   }
