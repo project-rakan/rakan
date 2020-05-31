@@ -9,6 +9,8 @@ namespace rakan {
 static Graph *createSimpleGraph();
 
 static Graph *createBigGraph();
+
+static Graph* GraphNxN(uint32_t n);
 /* 
  * Constructor Checks
  */
@@ -58,6 +60,7 @@ TEST(Test_Graph, TestMultipleContains) {
     ASSERT_EQ(g->ContainsNode(6), false);
     g->AddNode(6, 2, 2, 2);
     ASSERT_EQ(g->ContainsNode(6), true);
+    delete g;
 }
 
 
@@ -144,6 +147,241 @@ TEST(Test_Graph, TestDistrictRemoval) {
         g->RemoveNodeFromDistrict(i, i % 3);
         ASSERT_EQ(g->NodeExistsInDistrict(i, i % 3), false);
     }
+    delete g;
+}
+
+TEST(Test_Graph, TestDistrictPopulationBasic) {
+    // test with a basic 4x4 grid
+    Graph* g = GraphNxN(4);
+    ASSERT_TRUE(g->GetDistrictPop(0) == 40);
+    ASSERT_TRUE(g->GetDistrictPop(1) == 40);
+    ASSERT_TRUE(g->GetDistrictPop(2) == 40);
+    ASSERT_TRUE(g->GetDistrictPop(3) == 40);
+    ASSERT_TRUE(g->GetMinorityPop(0) == 20);
+    ASSERT_TRUE(g->GetMinorityPop(1) == 20);
+    ASSERT_TRUE(g->GetMinorityPop(2) == 20);
+    ASSERT_TRUE(g->GetMinorityPop(3) == 20);
+    delete g;
+}
+
+TEST(Test_Graph, TestDistrictPopulationHuge) {
+    // test with a 100x100 grid
+    Graph* g = GraphNxN(100);
+    ASSERT_TRUE(g->GetDistrictPop(0) == 25000);
+    ASSERT_TRUE(g->GetDistrictPop(1) == 25000);
+    ASSERT_TRUE(g->GetDistrictPop(2) == 25000);
+    ASSERT_TRUE(g->GetDistrictPop(3) == 25000);
+    ASSERT_TRUE(g->GetMinorityPop(0) == 12500);
+    ASSERT_TRUE(g->GetMinorityPop(1) == 12500);
+    ASSERT_TRUE(g->GetMinorityPop(2) == 12500);
+    ASSERT_TRUE(g->GetMinorityPop(3) == 12500);
+    delete g;
+}
+
+TEST(Test_Graph, TestPerimNodesSimple) {
+    Graph* g = GraphNxN(4);
+    // Every node should have two neighbors on the edge and 
+    // four neighbors within the square
+    for (uint32_t i = 0; i < g->GetNumNodes(); i++) {
+        ASSERT_TRUE(g->IsPerimNode(i));
+    }
+    delete g;
+}
+
+TEST(Test_Graph, TestPerimNodesComplex) {
+    Graph* g = GraphNxN(100);
+    // Every node should have two neighbors on the edge and 
+    // four neighbors within the square
+    for (uint32_t i = 0; i < g->GetNumNodes(); i++) {
+        Node* n = g->GetNode(i);
+        std::unordered_set<uint32_t> * neighbors = n->GetNeighbors();
+        uint32_t Num_Neighbors = neighbors->size();
+        if (Num_Neighbors == 3 || Num_Neighbors == 2) {
+            // These are on the edges of the grid and should be
+            // perim nodes
+            ASSERT_TRUE(g->IsPerimNode(i));
+        }
+        // Go through all of the neighbors and see if there is a neighbor with
+        // a different district number. if so, this is a perim node.
+        std::unordered_set<uint32_t>::iterator itr = neighbors->begin();
+        for (; itr != neighbors->end(); itr++) {
+            if (g->GetNode(*itr)->GetDistrict() != n->GetDistrict()) {
+                ASSERT_TRUE(g->IsPerimNode(i));
+            }
+        }
+    }
+    delete g;
+}
+
+TEST(Test_Graph, TestEdgeMarkComplex) {
+    Graph* g = GraphNxN(50);
+    unordered_set<Edge, EdgeHash>* Crossing_Edges = g->GetCrossingEdges();
+    // Every node should have two neighbors on the edge and 
+    // four neighbors within the square
+    unordered_set<Edge, EdgeHash>::iterator iter;
+    for (uint32_t i = 0; i < g->GetNumNodes(); i++) {
+        Node* n = g->GetNode(i);
+        std::unordered_set<uint32_t> * neighbors = n->GetNeighbors();
+        // Go through all of the neighbors and see if there is a neighbor with
+        // a different district number. This means that there should be a crossing
+        // edge marked between them.
+        std::unordered_set<uint32_t>::iterator itr = neighbors->begin();
+        for (; itr != neighbors->end(); itr++) {
+            if (g->GetNode(*itr)->GetDistrict() != n->GetDistrict()) {
+                bool check = false;
+                for (iter = Crossing_Edges->begin(); iter != Crossing_Edges->end(); iter++) {
+                    if ((iter->node1 == *itr && iter->node2 == i) || 
+                        (iter->node2 == *itr && iter->node1 == i)) {
+                            check = true;
+                        }
+                }
+                ASSERT_TRUE(check);
+            }
+        }
+    }
+    delete g;
+}
+
+TEST(Test_Graph, TestEdgeMarkSimple) {
+    Graph* g = GraphNxN(4);
+    unordered_set<Edge, EdgeHash>* Crossing_Edges = g->GetCrossingEdges();
+    // Every node should have two neighbors on the edge and 
+    // four neighbors within the square
+    unordered_set<Edge, EdgeHash>::iterator iter;
+    for (uint32_t i = 0; i < g->GetNumNodes(); i++) {
+        Node* n = g->GetNode(i);
+        std::unordered_set<uint32_t> * neighbors = n->GetNeighbors();
+        // Go through all of the neighbors and see if there is a neighbor with
+        // a different district number. This means that there should be a crossing
+        // edge marked between them.
+        std::unordered_set<uint32_t>::iterator itr = neighbors->begin();
+        for (; itr != neighbors->end(); itr++) {
+            if (g->GetNode(*itr)->GetDistrict() != n->GetDistrict()) {
+                bool check = false;
+                for (iter = Crossing_Edges->begin(); iter != Crossing_Edges->end(); iter++) {
+                    if ((iter->node1 == *itr && iter->node2 == i) || 
+                        (iter->node2 == *itr && iter->node1 == i)) {
+                            check = true;
+                        }
+                }
+                ASSERT_TRUE(check);
+            }
+        }
+    }
+    delete g;
+}
+
+TEST(Test_Graph, TestEdgeMarkMassive) {
+    Graph* g = GraphNxN(150);
+    unordered_set<Edge, EdgeHash>* Crossing_Edges = g->GetCrossingEdges();
+    // Every node should have two neighbors on the edge and 
+    // four neighbors within the square
+    unordered_set<Edge, EdgeHash>::iterator iter;
+    for (uint32_t i = 0; i < g->GetNumNodes(); i++) {
+        Node* n = g->GetNode(i);
+        std::unordered_set<uint32_t> * neighbors = n->GetNeighbors();
+        // Go through all of the neighbors and see if there is a neighbor with
+        // a different district number. This means that there should be a crossing
+        // edge marked between them.
+        std::unordered_set<uint32_t>::iterator itr = neighbors->begin();
+        for (; itr != neighbors->end(); itr++) {
+            if (g->GetNode(*itr)->GetDistrict() != n->GetDistrict()) {
+                bool check = false;
+                for (iter = Crossing_Edges->begin(); iter != Crossing_Edges->end(); iter++) {
+                    if ((iter->node1 == *itr && iter->node2 == i) || 
+                        (iter->node2 == *itr && iter->node1 == i)) {
+                            check = true;
+                        }
+                }
+                ASSERT_TRUE(check);
+            }
+        }
+    }
+    delete g;
+}
+
+
+TEST(Test_Graph, TestCorrectErrorPerim) {
+    Graph* g = GraphNxN(26);
+    uint32_t index = 27;
+    for (uint32_t j = 0; j < 11; j++) {
+        for(uint32_t i = 27; i < 38; i++) {
+            ASSERT_FALSE(g->IsPerimNode(i + (j*26)));
+        }
+        for (uint32_t i = 40; i < 51; i++) {
+            ASSERT_FALSE(g->IsPerimNode(i + (j*26)));
+        }
+    }
+    for (uint32_t j = 13; j < 24; j++) {
+        for(uint32_t i = 27; i < 38; i++) {
+            ASSERT_FALSE(g->IsPerimNode(i + (j*26)));
+        }
+        for (uint32_t i = 40; i < 51; i++) {
+            ASSERT_FALSE(g->IsPerimNode(i + (j*26)));
+        }
+    }
+
+    // Add all along top row
+    for (uint32_t i = 0; i < 26; i++) {
+        Node *n1 = g->GetNode(i);
+        ASSERT_FALSE(g->AddNodeToDistrictPerim(i, n1->GetDistrict()));
+    }
+    // Add all along bottom row
+    for (uint32_t i = (26*26) - 26; i < 26*26; i++) {
+        Node *n1 = g->GetNode(i);
+        ASSERT_FALSE(g->AddNodeToDistrictPerim(i, n1->GetDistrict()));
+    }
+    // Add all along leftmost column
+    for (uint32_t i = 0; i <= (26*26) - 26; i += 26) {
+        Node *n1 = g->GetNode(i);
+        ASSERT_FALSE(g->AddNodeToDistrictPerim(i, n1->GetDistrict()));
+    }
+    // Add all along rightmost column
+    for (uint32_t i = (26 - 1); i < (26*26); i += 26) {
+        Node *n1 = g->GetNode(i);
+        ASSERT_FALSE(g->AddNodeToDistrictPerim(i, n1->GetDistrict()));
+    }
+
+    for (int j = 0; j < 2; j++) {
+        // Remove all along top row
+        for (uint32_t i = 0; i < 26; i++) {
+            Node *n1 = g->GetNode(i);
+            if (j == 0) {
+                ASSERT_TRUE(g->RemoveNodeFromDistrictPerim(i, n1->GetDistrict()));
+            } else {
+                ASSERT_FALSE(g->RemoveNodeFromDistrictPerim(i, n1->GetDistrict()));
+            }
+        }
+        // Remove all along bottom row
+        for (uint32_t i = (26*26) - 26; i < 26*26; i++) {
+            Node *n1 = g->GetNode(i);
+            if (j == 0) {
+                ASSERT_TRUE(g->RemoveNodeFromDistrictPerim(i, n1->GetDistrict()));
+            } else {
+                ASSERT_FALSE(g->RemoveNodeFromDistrictPerim(i, n1->GetDistrict()));
+            }
+        }
+        // Remove all along leftmost column
+        for (uint32_t i = 0; i <= (26*26) - 26; i += 26) {
+            Node *n1 = g->GetNode(i);
+            if (j == 0 && i != 0 && i != 650) {
+                ASSERT_TRUE(g->RemoveNodeFromDistrictPerim(i, n1->GetDistrict()));
+            } else {
+                ASSERT_FALSE(g->RemoveNodeFromDistrictPerim(i, n1->GetDistrict()));
+            }
+        }
+        // Remove all along rightmost column
+        for (uint32_t i = 25; i < (26*26); i += 26) {
+            Node *n1 = g->GetNode(i);
+            if (j == 0 && i != 25 && i != 675) {
+                ASSERT_TRUE(g->RemoveNodeFromDistrictPerim(i, n1->GetDistrict()));
+            } else {
+                ASSERT_FALSE(g->RemoveNodeFromDistrictPerim(i, n1->GetDistrict()));
+            }
+        }
+    }
+
+    delete g;
 }
 
 // helper method to create a simple graph, 
@@ -159,7 +397,7 @@ static Graph *createSimpleGraph() {
     }
     return g;
 }
-// A helper method to create a graph
+
 static Graph *createBigGraph() {
     Graph *g = new Graph(60, 4);
     for (uint32_t i = 0; i < 60; i++) {
@@ -169,6 +407,115 @@ static Graph *createBigGraph() {
         g->AddEdge(i, i - 1);
         g->AddEdge(i, i + 1);
     }
+    return g;
+}
+
+// Creates a NxN grid where every node is connected 
+// vertically and horizontally. splits into 4 districts, and
+// n must be even and greater than 2.
+static Graph* GraphNxN(uint32_t n) {
+    Graph *g = new Graph(n * n, 4);
+    // Add in all nodes, each with 10 people inside them
+    for (uint32_t i = 0; i < n * n; i++) {
+        g->AddNode(i, i % 10, 5, 5);
+    }
+    // Go through each of the precincts and assign it to a district
+    uint32_t counter = 0;
+    uint32_t district = 0;
+    for (uint32_t i = 0; i < n ; i++) {
+        for (uint32_t j = 0; j < n / 2; j++) {
+            g->AddNodeToDistrict(counter, district);
+            counter++;
+        }
+        if (district == 0) {
+            district = 1;
+        } else {
+            district = 0;
+        }
+    }
+    district = 2;
+    for (uint32_t i = 0; i < n ; i++) {
+        for (uint32_t j = 0; j < n / 2; j++) {
+            g->AddNodeToDistrict(counter, district);
+            counter++;
+        }
+        if (district == 2) {
+            district = 3;
+        } else {
+            district = 2;
+        }
+    }
+
+    // Attach every node horizontally
+    for (uint32_t step = 0; step < n; step++) {
+        for (uint32_t i = 0; i < n - 1; i++) {
+            uint32_t first = i + (step * n);
+            uint32_t second = (i + 1) + (step * n);
+            Node *n1 = g->GetNode(first);
+            Node *n2 = g->GetNode(second);
+            g->AddEdge(first, second);
+            if (n1->GetDistrict() != n2->GetDistrict()) {
+                g->MarkCrossingEdge(first, second);
+                g->AddNodeToDistrictPerim(first, n1->GetDistrict());
+                g->AddNodeToDistrictPerim(second, n2->GetDistrict());
+            }
+        }
+    }
+    // Attach every node vertically
+    for (uint32_t offset = 0; offset < n; offset++) {
+        for (uint32_t i = 0; i < n - 1; i++) {
+            uint32_t first = offset + (i * n);
+            uint32_t second = offset + ((i + 1) * n);
+            Node *n1 = g->GetNode(first);
+            Node *n2 = g->GetNode(second);
+            g->AddEdge(first, second);
+            if (n1->GetDistrict() != n2->GetDistrict()) {
+                g->MarkCrossingEdge(first, second);
+                // Will add corner nodes twice to perim list but
+                // should not add to actual list and just return false
+                g->AddNodeToDistrictPerim(first, n1->GetDistrict());
+                g->AddNodeToDistrictPerim(second, n2->GetDistrict());
+            }
+        }
+    }
+    // Add all outmost edge nodes as Perim nodes
+
+    // Add all along top row
+    for (uint32_t i = 0; i < n; i++) {
+        Node *n1 = g->GetNode(i);
+        g->AddNodeToDistrictPerim(i, n1->GetDistrict());
+    }
+    // Add all along bottom row
+    for (uint32_t i = (n*n) - n; i < n*n; i++) {
+        Node *n1 = g->GetNode(i);
+        g->AddNodeToDistrictPerim(i, n1->GetDistrict());
+    }
+    // Add all along leftmost column
+    for (uint32_t i = 0; i <= (n*n) - n; i += n) {
+        Node *n1 = g->GetNode(i);
+        g->AddNodeToDistrictPerim(i, n1->GetDistrict());
+    }
+    // Add all along rightmost column
+    for (uint32_t i = (n - 1); i < (n*n); i += n) {
+        Node *n1 = g->GetNode(i);
+        g->AddNodeToDistrictPerim(i, n1->GetDistrict());
+    }
+    // Say that n = 4, then the graph would be
+    // organized as the following:
+    // 0 - 1 - 2 - 3
+    // | 0 |   | 1 |
+    // 4 - 5 - 6 - 7
+    // |   |   |   |
+    // 8 - 9 -10 - 11
+    // | 2 |   | 3 |
+    // 12- 13- 14- 15
+    // 
+    // Where the graph nodes are fully formed and marked such that
+    // district perimeters, crossing edges are all marked accordingly.
+    //
+    // Note that no matter the size, district number remains static at 4.
+    // Thus, the district pattern will remain consistent as a window style
+    // like shown above.
     return g;
 }
 }   // namespace rakan

@@ -3,6 +3,7 @@
 
 #include <inttypes.h>         // for uint32_t, uint16_t, etc.
 
+#include <queue>              // for std::queue
 #include <random>             // for std::default_random_engine
 #include <string>             // for std::string
 #include <unordered_map>      // for std::unordered_map
@@ -12,6 +13,7 @@
 #include "./Graph.h"          // for Graph class
 #include "./Node.h"           // for Node class
 
+using std::queue;
 using std::string;
 using std::unordered_set;
 using std::unordered_map;
@@ -323,7 +325,10 @@ class Runner {
   *
   * @return the pointer to the first node found in set; nullptr if not found
   */
-  Node *BFS(Node *start, unordered_set<uint32_t> *set);
+  Node* BFS(vector<uint32_t> *q,
+            unordered_set<uint32_t> *processed,
+            uint32_t district,
+            unordered_set<uint32_t> *set);
 
 
  private:
