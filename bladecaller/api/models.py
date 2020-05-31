@@ -39,7 +39,7 @@ class State(models.Model):
     @property
     def df(self):
         table = {'geoid': [], 'geometry': [], 'district': [], 'engine_id': []}
-        for vtd in self.vtds.all():
+        for vtd in self.vtds.all().order_by('engine_id'):
             table['geometry'].append(wkt.loads(vtd.geometry.wkt))
             table['geoid'].append(vtd.geoid)
             table['district'].append(vtd.district.district_id)
@@ -105,5 +105,5 @@ def queue_new_job(sender, **kwargs):
     # start an engine in a different process
 
     if kwargs['created'] and not job.finished:
-        tasks.performMetropolisHastingsWalk.delay(job.id)
+        tasks.performMetropolisHastingsWalk(job.id)
         
