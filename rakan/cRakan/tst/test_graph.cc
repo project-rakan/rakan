@@ -1,5 +1,4 @@
 #include <inttypes.h>
-#include <iostream>
 
 #include "../src/Graph.h"
 #include "../src/Node.h"
@@ -215,7 +214,7 @@ TEST(Test_Graph, TestPerimNodesComplex) {
 }
 
 TEST(Test_Graph, TestEdgeMarkComplex) {
-    Graph* g = GraphNxN(100);
+    Graph* g = GraphNxN(50);
     unordered_set<Edge, EdgeHash>* Crossing_Edges = g->GetCrossingEdges();
     // Every node should have two neighbors on the edge and 
     // four neighbors within the square
@@ -273,7 +272,7 @@ TEST(Test_Graph, TestEdgeMarkSimple) {
 }
 
 TEST(Test_Graph, TestEdgeMarkMassive) {
-    Graph* g = GraphNxN(200);
+    Graph* g = GraphNxN(150);
     unordered_set<Edge, EdgeHash>* Crossing_Edges = g->GetCrossingEdges();
     // Every node should have two neighbors on the edge and 
     // four neighbors within the square
@@ -298,6 +297,90 @@ TEST(Test_Graph, TestEdgeMarkMassive) {
             }
         }
     }
+    delete g;
+}
+
+
+TEST(Test_Graph, TestCorrectErrorPerim) {
+    Graph* g = GraphNxN(26);
+    uint32_t index = 27;
+    for (uint32_t j = 0; j < 11; j++) {
+        for(uint32_t i = 27; i < 38; i++) {
+            ASSERT_FALSE(g->IsPerimNode(i + (j*26)));
+        }
+        for (uint32_t i = 40; i < 51; i++) {
+            ASSERT_FALSE(g->IsPerimNode(i + (j*26)));
+        }
+    }
+    for (uint32_t j = 13; j < 24; j++) {
+        for(uint32_t i = 27; i < 38; i++) {
+            ASSERT_FALSE(g->IsPerimNode(i + (j*26)));
+        }
+        for (uint32_t i = 40; i < 51; i++) {
+            ASSERT_FALSE(g->IsPerimNode(i + (j*26)));
+        }
+    }
+
+    // Add all along top row
+    for (uint32_t i = 0; i < 26; i++) {
+        Node *n1 = g->GetNode(i);
+        ASSERT_FALSE(g->AddNodeToDistrictPerim(i, n1->GetDistrict()));
+    }
+    // Add all along bottom row
+    for (uint32_t i = (26*26) - 26; i < 26*26; i++) {
+        Node *n1 = g->GetNode(i);
+        ASSERT_FALSE(g->AddNodeToDistrictPerim(i, n1->GetDistrict()));
+    }
+    // Add all along leftmost column
+    for (uint32_t i = 0; i <= (26*26) - 26; i += 26) {
+        Node *n1 = g->GetNode(i);
+        ASSERT_FALSE(g->AddNodeToDistrictPerim(i, n1->GetDistrict()));
+    }
+    // Add all along rightmost column
+    for (uint32_t i = (26 - 1); i < (26*26); i += 26) {
+        Node *n1 = g->GetNode(i);
+        ASSERT_FALSE(g->AddNodeToDistrictPerim(i, n1->GetDistrict()));
+    }
+
+    for (int j = 0; j < 2; j++) {
+        // Remove all along top row
+        for (uint32_t i = 0; i < 26; i++) {
+            Node *n1 = g->GetNode(i);
+            if (j == 0) {
+                ASSERT_TRUE(g->RemoveNodeFromDistrictPerim(i, n1->GetDistrict()));
+            } else {
+                ASSERT_FALSE(g->RemoveNodeFromDistrictPerim(i, n1->GetDistrict()));
+            }
+        }
+        // Remove all along bottom row
+        for (uint32_t i = (26*26) - 26; i < 26*26; i++) {
+            Node *n1 = g->GetNode(i);
+            if (j == 0) {
+                ASSERT_TRUE(g->RemoveNodeFromDistrictPerim(i, n1->GetDistrict()));
+            } else {
+                ASSERT_FALSE(g->RemoveNodeFromDistrictPerim(i, n1->GetDistrict()));
+            }
+        }
+        // Remove all along leftmost column
+        for (uint32_t i = 0; i <= (26*26) - 26; i += 26) {
+            Node *n1 = g->GetNode(i);
+            if (j == 0 && i != 0 && i != 650) {
+                ASSERT_TRUE(g->RemoveNodeFromDistrictPerim(i, n1->GetDistrict()));
+            } else {
+                ASSERT_FALSE(g->RemoveNodeFromDistrictPerim(i, n1->GetDistrict()));
+            }
+        }
+        // Remove all along rightmost column
+        for (uint32_t i = 25; i < (26*26); i += 26) {
+            Node *n1 = g->GetNode(i);
+            if (j == 0 && i != 25 && i != 675) {
+                ASSERT_TRUE(g->RemoveNodeFromDistrictPerim(i, n1->GetDistrict()));
+            } else {
+                ASSERT_FALSE(g->RemoveNodeFromDistrictPerim(i, n1->GetDistrict()));
+            }
+        }
+    }
+
     delete g;
 }
 
