@@ -1,7 +1,3 @@
-#ifndef TEST_MODE
-#define SEED std::chrono::system_clock::now().time_since_epoch().count()
-#endif
-
 #include "./Runner.h"
 
 #include <math.h>               // for pow(), log(), fmin()
@@ -20,12 +16,18 @@
 #include "./Graph.h"            // for class Graph
 #include "./Node.h"             // for class Node
 
+#ifndef TEST_MODE
+#define SEED std::chrono::system_clock::now().time_since_epoch().count()
+#endif
+
 using std::queue;
 using std::uniform_int_distribution;
 using std::uniform_real_distribution;
 using std::unordered_map;
 using std::unordered_set;
 using std::vector;
+
+static bool IsValidBFSNode(rakan::Graph *g, uint32_t node_id, uint32_t district);
 
 namespace rakan {
 
@@ -141,20 +143,23 @@ unordered_set<Node *>* Runner::GenerateRandomSeeds() {
 
 bool Runner::SpawnDistricts(unordered_set<Node *> *seed_nodes) {
   unordered_set<uint32_t> unused;
-  unordered_map<int, Node *> last_found;
   Node *node, *found_node;
   vector<uint32_t> *changes = nullptr;
   map<string, double> *scores = new map<string, double>;
+  unordered_map<uint32_t, vector<uint32_t> *> queues;
+  unordered_set<uint32_t> *processed = new unordered_set<uint32_t>;
+  uint32_t i, check;
 
   if (!walk_changes_->empty()) {
     changes = (*walk_changes_)[0];
   }
 
-  for (uint32_t i = 0; i < graph_->num_nodes_; i++) {
+  for (i = 0; i < graph_->num_nodes_; i++) {
     node = graph_->nodes_[i];
     if (seed_nodes->find(node) != seed_nodes->end()) {
       unused.erase(i);
-      last_found[node->district_] = node;
+      queues[node->district_] = new vector<uint32_t>;
+      queues[node->district_]->push_back(i);
     } else {
       graph_->nodes_[i]->district_ = graph_->num_districts_ + 1;
       unused.insert(i);
@@ -162,13 +167,12 @@ bool Runner::SpawnDistricts(unordered_set<Node *> *seed_nodes) {
   }
 
   while (unused.size() > 0) {
-    uint32_t check = unused.size();
-    for (uint32_t i = 0; i < graph_->num_districts_; i++) {
-      found_node = BFS(last_found[i], &unused);
+    check = unused.size();
+    for (i = 0; i < graph_->num_districts_; i++) {
+      found_node = BFS(queues[i], processed, i, &unused);
       if (found_node != nullptr) {
         graph_->AddNodeToDistrict(found_node->id_, i);
         unused.erase(found_node->id_);
-        last_found[i] = found_node;
         if (changes != nullptr) {
           (*changes)[found_node->id_] = i;
         }
@@ -561,27 +565,31 @@ bool Runner::IsDistrictConnected(uint32_t district_id) {
   return true;
 }
 
-Node *Runner::BFS(Node *start, unordered_set<uint32_t> *set) {
+Node *Runner::BFS(vector<uint32_t> *q,
+                  unordered_set<uint32_t> *processed,
+                  uint32_t district,
+                  unordered_set<uint32_t> *set) {
+  uint32_t current_node_id;
   Node *current_node;
-  unordered_set<Node *> processed;
-  queue<Node *> q;
-  q.push(start);
 
-  while (!q.empty()) {
-    current_node = q.front();
-    q.pop();
+  while (!q->empty()) {
+    current_node_id = q->front();
 
-    if (set->find(current_node->id_) != set->end()) {
-      return current_node;
+    if (set->find(current_node_id) != set->end()) {
+      return graph_->GetNode(current_node_id);
     }
 
-    processed.insert(current_node);
-    for (auto neighbor : *current_node->GetNeighbors()) {
-      if (std::find(processed.begin(),
-                    processed.end(),
-                    graph_->GetNode(neighbor)) == processed.end() &&
-          !IsDistrictSevered(graph_->nodes_[neighbor], start->district_)) {
-        q.push(graph_->GetNode(neighbor));
+    current_node = graph_->GetNode(current_node_id);
+    q->erase(std::find(q->begin(), q->end(), current_node_id));
+    processed->insert(current_node_id);
+
+    if (IsValidBFSNode(graph_, current_node_id, district)) {
+      for (auto neighbor : *graph_->GetNode(current_node_id)->GetNeighbors()) {
+        if (std::find(processed->begin(), processed->end(), neighbor) == processed->end() &&
+            IsValidBFSNode(graph_, neighbor, district) &&
+            std::find(q->begin(), q->end(), neighbor) == q->end()) {
+          q->push_back(neighbor);
+        }
       }
     }
   }
@@ -590,3 +598,10 @@ Node *Runner::BFS(Node *start, unordered_set<uint32_t> *set) {
 }
 
 }   // namespace rakan
+
+static bool IsValidBFSNode(rakan::Graph *g,
+                             uint32_t node_id,
+                             uint32_t district) {
+  return (g->GetNode(node_id)->GetDistrict() == district ||
+          g->GetNode(node_id)->GetDistrict() == g->GetNumDistricts() + 1);
+}

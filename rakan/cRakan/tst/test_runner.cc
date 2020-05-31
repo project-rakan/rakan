@@ -1,7 +1,5 @@
 #include <inttypes.h>
 
-#include <iostream>
-
 #include "../src/Runner.h"
 #include "../src/Graph.h"
 #include "../src/Node.h"
@@ -921,6 +919,9 @@ TEST(Test_Runner, TestSeedHMap) {
 TEST(Test_Runner, TestSeed4x4Map) {
   Runner *r = Generate4x4Map(false);
   ASSERT_TRUE(r->seed());
+  for (uint32_t i = 0; i < r->GetGraph()->GetNumDistricts(); i++) {
+    ASSERT_TRUE(r->IsDistrictConnected(i));
+  }
   for (uint32_t i = 0; i < r->GetGraph()->GetNumDistricts(); i++) {
     ASSERT_TRUE(r->IsDistrictConnected(i));
   }
