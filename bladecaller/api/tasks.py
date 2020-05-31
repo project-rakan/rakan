@@ -49,10 +49,17 @@ def performMetropolisHastingsWalk(jobId: int):
 def visualizeMap(generatedMapId: int):
     generatedMap = GeneratedMap.objects.get(id=generatedMapId)
     df = generatedMap.df
-    df.boundary.plot()
+    df['coords'] = df['geometry'].apply(lambda x: x.representative_point().coords[:])
+    df['coords'] = [coords[0] for coords in df['coords']]
+    df.boundary.plot(
+        label=True,
+        figsize=(15,10),
+    )
     df.plot(column='district')
-    plt.legend('district')
     filepath = os.path.join(RAKAN_STATE_VISUALIZATIONS, f"{generatedMap.id}.png")
+    for idx, row in df.iterrows():
+        plt.annotate(s=idx, xy=row['coords'], horizontalalignment='center')
     plt.savefig(filepath)
+    plt.close()
     generatedMap.visualization = f"/images/{generatedMap.id}.png"
     generatedMap.save()
