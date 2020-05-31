@@ -109,7 +109,7 @@ class Graph {
 
   /**
    * Marks the edge between the two supplied nodes as crossing. There must
-   * not exist an edge between node1 and node2 and their districts must be
+   * exist an edge between node1 and node2 and their districts must be
    * different.
    * 
    * @param   node1   the crossing neighbor of node2
@@ -161,7 +161,7 @@ class Graph {
   * @param      district    the district to add the perimeter node to
   * 
   * @return true iff node exists in district and addition to perim nodes list
-  *         successful, false otherwise
+  *         successful, false if node is already in perim list.
   */
   bool AddNodeToDistrictPerim(uint32_t node, uint32_t district);
 
