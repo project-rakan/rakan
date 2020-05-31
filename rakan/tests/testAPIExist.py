@@ -15,7 +15,6 @@ class testAPIExist(unittest.TestCase):
         self.assertTrue(hasattr(self.engineClass, "seed"))
         self.assertTrue(hasattr(self.engineClass, "walk"))
         self.assertTrue(hasattr(self.engineClass, "districts"))
-        self.assertTrue(hasattr(self.engineClass, "visualize"))
 
     def test_canLoad(self):
         "Test that this class can be instantiated"
