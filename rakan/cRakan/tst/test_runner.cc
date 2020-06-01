@@ -1,5 +1,8 @@
 #include <inttypes.h>
 
+#include <chrono>               // for system_clock:now()
+#include <iostream>
+
 #include "../src/Runner.h"
 #include "../src/Graph.h"
 #include "../src/Node.h"
@@ -794,23 +797,29 @@ TEST(Test_Runner, TestRedistrictHourglassMap) {
   delete r;
 }
 
-TEST(Test_Runner, TestSeveredDistrictSimple) {
-  // r has 7 precincts, 3 districts
-  // draws out an H shape
-  Runner *r = GenerateHMap(true);
-  ASSERT_TRUE(r->IsDistrictSevered(r->GetGraph()->GetNode(0), 1));
-  ASSERT_TRUE(r->IsDistrictSevered(r->GetGraph()->GetNode(1), 1));
-  ASSERT_TRUE(r->IsDistrictSevered(r->GetGraph()->GetNode(2), 1));
-  ASSERT_FALSE(r->IsDistrictSevered(r->GetGraph()->GetNode(3), 0));
-  ASSERT_FALSE(r->IsDistrictSevered(r->GetGraph()->GetNode(3), 2));
-  ASSERT_TRUE(r->IsDistrictSevered(r->GetGraph()->GetNode(4), 0));
-  ASSERT_TRUE(r->IsDistrictSevered(r->GetGraph()->GetNode(5), 1));
-  ASSERT_TRUE(r->IsDistrictSevered(r->GetGraph()->GetNode(6), 0));
+// TEST(Test_Runner, TestValidRedistrictingHMap) {
+//   // r has 7 precincts, 3 districts
+//   // draws out an H shape
+//   Runner *r = GenerateHMap(true);
+//   Graph *g = r->GetGraph();
 
-  delete r;
-}
+//   // Disconnected districts
+//   ASSERT_FALSE(r->IsValidRedistricting(g->GetNode(0), g->GetNode(3));
+//   ASSERT_FALSE(r->IsValidRedistricting(g->GetNode(0), g->GetNode(4));
+//   ASSERT_FALSE(r->IsValidRedistricting(g->GetNode(0), g->GetNode(3));
+//   ASSERT_FALSE(r->IsValidRedistricting(g->GetNode(0), g->GetNode(3));
+//   ASSERT_TRUE(r->IsDistrictSevered(r->GetGraph()->GetNode(1), 1));
+//   ASSERT_FALSE(r->IsDistrictSevered(r->GetGraph()->GetNode(2), 1));
+//   ASSERT_FALSE(r->IsDistrictSevered(r->GetGraph()->GetNode(3), 0));
+//   ASSERT_FALSE(r->IsDistrictSevered(r->GetGraph()->GetNode(3), 2));
+//   ASSERT_TRUE(r->IsDistrictSevered(r->GetGraph()->GetNode(4), 0));
+//   ASSERT_TRUE(r->IsDistrictSevered(r->GetGraph()->GetNode(5), 1));
+//   ASSERT_TRUE(r->IsDistrictSevered(r->GetGraph()->GetNode(6), 0));
 
-TEST(Test_Runner, TestIsValidRedistricting) {
+//   delete r;
+// }
+
+TEST(Test_Runner, TestValidRedistricting4x4Map) {
   // r has 16 precincts, 4 districts
   // draws out a 4x4 square with 4 quadrants
   Runner *r = Generate4x4Map(true);
@@ -1419,5 +1428,37 @@ TEST(Test_Runner, TestWalkOneThousandSteps) {
   delete r1;
   delete r2;
 }
+
+// TEST(Test_Runner, TestWalkLargeMap) {
+//   uint32_t i;
+//   unsigned start_time, end_time;
+
+//   Runner r(8000, 10);
+//   for (i = 0; i < 8000; i++) {
+//     r.add_node(i, 0, 0, 0);
+//   }
+//   for (i = 0; i < 7997; i++) {
+//     r.add_edge(i, i+1);
+//     r.add_edge(i, i+2);
+//     r.add_edge(i, i+3);
+//   }
+
+//   std::cout << "Seeding large map..." << std::endl;
+//   start_time = std::chrono::system_clock::now().time_since_epoch().count();
+//   r.seed();
+//   end_time = std::chrono::system_clock::now().time_since_epoch().count();
+//   std::cout << "Finished seeding... (" << end_time - start_time << " ms)" << std::endl;
+
+//   std::cout << "Walking large map..." << std::endl;
+//   start_time = std::chrono::system_clock::now().time_since_epoch().count();
+//   r.Walk(10, 0, 0, 0, 0);
+//   end_time = std::chrono::system_clock::now().time_since_epoch().count();
+//   std::cout << "Finished walk... (" << end_time - start_time << " ms)" << std::endl;
+
+//   for (i = 0; i < 10; i++) {
+//     std::cout << "Checking if district " << i << " is connected..." << std::endl;
+//     ASSERT_TRUE(r.IsDistrictConnected(i));
+//   }
+// }
 
 }     // namespace rakan

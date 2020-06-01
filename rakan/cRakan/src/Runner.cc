@@ -1,5 +1,7 @@
 #include "./Runner.h"
 
+#include <iostream>
+
 #include <math.h>               // for pow(), log(), fmin()
 #include <inttypes.h>           // for uint32_t, etc.
 #include <stdlib.h>             // for rand()
@@ -441,26 +443,26 @@ bool Runner::IsDistrictSevered(Node *proposed_node, uint32_t new_district) {
     }
   }
 
-  graph_->AddNodeToDistrict(proposed_node->id_, new_district);
-  unordered_set<uint32_t> *nodes = graph_->GetNodesInDistrict(new_district);
-  unordered_set<uint32_t>::iterator itr = nodes->begin();
-  Node *first, *second;
+  // graph_->AddNodeToDistrict(proposed_node->id_, new_district);
+  // unordered_set<uint32_t> *nodes = graph_->GetNodesInDistrict(new_district);
+  // unordered_set<uint32_t>::iterator itr = nodes->begin();
+  // Node *first, *second;
 
-  if (nodes->size() > 1) {
-    while (1) {
-      first = graph_->GetNode(*itr);
-      if (itr == nodes->end() || ++itr == nodes->end()) {
-        break;
-      }
-      second = graph_->GetNode(*itr);
-      if (!DoesPathExist(first, second)) {
-        graph_->RemoveNodeFromDistrict(proposed_node->id_, new_district);
-        proposed_node->district_ = old_district;
-        return true;
-      }
-    }
-  }
-  graph_->RemoveNodeFromDistrict(proposed_node->id_, new_district);
+  // if (nodes->size() > 1) {
+  //   while (1) {
+  //     first = graph_->GetNode(*itr);
+  //     if (itr == nodes->end() || ++itr == nodes->end()) {
+  //       break;
+  //     }
+  //     second = graph_->GetNode(*itr);
+  //     if (!DoesPathExist(first, second)) {
+  //       graph_->RemoveNodeFromDistrict(proposed_node->id_, new_district);
+  //       proposed_node->district_ = old_district;
+  //       return true;
+  //     }
+  //   }
+  // }
+  // graph_->RemoveNodeFromDistrict(proposed_node->id_, new_district);
 
   proposed_node->district_ = old_district;
   return false;
