@@ -8,6 +8,8 @@ import os
 import matplotlib.pyplot as plt
 from bladecaller.settings import RAKAN_STATE_VISUALIZATIONS
 
+import hashlib
+
 @shared_task
 def performMetropolisHastingsWalk(jobId: int):
     job = Job.objects.get(id=jobId)
@@ -18,10 +20,14 @@ def performMetropolisHastingsWalk(jobId: int):
     scores = engine.getScores()
 
     # Generate the seed
+    generatedMap = maps[0]
+    mapHash = hashlib.md5(" ".join([str(_) for _ in generatedMap]).encode()).hexdigest()
     try:
+        generatedMap = maps[0]
         mapModel = GeneratedMap.objects.create(
             state=job.state,
-            mapContents=maps[0],
+            mapContents=generatedMap,
+            md5Hash=mapHash,
             compactness=scores[0][b'compact'],
             vra=scores[0][b'vra'],
             distribution=scores[0][b'distribution'],
@@ -29,7 +35,7 @@ def performMetropolisHastingsWalk(jobId: int):
         )
     except IntegrityError as e:
         mapModel = GeneratedMap.objects.get(
-            mapContents=maps[0]
+            md5Hash=mapHash
         )
     
     job.generatedMaps.add(mapModel)
@@ -40,10 +46,12 @@ def performMetropolisHastingsWalk(jobId: int):
     scores = engine.getScores()[1:]
 
     for map_, score_ in zip(maps, scores):
+        mapHash = hashlib.md5(" ".join([str(_) for _ in map_]).encode()).hexdigest()
         try:
             mapModel = GeneratedMap.objects.create(
                 state=job.state,
                 mapContents=map_,
+                md5Hash=mapHash,
                 compactness=score_[b'compact'],
                 vra=score_[b'vra'],
                 distribution=score_[b'distribution'],
@@ -51,7 +59,7 @@ def performMetropolisHastingsWalk(jobId: int):
             )
         except IntegrityError:
             mapModel = GeneratedMap.objects.get(
-                mapContents=map_
+                md5Hash=mapHash,
             )
         job.generatedMaps.add(mapModel)
 
