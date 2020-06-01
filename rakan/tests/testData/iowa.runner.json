@@ -1,0 +1,1387 @@
+{
+    "stCode": "IA",
+    "numPrecincts": 99,
+    "numDistricts": 4,
+    "precincts": [
+        {
+            "precID": 0,
+            "area": 1477002172,
+            "neighbors": [
+                1,
+                4,
+                14,
+                24,
+                38,
+                60,
+                87
+            ],
+            "minPopulation": 246,
+            "majPopulation": 15116
+        },
+        {
+            "precID": 1,
+            "area": 1102054158,
+            "neighbors": [
+                0,
+                14,
+                68,
+                72,
+                79,
+                86,
+                87
+            ],
+            "minPopulation": 153,
+            "majPopulation": 7902
+        },
+        {
+            "precID": 2,
+            "area": 1706209660,
+            "neighbors": [
+                21,
+                32,
+                95
+            ],
+            "minPopulation": 1152,
+            "majPopulation": 27499
+        },
+        {
+            "precID": 3,
+            "area": 1337065464,
+            "neighbors": [
+                25,
+                58,
+                67,
+                89,
+                92
+            ],
+            "minPopulation": 597,
+            "majPopulation": 25170
+        },
+        {
+            "precID": 4,
+            "area": 1148416704,
+            "neighbors": [
+                0,
+                13,
+                14,
+                23,
+                38,
+                82
+            ],
+            "minPopulation": 172,
+            "majPopulation": 12066
+        },
+        {
+            "precID": 5,
+            "area": 1860878076,
+            "neighbors": [
+                6,
+                9,
+                47,
+                51,
+                56,
+                78,
+                85
+            ],
+            "minPopulation": 1008,
+            "majPopulation": 51155
+        },
+        {
+            "precID": 6,
+            "area": 1483231958,
+            "neighbors": [
+                5,
+                8,
+                9,
+                11,
+                32,
+                37,
+                85
+            ],
+            "minPopulation": 37749,
+            "majPopulation": 224429
+        },
+        {
+            "precID": 7,
+            "area": 1485721668,
+            "neighbors": [
+                24,
+                36,
+                39,
+                76,
+                84,
+                93
+            ],
+            "minPopulation": 1594,
+            "majPopulation": 51037
+        },
+        {
+            "precID": 8,
+            "area": 1138052051,
+            "neighbors": [
+                6,
+                9,
+                11,
+                18,
+                32,
+                33
+            ],
+            "minPopulation": 1339,
+            "majPopulation": 47196
+        },
+        {
+            "precID": 9,
+            "area": 1484362482,
+            "neighbors": [
+                5,
+                6,
+                8,
+                21,
+                27,
+                32,
+                56
+            ],
+            "minPopulation": 897,
+            "majPopulation": 41015
+        },
+        {
+            "precID": 10,
+            "area": 1502780705,
+            "neighbors": [
+                12,
+                17,
+                20,
+                46,
+                70,
+                73,
+                75,
+                80
+            ],
+            "minPopulation": 7837,
+            "majPopulation": 32681
+        },
+        {
+            "precID": 11,
+            "area": 1506745752,
+            "neighbors": [
+                6,
+                8,
+                16,
+                18,
+                33,
+                34,
+                37,
+                41
+            ],
+            "minPopulation": 458,
+            "majPopulation": 29277
+        },
+        {
+            "precID": 12,
+            "area": 1481769516,
+            "neighbors": [
+                10,
+                13,
+                36,
+                75,
+                80,
+                93
+            ],
+            "minPopulation": 278,
+            "majPopulation": 19045
+        },
+        {
+            "precID": 13,
+            "area": 1476980432,
+            "neighbors": [
+                4,
+                12,
+                23,
+                36,
+                38,
+                80,
+                82
+            ],
+            "minPopulation": 1121,
+            "majPopulation": 40499
+        },
+        {
+            "precID": 14,
+            "area": 1463209640,
+            "neighbors": [
+                0,
+                1,
+                4,
+                38,
+                68,
+                77,
+                82
+            ],
+            "minPopulation": 629,
+            "majPopulation": 27270
+        },
+        {
+            "precID": 15,
+            "area": 1507116586,
+            "neighbors": [
+                22,
+                51,
+                52,
+                56,
+                69,
+                81
+            ],
+            "minPopulation": 814,
+            "majPopulation": 36181
+        },
+        {
+            "precID": 16,
+            "area": 1489549983,
+            "neighbors": [
+                11,
+                33,
+                34,
+                40,
+                65,
+                94,
+                97,
+                98
+            ],
+            "minPopulation": 4363,
+            "majPopulation": 83922
+        },
+        {
+            "precID": 17,
+            "area": 1494603627,
+            "neighbors": [
+                10,
+                20,
+                46,
+                70,
+                74,
+                80,
+                83,
+                96
+            ],
+            "minPopulation": 807,
+            "majPopulation": 23331
+        },
+        {
+            "precID": 18,
+            "area": 1309648063,
+            "neighbors": [
+                8,
+                11,
+                32,
+                33,
+                44,
+                65,
+                95
+            ],
+            "minPopulation": 636,
+            "majPopulation": 24238
+        },
+        {
+            "precID": 19,
+            "area": 1118240819,
+            "neighbors": [
+                26,
+                58,
+                60,
+                79,
+                87,
+                90,
+                92
+            ],
+            "minPopulation": 1059,
+            "majPopulation": 17517
+        },
+        {
+            "precID": 20,
+            "area": 1483006144,
+            "neighbors": [
+                10,
+                17,
+                29,
+                31,
+                70,
+                71,
+                73,
+                75
+            ],
+            "minPopulation": 1180,
+            "majPopulation": 32153
+        },
+        {
+            "precID": 21,
+            "area": 2052991662,
+            "neighbors": [
+                2,
+                9,
+                27,
+                30,
+                32,
+                95
+            ],
+            "minPopulation": 789,
+            "majPopulation": 35453
+        },
+        {
+            "precID": 22,
+            "area": 1839345595,
+            "neighbors": [
+                15,
+                48,
+                52,
+                81
+            ],
+            "minPopulation": 5915,
+            "majPopulation": 92268
+        },
+        {
+            "precID": 23,
+            "area": 1851937185,
+            "neighbors": [
+                4,
+                13,
+                42,
+                46,
+                66,
+                80,
+                82,
+                96
+            ],
+            "minPopulation": 5846,
+            "majPopulation": 28334
+        },
+        {
+            "precID": 24,
+            "area": 1532492297,
+            "neighbors": [
+                0,
+                7,
+                36,
+                38,
+                60,
+                76,
+                90
+            ],
+            "minPopulation": 10315,
+            "majPopulation": 121944
+        },
+        {
+            "precID": 25,
+            "area": 1307566037,
+            "neighbors": [
+                3,
+                50,
+                67,
+                88,
+                89
+            ],
+            "minPopulation": 279,
+            "majPopulation": 17225
+        },
+        {
+            "precID": 26,
+            "area": 1381708179,
+            "neighbors": [
+                19,
+                58,
+                79,
+                87,
+                92
+            ],
+            "minPopulation": 774,
+            "majPopulation": 16135
+        },
+        {
+            "precID": 27,
+            "area": 1499464129,
+            "neighbors": [
+                9,
+                21,
+                30,
+                32,
+                52,
+                56
+            ],
+            "minPopulation": 513,
+            "majPopulation": 35014
+        },
+        {
+            "precID": 28,
+            "area": 1113048991,
+            "neighbors": [
+                43,
+                55,
+                57
+            ],
+            "minPopulation": 7235,
+            "majPopulation": 73371
+        },
+        {
+            "precID": 29,
+            "area": 1046255197,
+            "neighbors": [
+                20,
+                31,
+                70,
+                71,
+                73
+            ],
+            "minPopulation": 551,
+            "majPopulation": 32769
+        },
+        {
+            "precID": 30,
+            "area": 1597071218,
+            "neighbors": [
+                21,
+                27,
+                48,
+                52
+            ],
+            "minPopulation": 11109,
+            "majPopulation": 176165
+        },
+        {
+            "precID": 31,
+            "area": 1042529538,
+            "neighbors": [
+                20,
+                29,
+                54,
+                73
+            ],
+            "minPopulation": 1421,
+            "majPopulation": 19188
+        },
+        {
+            "precID": 32,
+            "area": 1894125406,
+            "neighbors": [
+                2,
+                6,
+                8,
+                9,
+                18,
+                21,
+                27,
+                95
+            ],
+            "minPopulation": 1239,
+            "majPopulation": 40509
+        },
+        {
+            "precID": 33,
+            "area": 1298573635,
+            "neighbors": [
+                8,
+                11,
+                16,
+                18,
+                34,
+                44,
+                65
+            ],
+            "minPopulation": 1362,
+            "majPopulation": 31238
+        },
+        {
+            "precID": 34,
+            "area": 1508730236,
+            "neighbors": [
+                11,
+                16,
+                33,
+                37,
+                39,
+                40,
+                41,
+                98
+            ],
+            "minPopulation": 1362,
+            "majPopulation": 20003
+        },
+        {
+            "precID": 35,
+            "area": 1338087039,
+            "neighbors": [
+                64,
+                68,
+                72
+            ],
+            "minPopulation": 455,
+            "majPopulation": 14431
+        },
+        {
+            "precID": 36,
+            "area": 1479438698,
+            "neighbors": [
+                7,
+                12,
+                13,
+                24,
+                38,
+                93
+            ],
+            "minPopulation": 451,
+            "majPopulation": 18216
+        },
+        {
+            "precID": 37,
+            "area": 1299892162,
+            "neighbors": [
+                6,
+                11,
+                34,
+                41,
+                63,
+                85
+            ],
+            "minPopulation": 363,
+            "majPopulation": 24538
+        },
+        {
+            "precID": 38,
+            "area": 1536054733,
+            "neighbors": [
+                0,
+                4,
+                13,
+                14,
+                24,
+                36,
+                60
+            ],
+            "minPopulation": 527,
+            "majPopulation": 21375
+        },
+        {
+            "precID": 39,
+            "area": 1495741803,
+            "neighbors": [
+                7,
+                34,
+                41,
+                84,
+                93,
+                98
+            ],
+            "minPopulation": 1940,
+            "majPopulation": 29406
+        },
+        {
+            "precID": 40,
+            "area": 1484160548,
+            "neighbors": [
+                16,
+                34,
+                45,
+                54,
+                94,
+                97,
+                98
+            ],
+            "minPopulation": 762,
+            "majPopulation": 21915
+        },
+        {
+            "precID": 41,
+            "area": 1476281576,
+            "neighbors": [
+                11,
+                34,
+                37,
+                39,
+                63,
+                84,
+                98
+            ],
+            "minPopulation": 1463,
+            "majPopulation": 33597
+        },
+        {
+            "precID": 42,
+            "area": 1817245306,
+            "neighbors": [
+                23,
+                66,
+                77,
+                82
+            ],
+            "minPopulation": 531,
+            "majPopulation": 29313
+        },
+        {
+            "precID": 43,
+            "area": 1130684933,
+            "neighbors": [
+                28,
+                50,
+                55,
+                57,
+                88,
+                91
+            ],
+            "minPopulation": 3176,
+            "majPopulation": 37112
+        },
+        {
+            "precID": 44,
+            "area": 1226634300,
+            "neighbors": [
+                18,
+                33,
+                65,
+                95
+            ],
+            "minPopulation": 362,
+            "majPopulation": 18758
+        },
+        {
+            "precID": 45,
+            "area": 1128373428,
+            "neighbors": [
+                40,
+                54,
+                73,
+                75,
+                93,
+                98
+            ],
+            "minPopulation": 787,
+            "majPopulation": 18835
+        },
+        {
+            "precID": 46,
+            "area": 1119006108,
+            "neighbors": [
+                10,
+                17,
+                23,
+                66,
+                80,
+                96
+            ],
+            "minPopulation": 262,
+            "majPopulation": 13911
+        },
+        {
+            "precID": 47,
+            "area": 1521602833,
+            "neighbors": [
+                5,
+                51,
+                53,
+                56,
+                78,
+                85,
+                91
+            ],
+            "minPopulation": 700,
+            "majPopulation": 32008
+        },
+        {
+            "precID": 48,
+            "area": 1682473999,
+            "neighbors": [
+                22,
+                30,
+                52
+            ],
+            "minPopulation": 1011,
+            "majPopulation": 38674
+        },
+        {
+            "precID": 49,
+            "area": 1898344850,
+            "neighbors": [
+                61,
+                62,
+                63,
+                76,
+                78,
+                84,
+                85
+            ],
+            "minPopulation": 2402,
+            "majPopulation": 71283
+        },
+        {
+            "precID": 50,
+            "area": 1131503196,
+            "neighbors": [
+                25,
+                43,
+                53,
+                88,
+                89,
+                91
+            ],
+            "minPopulation": 4160,
+            "majPopulation": 29519
+        },
+        {
+            "precID": 51,
+            "area": 1613950751,
+            "neighbors": [
+                5,
+                15,
+                47,
+                56,
+                57,
+                69,
+                91
+            ],
+            "minPopulation": 37598,
+            "majPopulation": 224187
+        },
+        {
+            "precID": 52,
+            "area": 1494433696,
+            "neighbors": [
+                15,
+                22,
+                27,
+                30,
+                48,
+                56
+            ],
+            "minPopulation": 1471,
+            "majPopulation": 39798
+        },
+        {
+            "precID": 53,
+            "area": 1501996594,
+            "neighbors": [
+                47,
+                50,
+                61,
+                78,
+                89,
+                91
+            ],
+            "minPopulation": 346,
+            "majPopulation": 20677
+        },
+        {
+            "precID": 54,
+            "area": 2523487382,
+            "neighbors": [
+                31,
+                40,
+                45,
+                73,
+                75,
+                94,
+                98
+            ],
+            "minPopulation": 633,
+            "majPopulation": 30440
+        },
+        {
+            "precID": 55,
+            "area": 1395660192,
+            "neighbors": [
+                28,
+                43,
+                88
+            ],
+            "minPopulation": 4647,
+            "majPopulation": 67039
+        },
+        {
+            "precID": 56,
+            "area": 1876458741,
+            "neighbors": [
+                5,
+                9,
+                15,
+                27,
+                47,
+                51,
+                52
+            ],
+            "minPopulation": 38675,
+            "majPopulation": 383712
+        },
+        {
+            "precID": 57,
+            "area": 1081367922,
+            "neighbors": [
+                28,
+                43,
+                51,
+                69,
+                91
+            ],
+            "minPopulation": 2228,
+            "majPopulation": 20538
+        },
+        {
+            "precID": 58,
+            "area": 1125084528,
+            "neighbors": [
+                3,
+                19,
+                26,
+                62,
+                67,
+                90,
+                92
+            ],
+            "minPopulation": 254,
+            "majPopulation": 17541
+        },
+        {
+            "precID": 59,
+            "area": 1522341557,
+            "neighbors": [
+                70,
+                71,
+                83
+            ],
+            "minPopulation": 478,
+            "majPopulation": 22660
+        },
+        {
+            "precID": 60,
+            "area": 1455983174,
+            "neighbors": [
+                0,
+                19,
+                24,
+                38,
+                76,
+                87,
+                90
+            ],
+            "minPopulation": 611,
+            "majPopulation": 30745
+        },
+        {
+            "precID": 61,
+            "area": 1485092938,
+            "neighbors": [
+                49,
+                53,
+                62,
+                67,
+                78,
+                89
+            ],
+            "minPopulation": 1899,
+            "majPopulation": 42857
+        },
+        {
+            "precID": 62,
+            "area": 1477611033,
+            "neighbors": [
+                49,
+                58,
+                61,
+                67,
+                76,
+                90
+            ],
+            "minPopulation": 2213,
+            "majPopulation": 64404
+        },
+        {
+            "precID": 63,
+            "area": 1484573664,
+            "neighbors": [
+                37,
+                41,
+                49,
+                78,
+                84,
+                85
+            ],
+            "minPopulation": 9154,
+            "majPopulation": 72142
+        },
+        {
+            "precID": 64,
+            "area": 1141262914,
+            "neighbors": [
+                35,
+                68,
+                72,
+                77
+            ],
+            "minPopulation": 840,
+            "majPopulation": 29275
+        },
+        {
+            "precID": 65,
+            "area": 1216167443,
+            "neighbors": [
+                16,
+                18,
+                33,
+                44,
+                97
+            ],
+            "minPopulation": 311,
+            "majPopulation": 21244
+        },
+        {
+            "precID": 66,
+            "area": 1810230285,
+            "neighbors": [
+                23,
+                42,
+                46,
+                96
+            ],
+            "minPopulation": 547,
+            "majPopulation": 17943
+        },
+        {
+            "precID": 67,
+            "area": 1124840036,
+            "neighbors": [
+                3,
+                25,
+                58,
+                61,
+                62,
+                89,
+                92
+            ],
+            "minPopulation": 405,
+            "majPopulation": 15528
+        },
+        {
+            "precID": 68,
+            "area": 1100816119,
+            "neighbors": [
+                1,
+                14,
+                35,
+                64,
+                72,
+                77,
+                86
+            ],
+            "minPopulation": 560,
+            "majPopulation": 20918
+        },
+        {
+            "precID": 69,
+            "area": 1163239400,
+            "neighbors": [
+                15,
+                51,
+                57,
+                81
+            ],
+            "minPopulation": 9362,
+            "majPopulation": 76091
+        },
+        {
+            "precID": 70,
+            "area": 1484601681,
+            "neighbors": [
+                10,
+                17,
+                20,
+                29,
+                59,
+                71,
+                74,
+                83
+            ],
+            "minPopulation": 1123,
+            "majPopulation": 27651
+        },
+        {
+            "precID": 71,
+            "area": 1034422702,
+            "neighbors": [
+                20,
+                29,
+                59,
+                70,
+                83
+            ],
+            "minPopulation": 619,
+            "majPopulation": 12296
+        },
+        {
+            "precID": 72,
+            "area": 1386853582,
+            "neighbors": [
+                1,
+                35,
+                64,
+                68,
+                86
+            ],
+            "minPopulation": 1781,
+            "majPopulation": 30066
+        },
+        {
+            "precID": 73,
+            "area": 1474829275,
+            "neighbors": [
+                10,
+                20,
+                29,
+                31,
+                45,
+                54,
+                75
+            ],
+            "minPopulation": 412,
+            "majPopulation": 18421
+        },
+        {
+            "precID": 74,
+            "area": 2237053706,
+            "neighbors": [
+                17,
+                70,
+                83,
+                96
+            ],
+            "minPopulation": 1812,
+            "majPopulation": 48226
+        },
+        {
+            "precID": 75,
+            "area": 1498713549,
+            "neighbors": [
+                10,
+                12,
+                20,
+                45,
+                54,
+                73,
+                80,
+                93
+            ],
+            "minPopulation": 375,
+            "majPopulation": 14258
+        },
+        {
+            "precID": 76,
+            "area": 1532067147,
+            "neighbors": [
+                7,
+                24,
+                49,
+                60,
+                62,
+                84,
+                90
+            ],
+            "minPopulation": 131488,
+            "majPopulation": 729763
+        },
+        {
+            "precID": 77,
+            "area": 2484139642,
+            "neighbors": [
+                14,
+                42,
+                64,
+                68,
+                82
+            ],
+            "minPopulation": 13183,
+            "majPopulation": 172992
+        },
+        {
+            "precID": 78,
+            "area": 1517907092,
+            "neighbors": [
+                5,
+                47,
+                49,
+                53,
+                61,
+                63,
+                85
+            ],
+            "minPopulation": 1911,
+            "majPopulation": 35910
+        },
+        {
+            "precID": 79,
+            "area": 1395655440,
+            "neighbors": [
+                1,
+                19,
+                26,
+                86,
+                87
+            ],
+            "minPopulation": 243,
+            "majPopulation": 10002
+        },
+        {
+            "precID": 80,
+            "area": 1497869814,
+            "neighbors": [
+                10,
+                12,
+                13,
+                17,
+                23,
+                46,
+                75
+            ],
+            "minPopulation": 450,
+            "majPopulation": 20248
+        },
+        {
+            "precID": 81,
+            "area": 1212660045,
+            "neighbors": [
+                15,
+                22,
+                69
+            ],
+            "minPopulation": 45890,
+            "majPopulation": 284484
+        },
+        {
+            "precID": 82,
+            "area": 1531596668,
+            "neighbors": [
+                4,
+                13,
+                14,
+                23,
+                42,
+                77
+            ],
+            "minPopulation": 513,
+            "majPopulation": 23818
+        },
+        {
+            "precID": 83,
+            "area": 1991682276,
+            "neighbors": [
+                17,
+                59,
+                70,
+                71,
+                74
+            ],
+            "minPopulation": 4516,
+            "majPopulation": 62868
+        },
+        {
+            "precID": 84,
+            "area": 1485744995,
+            "neighbors": [
+                7,
+                39,
+                41,
+                49,
+                63,
+                76
+            ],
+            "minPopulation": 20390,
+            "majPopulation": 158682
+        },
+        {
+            "precID": 85,
+            "area": 1870180580,
+            "neighbors": [
+                5,
+                6,
+                37,
+                47,
+                49,
+                63,
+                78
+            ],
+            "minPopulation": 4787,
+            "majPopulation": 30746
+        },
+        {
+            "precID": 86,
+            "area": 1384752221,
+            "neighbors": [
+                1,
+                68,
+                72,
+                79,
+                87
+            ],
+            "minPopulation": 497,
+            "majPopulation": 12132
+        },
+        {
+            "precID": 87,
+            "area": 1102811637,
+            "neighbors": [
+                0,
+                1,
+                19,
+                26,
+                60,
+                79,
+                86
+            ],
+            "minPopulation": 781,
+            "majPopulation": 24289
+        },
+        {
+            "precID": 88,
+            "area": 1270437233,
+            "neighbors": [
+                25,
+                43,
+                50,
+                55,
+                89
+            ],
+            "minPopulation": 261,
+            "majPopulation": 14874
+        },
+        {
+            "precID": 89,
+            "area": 1129289460,
+            "neighbors": [
+                3,
+                25,
+                50,
+                53,
+                61,
+                67,
+                88
+            ],
+            "minPopulation": 5645,
+            "majPopulation": 65602
+        },
+        {
+            "precID": 90,
+            "area": 1484970305,
+            "neighbors": [
+                19,
+                24,
+                58,
+                60,
+                62,
+                76
+            ],
+            "minPopulation": 2679,
+            "majPopulation": 89781
+        },
+        {
+            "precID": 91,
+            "area": 1478675887,
+            "neighbors": [
+                43,
+                47,
+                50,
+                51,
+                53,
+                57
+            ],
+            "minPopulation": 1816,
+            "majPopulation": 41596
+        },
+        {
+            "precID": 92,
+            "area": 1365315689,
+            "neighbors": [
+                3,
+                19,
+                26,
+                58,
+                67
+            ],
+            "minPopulation": 256,
+            "majPopulation": 12546
+        },
+        {
+            "precID": 93,
+            "area": 1860721314,
+            "neighbors": [
+                7,
+                12,
+                36,
+                39,
+                45,
+                75,
+                98
+            ],
+            "minPopulation": 5838,
+            "majPopulation": 70191
+        },
+        {
+            "precID": 94,
+            "area": 1040443926,
+            "neighbors": [
+                16,
+                40,
+                54,
+                97
+            ],
+            "minPopulation": 846,
+            "majPopulation": 20882
+        },
+        {
+            "precID": 95,
+            "area": 1787448780,
+            "neighbors": [
+                2,
+                18,
+                21,
+                32,
+                44
+            ],
+            "minPopulation": 1414,
+            "majPopulation": 40692
+        },
+        {
+            "precID": 96,
+            "area": 2273422932,
+            "neighbors": [
+                17,
+                23,
+                46,
+                66,
+                74
+            ],
+            "minPopulation": 33537,
+            "majPopulation": 170631
+        },
+        {
+            "precID": 97,
+            "area": 1041024070,
+            "neighbors": [
+                16,
+                40,
+                65,
+                94
+            ],
+            "minPopulation": 319,
+            "majPopulation": 14871
+        },
+        {
+            "precID": 98,
+            "area": 1507990773,
+            "neighbors": [
+                16,
+                34,
+                39,
+                40,
+                41,
+                45,
+                54,
+                93
+            ],
+            "minPopulation": 1361,
+            "majPopulation": 25087
+        }
+    ]
+}
