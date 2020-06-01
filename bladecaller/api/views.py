@@ -212,54 +212,70 @@ def updateMapJob(request):
 
     jobId = request.data['id']
 
-    # Check jobID is valid
-    if len(models.Job.objects.filter(id=jobId)) == 0:
+    if not isinstance(jobId, str):
         return Response({'msg': 'Unable to find jobId', 'id': jobId}, status=status.HTTP_400_BAD_REQUEST)
 
-    job = models.Job.objects.get(id=jobId)
-    stateModel = models.State.objects.get(state=job.state)
-    finished = job.finished
+    # Check jobID is valid
+    if len(models.State.objects.filter(state=jobId)):
+        state = models.State.objects.get(state=jobId)
+        return Response({
+            'id': jobId,
+            'mapId': '0',
+            'state': state.state,
+            'updates': [[vtd.engine_id, vtd.district.district_id] for vtd in state.vtds.all().order_by('engine_id')],
+            'score': 0,
+            'probability': 0,
+            'references': len(models.GeneratedMap.objects.all())
+        }, status=status.HTTP_200_OK)
 
-    # Check if maps are available
-    if len(job.generatedMaps.all()) == 0:
-        return Response({'msg': 'No maps available yet', 'id': jobId}, status=status.HTTP_204_NO_CONTENT)
-
-    mapFound = job.generatedMaps.all().order_by('-added')[0]
-
-    # Calculate our scores
-    weightedScore = (
-        mapFound.compactness * job.alpha +
-        mapFound.distribution * job.beta +
-        mapFound.borderRespect * job.gamma +
-        mapFound.vra * job.eta
-    )
-
-    # Calculate the probability iff there exists enough entries in the db
-    mapCount = len(models.GeneratedMap.objects.all())
-    if mapCount >= MIN_MAPS_FOR_PROBABILITY:
-        # Handle the random walk case:
-        alpha, beta, gamma, eta = job.alpha, job.beta, job.gamma, job.eta
-        denom = sum([abs(job.alpha), abs(job.beta), abs(job.gamma), abs(job.eta)])
-        if sum([abs(job.alpha), abs(job.beta), abs(job.gamma), abs(job.eta)]) == 0:
-            denom = 1.
-        elif sum([job.alpha, job.beta, job.gamma, job.eta]) == 0:
-            denom = alpha = beta = gamma = eta = 1.
-
-        probability = (
-            models.GeneratedMap.objects.filter(compactness__lte=mapFound.compactness) * alpha + 
-            models.GeneratedMap.objects.filter(distribution__lte=mapFound.distribution) * beta + 
-            models.GeneratedMap.objects.filter(borderRespect__lte=mapFound.borderRespect) * gamma + 
-            models.GeneratedMap.objects.filter(vra__lte=mapFound.vra) * eta
-        ) / denom
     else:
-        probability = float('nan')
+        if len(models.Job.objects.filter(jobId=jobId)) == 0:
+            return Response({'msg': 'Unable to find jobId', 'id': jobId}, status=status.HTTP_400_BAD_REQUEST)
 
-    return Response({
-        'id': jobId,
-        'mapId': mapFound.id,
-        'state': mapFound.state.state,
-        'updates': [[precinct_id, district_id] for precinct_id, district_id in enumerate(mapFound.mapContents)],
-        'score': weightedScore,
-        'probability': probability,
-        'references': mapCount
-    }, status=(status.HTTP_200_OK if finished else status.HTTP_206_PARTIAL_CONTENT))
+        job = models.Job.objects.get(jobId=jobId)
+        stateModel = models.State.objects.get(state=job.state)
+        finished = job.finished
+
+        # Check if maps are available
+        if len(job.generatedMaps.all()) == 0:
+            return Response({'msg': 'No maps available yet', 'id': jobId}, status=status.HTTP_204_NO_CONTENT)
+
+        mapFound = job.generatedMaps.all().order_by('-added')[0]
+
+        # Calculate our scores
+        weightedScore = (
+            mapFound.compactness * job.alpha +
+            mapFound.distribution * job.beta +
+            mapFound.borderRespect * job.gamma +
+            mapFound.vra * job.eta
+        )
+
+        # Calculate the probability iff there exists enough entries in the db
+        mapCount = len(models.GeneratedMap.objects.all())
+        if mapCount >= MIN_MAPS_FOR_PROBABILITY:
+            # Handle the random walk case:
+            alpha, beta, gamma, eta = job.alpha, job.beta, job.gamma, job.eta
+            denom = sum([abs(job.alpha), abs(job.beta), abs(job.gamma), abs(job.eta)])
+            if sum([abs(job.alpha), abs(job.beta), abs(job.gamma), abs(job.eta)]) == 0:
+                denom = 1.
+            elif sum([job.alpha, job.beta, job.gamma, job.eta]) == 0:
+                denom = alpha = beta = gamma = eta = 1.
+
+            probability = (
+                models.GeneratedMap.objects.filter(compactness__lte=mapFound.compactness) * alpha + 
+                models.GeneratedMap.objects.filter(distribution__lte=mapFound.distribution) * beta + 
+                models.GeneratedMap.objects.filter(borderRespect__lte=mapFound.borderRespect) * gamma + 
+                models.GeneratedMap.objects.filter(vra__lte=mapFound.vra) * eta
+            ) / denom
+        else:
+            probability = "NaN"
+
+        return Response({
+            'id': jobId,
+            'mapId': mapFound.id,
+            'state': mapFound.state.state,
+            'updates': [[precinct_id, district_id] for precinct_id, district_id in enumerate(mapFound.mapContents)],
+            'score': weightedScore,
+            'probability': probability,
+            'references': mapCount
+        }, status=(status.HTTP_200_OK if finished else status.HTTP_206_PARTIAL_CONTENT))

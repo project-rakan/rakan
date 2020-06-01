@@ -81,6 +81,6 @@ def visualizeMap(generatedMapId: int):
     # for idx, row in df.iterrows():
     #     plt.annotate(s=idx, xy=row['coords'], horizontalalignment='center')
     plt.savefig(filepath)
-    plt.close()
+    plt.close('all')
     generatedMap.visualization = f"/images/{generatedMap.id}.png"
     generatedMap.save()
