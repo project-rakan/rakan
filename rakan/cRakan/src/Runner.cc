@@ -65,11 +65,11 @@ Runner::~Runner() {
   delete scores_;
 }
 
-void Runner::add_node(uint32_t node_id,
+bool Runner::add_node(uint32_t node_id,
                       uint32_t county,
                       uint32_t majority_population,
                       uint32_t minority_population) {
-  graph_->AddNode(node_id, county, majority_population, minority_population);
+  return graph_->AddNode(node_id, county, majority_population, minority_population);
 }
 
 bool Runner::add_edge(uint32_t node_one, uint32_t node_two) {
@@ -570,7 +570,6 @@ Node *Runner::BFS(vector<uint32_t> *q,
                   uint32_t district,
                   unordered_set<uint32_t> *set) {
   uint32_t current_node_id;
-  Node *current_node;
 
   while (!q->empty()) {
     current_node_id = q->front();
@@ -579,7 +578,6 @@ Node *Runner::BFS(vector<uint32_t> *q,
       return graph_->GetNode(current_node_id);
     }
 
-    current_node = graph_->GetNode(current_node_id);
     q->erase(std::find(q->begin(), q->end(), current_node_id));
     processed->insert(current_node_id);
 

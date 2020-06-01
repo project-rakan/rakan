@@ -15,7 +15,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from api import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('create-guid/', views.createGuid),             # Get a GUID
+    path('create-job/', views.startMapJob),             # Start a Runner with a given GUID
+    path('get-job-update/', views.updateMapJob),        # Get updates on that Runner with a given GUID
+    path('get-districting/', views.getDistricting),     # Given a mapId, get a redistricting
+    path('score-map/', views.scoreMap),                 # Get scoring data on a submitted map
 ]

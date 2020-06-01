@@ -11,39 +11,66 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# Include Rakan location
+sys.path.append(os.getenv('RAKAN_LOCATION', '/home/project'))
+
+# Set minimum required entries for creating probabilities
+MIN_MAPS_FOR_PROBABILITY = 5000
+
+# Set default step size when steps isn't specified by frontend
+DEFAULT_WALK_SIZE = 200
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '8-+ofui#=t)$glecc@%)1zd)7n8^38&x8^((r*guz1f7k12gr('
+SECRET_KEY = os.getenv('DJANGO_SECRET', 'blj9_2iel2esgjtpn-p=_^k&33w1ym#5f@p40843kv5&x8^((r*guz1f7k12gr(')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG_MODE', 'true') == 'true'
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+    'dfbbc4eb0ee6.ngrok.io',
+]
 
 # Application definition
 
 INSTALLED_APPS = [
+    # Django builtins
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+] + [
+    # Django plugins
+    'rest_framework',
+    'django_celery_results',
+    'corsheaders',
+] + [
+    # My apps
+    'api',
+    'datamerger',
 ]
+
+# Utilize CORS
+# https://github.com/adamchainz/django-cors-headers
+CORS_ORIGIN_ALLOW_ALL = True
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -75,10 +102,15 @@ WSGI_APPLICATION = 'bladecaller.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': os.getenv('DATABASE_TABLE', 'temptable'),
+        'USER': os.getenv('DATABASE_USER', 'guest'),
+        'PASSWORD': os.getenv('DATABASE_PASS', 'guest'),
+        'HOST': 'localhost',
+        'PORT': '',
     }
 }
+
 
 
 # Password validation
@@ -119,3 +151,51 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = '/var/www/html/static/'
+MAP_ROOT = os.getenv('RAKAN_STATEFILES', '/var/www/html/stateinfo/')
+
+# Django Restframework
+# https://www.django-rest-framework.org/
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 50
+}
+
+# Django + Celery
+# https://docs.celeryproject.org/en/latest/django/first-steps-with-django.html
+
+CELERY_CACHE_BACKEND = 'django-cache'
+BROKER_URL = (
+    f'amqp://{os.getenv("RABBIT_USER", "guest")}'
+    f':{os.getenv("RABBIT_PASS", "guest")}@'
+    f'{os.getenv("RABBIT_LOCATION", "localhost")}:'
+    f'{os.getenv("RABBIT_PORT", "5672")}/{os.getenv("RABBIT_VHOST", "celery")}'
+)
+
+# Rakan settings
+
+CONGRESS_TARGET = "https://www2.census.gov/geo/tiger/GENZ2018/shp/cb_2018_us_cd116_20m.zip"
+CENSUS_TARGET = "http://censusdata.ire.org/{fips}/all_140_in_{fips}.P3.csv"
+VTD_TARGET = "https://www2.census.gov/geo/tiger/TIGER2012/VTD/tl_2012_{fips}_vtd10.zip"
+TRACT_TARGET = "https://www2.census.gov/geo/tiger/GENZ2018/shp/cb_2018_{fips}_tract_500k.zip"
+
+DATA_LOCATION = os.path.join(os.getenv('RAKAN_LOCATION'), 'data')
+
+if DEBUG:
+    STATE_TABLE = os.path.join(os.getenv('RAKAN_LOCATION'), 'configs', 'stateKeys.csv')
+else:
+    STATE_TABLE = os.path.join(os.getenv('RAKAN_LOCATION'), 'configs', 'stateKeysProd.csv')
+
+CONGRESS_ZIP_NAME = os.path.join(DATA_LOCATION, "116_congress.zip")
+CONGRESS_DIR_NAME = os.path.join(DATA_LOCATION, "116_congress")
+
+STATE_DIR_NAME = os.path.join(DATA_LOCATION, "{state_name}")
+STATE_CENSUS_FILE_NAME = os.path.join(STATE_DIR_NAME, "census.csv")
+
+STATE_VTD_DIR_NAME = os.path.join(STATE_DIR_NAME, "vtd")
+STATE_VTD_ZIP_NAME = os.path.join(STATE_DIR_NAME, "vtd.zip")
+
+STATE_TRACT_DIR_NAME = os.path.join(STATE_DIR_NAME, "tract")
+STATE_TRACT_ZIP_NAME = os.path.join(STATE_DIR_NAME, "tract.zip")
+
+RAKAN_STATE_VISUALIZATIONS = os.getenv("RAKAN_STATE_VISUALIZATIONS", "media/")
