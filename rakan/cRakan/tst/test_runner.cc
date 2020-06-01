@@ -1,5 +1,8 @@
 #include <inttypes.h>
 
+#include <chrono>               // for system_clock:now()
+#include <iostream>
+
 #include "../src/Runner.h"
 #include "../src/Graph.h"
 #include "../src/Node.h"
@@ -794,23 +797,7 @@ TEST(Test_Runner, TestRedistrictHourglassMap) {
   delete r;
 }
 
-TEST(Test_Runner, TestSeveredDistrictSimple) {
-  // r has 7 precincts, 3 districts
-  // draws out an H shape
-  Runner *r = GenerateHMap(true);
-  ASSERT_TRUE(r->IsDistrictSevered(r->GetGraph()->GetNode(0), 1));
-  ASSERT_TRUE(r->IsDistrictSevered(r->GetGraph()->GetNode(1), 1));
-  ASSERT_TRUE(r->IsDistrictSevered(r->GetGraph()->GetNode(2), 1));
-  ASSERT_FALSE(r->IsDistrictSevered(r->GetGraph()->GetNode(3), 0));
-  ASSERT_FALSE(r->IsDistrictSevered(r->GetGraph()->GetNode(3), 2));
-  ASSERT_TRUE(r->IsDistrictSevered(r->GetGraph()->GetNode(4), 0));
-  ASSERT_TRUE(r->IsDistrictSevered(r->GetGraph()->GetNode(5), 1));
-  ASSERT_TRUE(r->IsDistrictSevered(r->GetGraph()->GetNode(6), 0));
-
-  delete r;
-}
-
-TEST(Test_Runner, TestIsValidRedistricting) {
+TEST(Test_Runner, TestValidRedistricting4x4Map) {
   // r has 16 precincts, 4 districts
   // draws out a 4x4 square with 4 quadrants
   Runner *r = Generate4x4Map(true);

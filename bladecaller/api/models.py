@@ -54,8 +54,9 @@ class GeneratedMap(models.Model):
 
     mapContents = ArrayField(
         models.IntegerField(),
-        unique=True
     )
+
+    md5hash = models.CharField(max_length=32, unique=True)
 
     compactness = models.FloatField()
     distribution = models.FloatField()
