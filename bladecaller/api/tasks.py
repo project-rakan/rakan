@@ -27,7 +27,7 @@ def performMetropolisHastingsWalk(jobId: int):
         mapModel = GeneratedMap.objects.create(
             state=job.state,
             mapContents=generatedMap,
-            md5Hash=mapHash,
+            md5hash=mapHash,
             compactness=scores[0][b'compact'],
             vra=scores[0][b'vra'],
             distribution=scores[0][b'distribution'],
@@ -35,7 +35,7 @@ def performMetropolisHastingsWalk(jobId: int):
         )
     except IntegrityError as e:
         mapModel = GeneratedMap.objects.get(
-            md5Hash=mapHash
+            md5hash=mapHash
         )
     
     job.generatedMaps.add(mapModel)
@@ -51,7 +51,7 @@ def performMetropolisHastingsWalk(jobId: int):
             mapModel = GeneratedMap.objects.create(
                 state=job.state,
                 mapContents=map_,
-                md5Hash=mapHash,
+                md5hash=mapHash,
                 compactness=score_[b'compact'],
                 vra=score_[b'vra'],
                 distribution=score_[b'distribution'],
@@ -59,7 +59,7 @@ def performMetropolisHastingsWalk(jobId: int):
             )
         except IntegrityError:
             mapModel = GeneratedMap.objects.get(
-                md5Hash=mapHash,
+                md5hash=mapHash,
             )
         job.generatedMaps.add(mapModel)
 
