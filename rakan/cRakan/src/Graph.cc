@@ -47,7 +47,7 @@ Graph::Graph(const uint32_t num_nodes,
         new unordered_map<uint32_t, unordered_set<uint32_t> *>;
   }
 
-  crossing_edges_ = new unordered_set<Edge, EdgeHash>;
+  crossing_edges_ = new unordered_set<edge, edge_hash>;
   pop_of_district_ = new uint32_t[num_districts_];
   min_pop_of_district_ = new uint32_t[num_districts_];
   maj_pop_of_district_ = new uint32_t[num_districts_];
@@ -137,7 +137,7 @@ bool Graph::AddEdge(uint32_t node1, uint32_t node2) {
 }
 
 bool Graph::MarkCrossingEdge(uint32_t node1, uint32_t node2) {
-  Edge e(node1, node2);
+  edge e(node1, node2);
   if (nodes_[node1]->district_ != nodes_[node2]->district_ &&
       ContainsEdge(node1, node2) &&
       crossing_edges_->find(e) == crossing_edges_->end()) {
@@ -198,7 +198,7 @@ bool Graph::RemoveNodeFromDistrict(uint32_t node_id, uint32_t district) {
 
 bool Graph::AddNodeToDistrictPerim(uint32_t node_id, uint32_t district) {
   Node *node = nodes_[node_id];
-  if (nodes_on_perim_[node->district_]->find(node->id_) !=
+  if (nodes_on_perim_[node->district_]->find(node_id) !=
       nodes_on_perim_[node->district_]->end()) {
     return false;
   }
@@ -240,7 +240,7 @@ bool Graph::UpdatePerimNode(Node *node) {
     if (neighbor > num_nodes_) {
       return false;
     }
-    Edge e(node->id_, neighbor);
+    edge e(node->id_, neighbor);
     if (nodes_[neighbor]->district_ != node->district_) {
       crossing_neighbors.insert(neighbor);
       if (crossing_edges_->find(e) == crossing_edges_->end()) {
@@ -347,7 +347,7 @@ unordered_set<uint32_t>*
   return (*perim_nodes_to_neighbors_[district]->find(node)).second;
 }
 
-unordered_set<Edge, EdgeHash>* Graph::GetCrossingEdges() {
+unordered_set<edge, edge_hash>* Graph::GetCrossingEdges() {
   return crossing_edges_;
 }
 

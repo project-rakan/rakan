@@ -61,4 +61,5 @@ TEST(Test_Node, TestSetPop) {
     ASSERT_EQ(n.GetMinorityPop(), 30);
     ASSERT_EQ(n.GetTotalPop(), 80);
 }
-}
+
+}     // namespace rakan

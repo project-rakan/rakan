@@ -2,7 +2,7 @@
 #define SRC_GRAPH_H_
 
 #include <inttypes.h>       // for uint32_t
-#include <stdio.h>          // for FILE *
+#include <math.h>
 
 #include <unordered_set>    // for std::unordered_set
 #include <unordered_map>    // for std::unordered_map
@@ -18,22 +18,15 @@ using std::vector;
 
 namespace rakan {
 
-struct Edge {
-  Edge() {}
-
-  Edge(uint32_t n1, uint32_t n2) {
-    if (n1 < n2) {
-      node1 = n1;
-      node2 = n2;
-    } else if (n2 < n1) {
-      node1 = n2;
-      node2 = n1;
-    }
+struct edge {
+  edge(uint32_t n1, uint32_t n2) {
+    node1 = fmin(n1, n2);
+    node2 = fmax(n1, n2);
   }
 
-  Edge(const Edge &other) = default;
+  // edge(const edge &other) = default;
 
-  bool operator==(const Edge &edge) const {
+  bool operator==(const edge &edge) const {
     return (node1 == edge.node1 && node2 == edge.node2);
   }
 
@@ -41,9 +34,9 @@ struct Edge {
   uint32_t node2;
 };
 
-class EdgeHash {
+class edge_hash {
  public:
-  size_t operator()(const Edge &edge) const {
+  size_t operator()(const edge &edge) const {
     return edge.node1 + edge.node2;
   }
 };
@@ -315,7 +308,7 @@ class Graph {
    * 
    * @return a pointer to the set of crossing edges
    */
-  unordered_set<Edge, EdgeHash>* GetCrossingEdges();
+  unordered_set<edge, edge_hash>* GetCrossingEdges();
 
   /**
   * Gets the total population of the given district.
@@ -336,6 +329,7 @@ class Graph {
   *         district does not exist
   */
   int32_t GetMinorityPop(const uint32_t district) const;
+
 
  private:
   // The number of nodes on this graph.
@@ -371,7 +365,7 @@ class Graph {
   unordered_map<uint32_t, uint32_t> *num_districts_in_county_;
 
   // A map of an index to an edge that contain two nodes in different districts.
-  unordered_set<Edge, EdgeHash> *crossing_edges_;
+  unordered_set<edge, edge_hash> *crossing_edges_;
 
   // An array of maps. The index of the map is the district ID. Each district 
   // map stores node IDs as keys, and each node must be on the perimeter of the

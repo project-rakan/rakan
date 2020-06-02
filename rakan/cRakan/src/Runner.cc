@@ -303,7 +303,7 @@ double Runner::LogScore() {
 double Runner::MetropolisHastings() {
   double old_score, new_score, ratio;
   uint32_t i, random_index, random_number, old_district;
-  Edge edge;
+  unordered_set<edge, edge_hash>::iterator itr;
   Node *victim_node, *idle_node;
   vector<uint32_t> *changes = new vector<uint32_t>;
   map<string, double> *scores = new map<string, double>;
@@ -311,27 +311,25 @@ double Runner::MetropolisHastings() {
 
   // random number generators initialization
   uniform_int_distribution<uint32_t> index(0, graph_->crossing_edges_->size() - 1);
-  uniform_int_distribution<uint32_t> number(0, graph_->crossing_edges_->size() - 1);
+  uniform_int_distribution<uint32_t> number(0, 1);
   uniform_real_distribution<double> decimal_number(0, 1);
 
   while (!is_valid) {
     random_index = index(*generator_);
     i = 0;
-    unordered_set<Edge, EdgeHash>::iterator itr =
-        graph_->crossing_edges_->begin();
+    itr = graph_->crossing_edges_->begin();
     while (i < random_index) {
       itr++;
       i++;
     }
-    edge = *itr;
 
-    random_number = floor(number(*generator_));
-    if (random_number > graph_->crossing_edges_->size() / 2) {
-      victim_node = graph_->nodes_[edge.node1];
-      idle_node = graph_->nodes_[edge.node2];
+    random_number = number(*generator_);
+    if (random_number == 0) {
+      victim_node = graph_->nodes_[itr->node1];
+      idle_node = graph_->nodes_[itr->node2];
     } else {
-      victim_node = graph_->nodes_[edge.node2];
-      idle_node = graph_->nodes_[edge.node1];
+      victim_node = graph_->nodes_[itr->node2];
+      idle_node = graph_->nodes_[itr->node1];
     }
 
     old_district = victim_node->district_;
@@ -344,8 +342,10 @@ double Runner::MetropolisHastings() {
   if (new_score > old_score) {
     ratio = decimal_number(*generator_);
     if (ratio <= (old_score / new_score)) {
-      victim_node->district_ = old_district;
-      Redistrict(victim_node, victim_node);
+      graph_->RemoveNodeFromDistrict(victim_node->id_, idle_node->district_);
+      graph_->RemoveNodeFromDistrictPerim(victim_node->id_, old_district);
+      graph_->AddNodeToDistrict(victim_node->id_, old_district);
+      graph_->AddNodeToDistrictPerim(victim_node->id_, old_district);
       score_ = old_score;
     } else {
       score_ = new_score;
