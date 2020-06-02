@@ -535,8 +535,8 @@ TEST(Test_Runner, TestRedistrict4x4Map) {
   Runner *r = Generate4x4Map(true);
   Graph *g = r->GetGraph();
   Node *victim_node, *idle_node;
-  unordered_set<Edge, EdgeHash> *crossing_edges;
-  unordered_set<Edge, EdgeHash> expected_crossing_edges;
+  unordered_set<edge, edge_hash> *crossing_edges;
+  unordered_set<edge, edge_hash> expected_crossing_edges;
   expected_crossing_edges.emplace(1, 2);
   expected_crossing_edges.emplace(5, 6);
   expected_crossing_edges.emplace(4, 8);
@@ -559,16 +559,16 @@ TEST(Test_Runner, TestRedistrict4x4Map) {
   ASSERT_EQ(victim_node->GetDistrict(), 1);
   ASSERT_EQ(g->GetPerimNodeNeighbors(0, 1), nullptr);
 
-  Edge e1(1, 2);
+  edge e1(1, 2);
   expected_crossing_edges.erase(e1);
   expected_crossing_edges.emplace(0, 1);
   expected_crossing_edges.emplace(1, 5);
   ASSERT_EQ(crossing_edges->size(), expected_crossing_edges.size());
-  unordered_set<Edge, EdgeHash>::iterator itr = expected_crossing_edges.begin();
+  unordered_set<edge, edge_hash>::iterator itr = expected_crossing_edges.begin();
   for (uint32_t i = 0; i < expected_crossing_edges.size(); i++) {
-    Edge expected = *itr;
+    edge expected = *itr;
     ASSERT_NE(crossing_edges->find(expected), crossing_edges->end());
-    Edge actual = *crossing_edges->find(expected);
+    edge actual = *crossing_edges->find(expected);
     ASSERT_EQ(expected, expected);
     itr++;
   }
@@ -587,16 +587,16 @@ TEST(Test_Runner, TestRedistrict4x4Map) {
   ASSERT_EQ(victim_node->GetDistrict(), 0);
   ASSERT_EQ(g->GetPerimNodeNeighbors(2, 9), nullptr);
 
-  Edge e2(5, 9);
+  edge e2(5, 9);
   expected_crossing_edges.erase(e2);
   expected_crossing_edges.emplace(8, 9);
   expected_crossing_edges.emplace(9, 13);
   ASSERT_EQ(crossing_edges->size(), expected_crossing_edges.size());
   itr = expected_crossing_edges.begin();
   for (uint32_t i = 0; i < expected_crossing_edges.size(); i++) {
-    Edge expected = *itr;
+    edge expected = *itr;
     ASSERT_NE(crossing_edges->find(expected), crossing_edges->end());
-    Edge actual = *crossing_edges->find(expected);
+    edge actual = *crossing_edges->find(expected);
     ASSERT_EQ(expected, expected);
     itr++;
   }
@@ -616,15 +616,15 @@ TEST(Test_Runner, TestRedistrict4x4Map) {
   ASSERT_EQ(g->GetPerimNodeNeighbors(2, 13), nullptr);
   ASSERT_NE(g->GetPerimNodeNeighbors(2, 12), nullptr);
 
-  Edge e3(9, 13);
+  edge e3(9, 13);
   expected_crossing_edges.erase(e3);
   expected_crossing_edges.emplace(12, 13);
   ASSERT_EQ(crossing_edges->size(), expected_crossing_edges.size());
   itr = expected_crossing_edges.begin();
   for (uint32_t i = 0; i < expected_crossing_edges.size(); i++) {
-    Edge expected = *itr;
+    edge expected = *itr;
     ASSERT_NE(crossing_edges->find(expected), crossing_edges->end());
-    Edge actual = *crossing_edges->find(expected);
+    edge actual = *crossing_edges->find(expected);
     ASSERT_EQ(expected, expected);
     itr++;
   }
@@ -644,16 +644,16 @@ TEST(Test_Runner, TestRedistrict4x4Map) {
   ASSERT_EQ(g->GetPerimNodeNeighbors(1, 7), nullptr);
   ASSERT_NE(g->GetPerimNodeNeighbors(3, 7), nullptr);
 
-  Edge e4(7, 11);
+  edge e4(7, 11);
   expected_crossing_edges.erase(e4);
   expected_crossing_edges.emplace(3, 7);
   expected_crossing_edges.emplace(6, 7);
   ASSERT_EQ(crossing_edges->size(), expected_crossing_edges.size());
   itr = expected_crossing_edges.begin();
   for (uint32_t i = 0; i < expected_crossing_edges.size(); i++) {
-    Edge expected = *itr;
+    edge expected = *itr;
     ASSERT_NE(crossing_edges->find(expected), crossing_edges->end());
-    Edge actual = *crossing_edges->find(expected);
+    edge actual = *crossing_edges->find(expected);
     ASSERT_EQ(expected, expected);
     itr++;
   }
@@ -670,17 +670,17 @@ TEST(Test_Runner, TestRedistrict4x4Map) {
   ASSERT_NE(g->GetPerimNodeNeighbors(1, 7), nullptr);
   ASSERT_EQ(g->GetPerimNodeNeighbors(3, 7), nullptr);
 
-  Edge e5(3, 7);
-  Edge e6(6, 7);
+  edge e5(3, 7);
+  edge e6(6, 7);
   expected_crossing_edges.erase(e5);
   expected_crossing_edges.erase(e6);
   expected_crossing_edges.emplace(7, 11);
   ASSERT_EQ(crossing_edges->size(), expected_crossing_edges.size());
   itr = expected_crossing_edges.begin();
   for (uint32_t i = 0; i < expected_crossing_edges.size(); i++) {
-    Edge expected = *itr;
+    edge expected = *itr;
     ASSERT_NE(crossing_edges->find(expected), crossing_edges->end());
-    Edge actual = *crossing_edges->find(expected);
+    edge actual = *crossing_edges->find(expected);
     ASSERT_EQ(expected, expected);
     itr++;
   }
@@ -696,8 +696,8 @@ TEST(Test_Runner, TestRedistrictHourglassMap) {
   Runner *r = GenerateHourglassMap(true);
   Graph *g = r->GetGraph();
   Node *victim_node, *idle_node;
-  unordered_set<Edge, EdgeHash> *crossing_edges;
-  unordered_set<Edge, EdgeHash> expected_crossing_edges;
+  unordered_set<edge, edge_hash> *crossing_edges;
+  unordered_set<edge, edge_hash> expected_crossing_edges;
   expected_crossing_edges.emplace(0, 1);
   expected_crossing_edges.emplace(1, 3);
   expected_crossing_edges.emplace(2, 3);
@@ -726,17 +726,17 @@ TEST(Test_Runner, TestRedistrictHourglassMap) {
   ASSERT_EQ(g->GetPerimNodeNeighbors(0, 0), nullptr);
   ASSERT_NE(g->GetPerimNodeNeighbors(0, 1), nullptr);
 
-  Edge e1(0, 1);
-  Edge e2(1, 3);
+  edge e1(0, 1);
+  edge e2(1, 3);
   expected_crossing_edges.erase(e1);
   expected_crossing_edges.erase(e2);
   expected_crossing_edges.emplace(1, 2);
   ASSERT_EQ(crossing_edges->size(), expected_crossing_edges.size());
-  unordered_set<Edge, EdgeHash>::iterator itr = expected_crossing_edges.begin();
+  unordered_set<edge, edge_hash>::iterator itr = expected_crossing_edges.begin();
   for (uint32_t i = 0; i < expected_crossing_edges.size(); i++) {
-    Edge expected = *itr;
+    edge expected = *itr;
     ASSERT_NE(crossing_edges->find(expected), crossing_edges->end());
-    Edge actual = *crossing_edges->find(expected);
+    edge actual = *crossing_edges->find(expected);
     ASSERT_EQ(expected, expected);
     itr++;
   }
@@ -771,15 +771,15 @@ TEST(Test_Runner, TestRedistrictHourglassMap) {
   ASSERT_NE(g->GetPerimNodeNeighbors(0, 3), nullptr);
   ASSERT_NE(g->GetPerimNodeNeighbors(2, 5), nullptr);
 
-  Edge e3(4, 5);
+  edge e3(4, 5);
   expected_crossing_edges.erase(e3);
   expected_crossing_edges.emplace(3, 4);
   ASSERT_EQ(crossing_edges->size(), expected_crossing_edges.size());
   itr = expected_crossing_edges.begin();
   for (uint32_t i = 0; i < expected_crossing_edges.size(); i++) {
-    Edge expected = *itr;
+    edge expected = *itr;
     ASSERT_NE(crossing_edges->find(expected), crossing_edges->end());
-    Edge actual = *crossing_edges->find(expected);
+    edge actual = *crossing_edges->find(expected);
     ASSERT_EQ(expected, expected);
     itr++;
   }
@@ -1284,7 +1284,7 @@ TEST(Test_Runner, TestWalkHundredSteps) {
   for (i = 0; i < r1->GetGraph()->GetNumDistricts(); i++) {
     ASSERT_TRUE(r1->IsDistrictConnected(i));
   }
-  r1->Walk(100, 0, 0, 0, 0);
+  r1->Walk(100, 0.5, 0.5, 0.5, 0.5);
   for (i = 0; i < r1->GetGraph()->GetNumDistricts(); i++) {
     ASSERT_TRUE(r1->IsDistrictConnected(i));
   }
@@ -1306,7 +1306,7 @@ TEST(Test_Runner, TestWalkHundredSteps) {
   for (i = 0; i < r2->GetGraph()->GetNumDistricts(); i++) {
     ASSERT_TRUE(r2->IsDistrictConnected(i));
   }
-  r2->Walk(100, 0, 0, 0, 0);
+  r2->Walk(100, 0.5, 0.5, 0.5, 0.5);
   for (i = 0; i < r2->GetGraph()->GetNumDistricts(); i++) {
     ASSERT_TRUE(r2->IsDistrictConnected(i));
   }
@@ -1405,6 +1405,79 @@ TEST(Test_Runner, TestWalkOneThousandSteps) {
   delete r;
   delete r1;
   delete r2;
+}
+
+TEST(Test_Runner, TestWeights) {
+  uint32_t i;
+  Runner *r;
+
+  // all 0.5s
+  r = GenerateIowa();
+  ASSERT_TRUE(r->seed());
+  for (i = 0; i < r->GetGraph()->GetNumDistricts(); i++) {
+    ASSERT_TRUE(r->IsDistrictConnected(i));
+  }
+  r->Walk(1000, 0.5, 0.5, 0.5, 0.5);
+  for (i = 0; i < r->GetGraph()->GetNumDistricts(); i++) {
+    ASSERT_TRUE(r->IsDistrictConnected(i));
+  }
+  delete r;
+
+  // all 1s
+  r = GenerateIowa();
+  ASSERT_TRUE(r->seed());
+  for (i = 0; i < r->GetGraph()->GetNumDistricts(); i++) {
+    ASSERT_TRUE(r->IsDistrictConnected(i));
+  }
+  r->Walk(1000, 1, 1, 1, 1);
+  for (i = 0; i < r->GetGraph()->GetNumDistricts(); i++) {
+    ASSERT_TRUE(r->IsDistrictConnected(i));
+  }
+  delete r;
+
+  // negatives
+  r = GenerateIowa();
+  ASSERT_TRUE(r->seed());
+  for (i = 0; i < r->GetGraph()->GetNumDistricts(); i++) {
+    ASSERT_TRUE(r->IsDistrictConnected(i));
+  }
+  r->Walk(1000, -.5, -.5, -.5, -.5);
+  for (i = 0; i < r->GetGraph()->GetNumDistricts(); i++) {
+    ASSERT_TRUE(r->IsDistrictConnected(i));
+  }
+  delete r;
+  r = GenerateIowa();
+  ASSERT_TRUE(r->seed());
+  for (i = 0; i < r->GetGraph()->GetNumDistricts(); i++) {
+    ASSERT_TRUE(r->IsDistrictConnected(i));
+  }
+  r->Walk(1000, -1, -1, -1, -1);
+  for (i = 0; i < r->GetGraph()->GetNumDistricts(); i++) {
+    ASSERT_TRUE(r->IsDistrictConnected(i));
+  }
+  delete r;
+
+  // large
+  r = GenerateIowa();
+  ASSERT_TRUE(r->seed());
+  for (i = 0; i < r->GetGraph()->GetNumDistricts(); i++) {
+    ASSERT_TRUE(r->IsDistrictConnected(i));
+  }
+  r->Walk(1000, 100, 100, 100, 100);
+  for (i = 0; i < r->GetGraph()->GetNumDistricts(); i++) {
+    ASSERT_TRUE(r->IsDistrictConnected(i));
+  }
+  delete r;
+  r = GenerateIowa();
+  ASSERT_TRUE(r->seed());
+  for (i = 0; i < r->GetGraph()->GetNumDistricts(); i++) {
+    ASSERT_TRUE(r->IsDistrictConnected(i));
+  }
+  r->Walk(1000, -100, -100, -100, -100);
+  for (i = 0; i < r->GetGraph()->GetNumDistricts(); i++) {
+    ASSERT_TRUE(r->IsDistrictConnected(i));
+  }
+  delete r;
 }
 
 }     // namespace rakan

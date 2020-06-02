@@ -215,10 +215,10 @@ TEST(Test_Graph, TestPerimNodesComplex) {
 
 TEST(Test_Graph, TestEdgeMarkComplex) {
     Graph* g = GraphNxN(50);
-    unordered_set<Edge, EdgeHash>* Crossing_Edges = g->GetCrossingEdges();
+    unordered_set<edge, edge_hash>* Crossing_Edges = g->GetCrossingEdges();
     // Every node should have two neighbors on the edge and 
     // four neighbors within the square
-    unordered_set<Edge, EdgeHash>::iterator iter;
+    unordered_set<edge, edge_hash>::iterator iter;
     for (uint32_t i = 0; i < g->GetNumNodes(); i++) {
         Node* n = g->GetNode(i);
         std::unordered_set<uint32_t> * neighbors = n->GetNeighbors();
@@ -244,10 +244,10 @@ TEST(Test_Graph, TestEdgeMarkComplex) {
 
 TEST(Test_Graph, TestEdgeMarkSimple) {
     Graph* g = GraphNxN(4);
-    unordered_set<Edge, EdgeHash>* Crossing_Edges = g->GetCrossingEdges();
+    unordered_set<edge, edge_hash>* Crossing_Edges = g->GetCrossingEdges();
     // Every node should have two neighbors on the edge and 
     // four neighbors within the square
-    unordered_set<Edge, EdgeHash>::iterator iter;
+    unordered_set<edge, edge_hash>::iterator iter;
     for (uint32_t i = 0; i < g->GetNumNodes(); i++) {
         Node* n = g->GetNode(i);
         std::unordered_set<uint32_t> * neighbors = n->GetNeighbors();
@@ -273,10 +273,10 @@ TEST(Test_Graph, TestEdgeMarkSimple) {
 
 TEST(Test_Graph, TestEdgeMarkMassive) {
     Graph* g = GraphNxN(150);
-    unordered_set<Edge, EdgeHash>* Crossing_Edges = g->GetCrossingEdges();
+    unordered_set<edge, edge_hash>* Crossing_Edges = g->GetCrossingEdges();
     // Every node should have two neighbors on the edge and 
     // four neighbors within the square
-    unordered_set<Edge, EdgeHash>::iterator iter;
+    unordered_set<edge, edge_hash>::iterator iter;
     for (uint32_t i = 0; i < g->GetNumNodes(); i++) {
         Node* n = g->GetNode(i);
         std::unordered_set<uint32_t> * neighbors = n->GetNeighbors();
@@ -518,4 +518,5 @@ static Graph* GraphNxN(uint32_t n) {
     // like shown above.
     return g;
 }
+
 }   // namespace rakan
