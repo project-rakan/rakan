@@ -199,24 +199,18 @@ bool Runner::seed() {
 }
 
 void Runner::populate() {
-  unordered_map<uint32_t, unordered_set<uint32_t> *> *map;
+  //unordered_map<uint32_t, unordered_set<uint32_t> *> *map;
   Node *current_node, *neighbor_node;
   uint32_t i, current_district;
 
   for (i = 0; i < graph_->num_nodes_; i++) {
     current_node = graph_->nodes_[i];
     current_district = current_node->district_;
-
+    graph_->AddNodeToDistrictPerim(i, current_district);
     for (auto &neighbor_id : *current_node->neighbors_) {
       neighbor_node = graph_->nodes_[neighbor_id];
       if (neighbor_node->district_ != current_district) {
         graph_->MarkCrossingEdge(i, neighbor_id);
-        graph_->nodes_on_perim_[current_district]->insert(i);
-        map = graph_->perim_nodes_to_neighbors_[current_district];
-        if (map->find(i) == map->end()) {
-          (*map)[i] = new unordered_set<uint32_t>;
-        }
-        (*map)[i]->insert(neighbor_id);
       }
     }
   }
@@ -233,6 +227,7 @@ double Runner::ScoreCompactness() {
   double current_score = 0, sum = 0;
 
   for (i = 0; i < graph_->num_districts_; i++) {
+    num_foreign_neighbors = 0;
     for (auto &pair : *graph_->perim_nodes_to_neighbors_[i]) {
       num_foreign_neighbors += pair.second->size();
     }
@@ -246,17 +241,18 @@ double Runner::ScoreCompactness() {
 }
 
 double Runner::ScorePopulationDistribution() {
-  uint32_t i, total_pop, avg_pop;
+  uint32_t i, total_pop;
+  double avg_pop;
   double sum = 0;
   
   total_pop = graph_->state_pop_;
-  avg_pop = total_pop / graph_->num_districts_;
+  avg_pop = ((double) total_pop ) / ((double) graph_->num_districts_);
 
   for (i = 0; i < graph_->num_districts_; i++) {
-    sum += pow((graph_->pop_of_district_[i] - avg_pop), 1);
+    sum += pow((graph_->pop_of_district_[i] - avg_pop), 2);
   }
 
-  distribution_score_ = sum / graph_->num_districts_;
+  distribution_score_ = sum / ((double) total_pop);
   return distribution_score_;
 }
 
@@ -346,6 +342,8 @@ double Runner::MetropolisHastings() {
       graph_->RemoveNodeFromDistrictPerim(victim_node->id_, old_district);
       graph_->AddNodeToDistrict(victim_node->id_, old_district);
       graph_->AddNodeToDistrictPerim(victim_node->id_, old_district);
+      graph_->UpdatePerimNode(victim_node);
+      graph_->UpdatePerimNode(idle_node);
       score_ = old_score;
     } else {
       score_ = new_score;
