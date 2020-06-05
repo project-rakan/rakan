@@ -206,10 +206,10 @@ void Runner::populate() {
   for (i = 0; i < graph_->num_nodes_; i++) {
     current_node = graph_->nodes_[i];
     current_district = current_node->district_;
-    graph_->AddNodeToDistrictPerim(i, current_district);
     for (auto &neighbor_id : *current_node->neighbors_) {
       neighbor_node = graph_->nodes_[neighbor_id];
       if (neighbor_node->district_ != current_district) {
+        graph_->AddNodeToDistrictPerim(i, current_district);
         graph_->MarkCrossingEdge(i, neighbor_id);
       }
     }
