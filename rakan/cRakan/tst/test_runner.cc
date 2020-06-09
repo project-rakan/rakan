@@ -1511,39 +1511,50 @@ TEST(Test_Runner, TestPopDistScore) {
   Runner *r = generateSquareGraph(4);
   Graph *g = r->GetGraph();
   r->populate();
-  double compact = r->ScorePopulationDistribution();
-  ASSERT_DOUBLE_EQ(compact, 0.015714285714285715);
+  double dist = r->ScorePopulationDistribution();
+  ASSERT_DOUBLE_EQ(dist, 0.028947368421052631);
+  delete r;
 }
 
 // Testing the Borders Score, which is measured as follows:
-// ((District Perimeter) ^ 2) / District Area
-// District Perimeter: The number of 
-// precincts in the perimeter of a district
-// District Area: The number of nodes in the district.
-TEST(Test_Runner, TestBordersScore) {
+// ((Number of unique districts - 1 in a county i) ^ 2)
+// Added up for all counties i in the map.
+TEST(Test_Runner, TestBordersScoreEasy) {
   Runner *r = generateSquareGraph(4);
   Graph *g = r->GetGraph();
   r->populate();
-  double compact = r->ScoreExistingBorders();
-  //ASSERT_DOUBLE_EQ(compact, 0.015714285714285715);
+  double border = r->ScoreExistingBorders();
+  ASSERT_DOUBLE_EQ(border, 4);
+  delete r;
 }
 
-// Testing the Compactness Score, which is measured as follows:
-// ((District Perimeter) ^ 2) / District Area
-// District Perimeter: The number of 
-// precincts in the perimeter of a district
-// District Area: The number of nodes in the district.
-TEST(Test_Runner, TestVRAScore) {
+TEST(Test_Runner, TestBordersScoreHard) {
+  Runner *r = generateSquareGraph(100);
+  Graph *g = r->GetGraph();
+  r->populate();
+  double border = r->ScoreExistingBorders();
+  ASSERT_DOUBLE_EQ(border, 100);
+  delete r;
+}
 
+// Testing the VRA Score, which is measured as follows:
+// The max of (0.5 - the percent of the population in district i is a minority)
+//         or 0, added up for all of the districts inside of the map.
+TEST(Test_Runner, TestVRAScore) {
+  Runner *r = generateSquareGraph(4);
+  Graph *g = r->GetGraph();
+  r->populate();
+  double VRA = r->ScoreVRA();
+  ASSERT_DOUBLE_EQ(VRA, 1.372463768115942);
+  delete r;
 }
 
 // Method to generate an easily scorable graph
 static Runner* generateSquareGraph(uint32_t n) {
   Runner *r = new Runner(n * n, 4);
   Graph *g = r->GetGraph();
-    // Add in all nodes, each with 10 people inside them
     for (uint32_t i = 0; i < n * n; i++) {
-        g->AddNode(i, i % 10, 5, 5 + (i % 3));
+        g->AddNode(i, i % n, 5, (i % 3));
     }
     // Go through each of the precincts and assign it to a district
     uint32_t counter = 0;

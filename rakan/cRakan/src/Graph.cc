@@ -161,7 +161,7 @@ bool Graph::AddNodeToDistrict(uint32_t node_id, uint32_t district) {
   nodes_in_district_[district]->insert(node_id);
   pop_of_district_[district] += nodes_[node_id]->GetTotalPop();
   maj_pop_of_district_[district] += nodes_[node_id]->GetMajorityPop();
-  min_pop_of_district_[district] += nodes_[node_id]->GetMajorityPop();
+  min_pop_of_district_[district] += nodes_[node_id]->GetMinorityPop();
 
   unordered_set<uint32_t> *nodes = (*nodes_in_county_)[nodes_[node_id]->county_];
   unordered_set<uint32_t> temp;

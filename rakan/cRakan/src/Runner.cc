@@ -275,8 +275,9 @@ double Runner::ScoreVRA() {
     min_pop_percentage = ((double) graph_->GetMinorityPop(i)) /
                           ((double)graph_->GetDistrictPop(i));
     if ((0.5 - min_pop_percentage) > 0) {
-      sum += min_pop_percentage;
+      sum += 0.5 - min_pop_percentage;
     }
+    min_pop_percentage = 0;
   }
 
   vra_score_ = sum;
