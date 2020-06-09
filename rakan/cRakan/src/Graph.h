@@ -227,6 +227,18 @@ class Graph {
    */
   bool IsPerimNode(const uint32_t node) const;
 
+  /**
+   * Queries whether or not the node is on the perimeter of a district has
+   * neighbors in different districts.
+   * 
+   * @param   node        the node to check the neighbors of
+   * @param   district    the district this node is in.
+   *
+   * @return true iff the node is on the perimeter of a district has
+   * neighbors in different districts; false otherwise.
+   */
+  bool PerimHasNeighbors(const uint32_t district, const uint32_t node_id) const;
+
 
   /////////////////////////////////////////////////////////////////////////////
   // Accessors

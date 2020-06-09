@@ -10,6 +10,8 @@
 #include "gtest/gtest.h"
 
 namespace rakan {
+  
+static Runner* generateSquareGraph(uint32_t n);
 
 Runner* GenerateIowa() {
   Runner *r = new Runner(99, 4);
@@ -1261,11 +1263,10 @@ TEST(Test_Runner, TestWalkHundredSteps) {
   for (i = 0; i < r->GetGraph()->GetNumDistricts(); i++) {
     ASSERT_TRUE(r->IsDistrictConnected(i));
   }
-  r->Walk(100, 0, 0, 0, 0);
+  r->Walk(100, 0.5, 0, 0, 0);
   for (i = 0; i < r->GetGraph()->GetNumDistricts(); i++) {
     ASSERT_TRUE(r->IsDistrictConnected(i));
   }
-
   g = r->GetGraph();
   all_maps = r->getMaps();
   map = all_maps[all_maps.size() - 1];
@@ -1479,5 +1480,147 @@ TEST(Test_Runner, TestWeights) {
   }
   delete r;
 }
+
+//
+///////////////////
+// Scoring Tests //
+///////////////////
+//
+// Score Compactness
+// Score Population Distribution
+// Score Existing Borders
+// Score VRA
+
+// Testing the Compactness Score, which is measured as follows:
+// ((District Perimeter) ^ 2) / District Area
+// District Perimeter: The number of neighbors in different districts.
+// District Area: The number of nodes in the district.
+TEST(Test_Runner, TestCompactScore) {
+  Runner *r = generateSquareGraph(4);
+  Graph *g = r->GetGraph();
+  r->populate();
+  double compact = r->ScoreCompactness();
+  ASSERT_DOUBLE_EQ(compact, 16);
+  delete r;
+}
+
+// Testing the Population Distribution Score, which is measured as follows:
+// The summation of: (districts population - average district population) ^ 2
+// for every district in the map, all divided by the total population of the map.
+TEST(Test_Runner, TestPopDistScore) {
+  Runner *r = generateSquareGraph(4);
+  Graph *g = r->GetGraph();
+  r->populate();
+  double dist = r->ScorePopulationDistribution();
+  ASSERT_DOUBLE_EQ(dist, 0.028947368421052631);
+  delete r;
+}
+
+// Testing the Borders Score, which is measured as follows:
+// ((Number of unique districts - 1 in a county i) ^ 2)
+// Added up for all counties i in the map.
+TEST(Test_Runner, TestBordersScoreEasy) {
+  Runner *r = generateSquareGraph(4);
+  Graph *g = r->GetGraph();
+  r->populate();
+  double border = r->ScoreExistingBorders();
+  ASSERT_DOUBLE_EQ(border, 4);
+  delete r;
+}
+
+TEST(Test_Runner, TestBordersScoreHard) {
+  Runner *r = generateSquareGraph(100);
+  Graph *g = r->GetGraph();
+  r->populate();
+  double border = r->ScoreExistingBorders();
+  ASSERT_DOUBLE_EQ(border, 100);
+  delete r;
+}
+
+// Testing the VRA Score, which is measured as follows:
+// The max of (0.5 - the percent of the population in district i is a minority)
+//         or 0, added up for all of the districts inside of the map.
+TEST(Test_Runner, TestVRAScore) {
+  Runner *r = generateSquareGraph(4);
+  Graph *g = r->GetGraph();
+  r->populate();
+  double VRA = r->ScoreVRA();
+  ASSERT_DOUBLE_EQ(VRA, 1.372463768115942);
+  delete r;
+}
+
+// Method to generate an easily scorable graph
+static Runner* generateSquareGraph(uint32_t n) {
+  Runner *r = new Runner(n * n, 4);
+  Graph *g = r->GetGraph();
+    for (uint32_t i = 0; i < n * n; i++) {
+        g->AddNode(i, i % n, 5, (i % 3));
+    }
+    // Go through each of the precincts and assign it to a district
+    uint32_t counter = 0;
+    uint32_t district = 0;
+    for (uint32_t i = 0; i < n ; i++) {
+        for (uint32_t j = 0; j < n / 2; j++) {
+            g->AddNodeToDistrict(counter, district);
+            counter++;
+        }
+        if (district == 0) {
+            district = 1;
+        } else {
+            district = 0;
+        }
+    }
+    district = 2;
+    for (uint32_t i = 0; i < n ; i++) {
+        for (uint32_t j = 0; j < n / 2; j++) {
+            g->AddNodeToDistrict(counter, district);
+            counter++;
+        }
+        if (district == 2) {
+            district = 3;
+        } else {
+            district = 2;
+        }
+    }
+
+    // Attach every node horizontally
+    for (uint32_t step = 0; step < n; step++) {
+        for (uint32_t i = 0; i < n - 1; i++) {
+            uint32_t first = i + (step * n);
+            uint32_t second = (i + 1) + (step * n);
+            Node *n1 = g->GetNode(first);
+            Node *n2 = g->GetNode(second);
+            g->AddEdge(first, second);
+        }
+    }
+    // Attach every node vertically
+    for (uint32_t offset = 0; offset < n; offset++) {
+        for (uint32_t i = 0; i < n - 1; i++) {
+            uint32_t first = offset + (i * n);
+            uint32_t second = offset + ((i + 1) * n);
+            Node *n1 = g->GetNode(first);
+            Node *n2 = g->GetNode(second);
+            g->AddEdge(first, second);
+        }
+    }
+    // Say that n = 4, then the graph would be
+    // organized as the following:
+    // 0 - 1 - 2 - 3
+    // | 0 |   | 1 |
+    // 4 - 5 - 6 - 7
+    // |   |   |   |
+    // 8 - 9 -10 - 11
+    // | 2 |   | 3 |
+    // 12- 13- 14- 15
+    // 
+    // Where the graph nodes are fully formed and marked such that
+    // district perimeters, crossing edges are all marked accordingly.
+    //
+    // Note that no matter the size, district number remains static at 4.
+    // Thus, the district pattern will remain consistent as a window style
+    // like shown above.
+    return r;
+}
+
 
 }     // namespace rakan

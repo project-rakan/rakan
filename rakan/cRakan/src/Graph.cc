@@ -161,7 +161,7 @@ bool Graph::AddNodeToDistrict(uint32_t node_id, uint32_t district) {
   nodes_in_district_[district]->insert(node_id);
   pop_of_district_[district] += nodes_[node_id]->GetTotalPop();
   maj_pop_of_district_[district] += nodes_[node_id]->GetMajorityPop();
-  min_pop_of_district_[district] += nodes_[node_id]->GetMajorityPop();
+  min_pop_of_district_[district] += nodes_[node_id]->GetMinorityPop();
 
   unordered_set<uint32_t> *nodes = (*nodes_in_county_)[nodes_[node_id]->county_];
   unordered_set<uint32_t> temp;
@@ -197,6 +197,7 @@ bool Graph::RemoveNodeFromDistrict(uint32_t node_id, uint32_t district) {
 }
 
 bool Graph::AddNodeToDistrictPerim(uint32_t node_id, uint32_t district) {
+  Node *neighbor_node;
   Node *node = nodes_[node_id];
   if (nodes_on_perim_[node->district_]->find(node_id) !=
       nodes_on_perim_[node->district_]->end()) {
@@ -209,7 +210,13 @@ bool Graph::AddNodeToDistrictPerim(uint32_t node_id, uint32_t district) {
   if (map->find(node->id_) != map->end()) {
     return false;
   }
-  map->insert({node->id_, node->neighbors_});
+  (*map)[node_id] = new unordered_set<uint32_t>;
+  for (auto &neighbor_id : *node->neighbors_) {
+    neighbor_node = nodes_[neighbor_id];
+    if (neighbor_node->district_ != node->district_) {
+      (*map)[node_id]->insert(neighbor_id);
+    }
+  }
   return true;
 }
 
@@ -288,13 +295,21 @@ bool Graph::IsPerimNode(const uint32_t node_id) const {
   if (node_id > num_nodes_ || nodes_[node_id]->district_ > num_districts_) {
     return false;
   }
-  if (perim_nodes_to_neighbors_[nodes_[node_id]->district_]->find(node_id) ==
-      perim_nodes_to_neighbors_[nodes_[node_id]->district_]->end()) {
+  if (nodes_on_perim_[nodes_[node_id]->district_]->find(node_id) ==
+      nodes_on_perim_[nodes_[node_id]->district_]->end()) {
         return false;
   }
   return true;
 }
+/*
+bool Graph::PerimHasNeighbors(const uint32_t district, const uint32_t node_id) const {
+  if (node_id > num_nodes_ || district> num_districts_) {
+    return false;
+  }
+  if ()
 
+}
+*/
 ///////////////////////////////////////////////////////////////////////////////
 // Accessors
 ///////////////////////////////////////////////////////////////////////////////
@@ -340,11 +355,14 @@ unordered_set<uint32_t>* Graph::GetPerimNodes(uint32_t district) const {
 unordered_set<uint32_t>*
     Graph::GetPerimNodeNeighbors(const uint32_t district,
                                  const uint32_t node) const {
+  unordered_map<uint32_t, unordered_set<uint32_t>* >::iterator itr =
+  perim_nodes_to_neighbors_[district]->find(node);
   if (district > num_districts_ || node > num_nodes_ ||
-      !NodeExistsInDistrict(node, district) || !IsPerimNode(node)) {
+      !NodeExistsInDistrict(node, district) || !IsPerimNode(node) ||
+      itr == perim_nodes_to_neighbors_[district]->end()) {
     return nullptr;
   }
-  return (*perim_nodes_to_neighbors_[district]->find(node)).second;
+  return itr->second;
 }
 
 unordered_set<edge, edge_hash>* Graph::GetCrossingEdges() {
