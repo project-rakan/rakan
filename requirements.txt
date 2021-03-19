@@ -16,7 +16,7 @@ descartes==1.1.0
 Django==3.0.6
 django-celery-results==1.2.1
 django-cors-headers==3.3.0
-djangorestframework==3.11.0
+djangorestframework==3.11.2
 Fiona==1.8.13.post1
 future==0.18.2
 geopandas==0.7.0
