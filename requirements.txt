@@ -46,7 +46,7 @@ progress==1.5
 psycopg2==2.8.5
 pycparser==2.20
 pycrypto==2.6.1
-Pygments==2.6.1
+Pygments==2.7.4
 pygobject==3.26.1
 pymdown-extensions==7.1
 pyparsing==2.4.7
