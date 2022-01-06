@@ -3,7 +3,7 @@ asgiref==3.2.7
 asn1crypto==0.24.0
 attrs==19.3.0
 billiard==3.6.3.0
-celery==4.4.2
+celery==5.2.2
 cffi==1.14.0
 click==7.1.2
 click-plugins==1.1.1
