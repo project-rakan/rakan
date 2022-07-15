@@ -14,7 +14,7 @@ cycler==0.10.0
 Cython==0.29.18
 descartes==1.1.0
 Django==3.0.6
-django-celery-results==1.2.1
+django-celery-results==2.4.0
 django-cors-headers==3.3.0
 djangorestframework==3.11.0
 Fiona==1.8.13.post1
